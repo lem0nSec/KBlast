@@ -13,6 +13,6 @@
 
 #define KBLAST_CLT_TITLE	L"KBlast v1.0 ( by lem0nSec )"
 #define KBLAST_CLT_VERSION	L"1.0"
-#define KBLAST_DRV_BINARY	L"KMDFDriver1.sys"
-#define KBLAST_DRV_FILENAME	L"\\\\.\\KMDFDriver1"
-#define KBLAST_SRV_NAME		L"KMDFDriver1"
+#define KBLAST_DRV_BINARY	L"KBlaster.sys"
+#define KBLAST_DRV_FILENAME	L"\\\\.\\KBlaster"
+#define KBLAST_SRV_NAME		L"KBlaster"
