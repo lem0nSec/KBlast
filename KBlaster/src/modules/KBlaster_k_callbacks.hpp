@@ -1,0 +1,53 @@
+#pragma once
+
+
+#include "../globals.hpp"
+
+
+typedef enum _CALLBACK_TYPE {
+
+	CALLBACK_PROCESS,
+	CALLBACK_THREAD,
+	CALLBACK_IMAGE
+
+} CALLBACK_TYPE;
+
+/*
+typedef struct _CALLBACK_INFORMATION {
+
+	CHAR ModuleName[AUX_KLIB_MODULE_PATH_LEN];
+	ULONG64 CallbackHandle;
+	PVOID PointerToHandle;
+	PVOID CallbackFunctionPointer;
+
+} CALLBACK_INFORMATION, * PCALLBACK_INFORMATION;
+*/
+
+
+typedef struct _CALLBACK_MODULE_INFORMATION {
+
+	PVOID ModuleBase;
+	ULONG ModuleImageSize;
+	USHORT ModuleFileNameOffset;
+	CHAR ModuleFullPathName[AUX_KLIB_MODULE_PATH_LEN];
+
+} CALLBACK_MODULE_INFORMATION, * PCALLBACK_MODULE_INFORMATION;
+
+
+typedef struct _CALLBACK_INFORMATION {
+
+	ULONG64 CallbackHandle;
+	PVOID PointerToHandle;
+	PVOID CallbackFunctionPointer;
+	CALLBACK_MODULE_INFORMATION ModuleInformation;
+
+} CALLBACK_INFORMATION, * PCALLBACK_INFORMATION;
+
+
+typedef struct _PROCESS_KERNEL_CALLBACK_ARRAY {
+
+	PVOID Array;
+	ULONG CallbackQuota;
+	CALLBACK_INFORMATION CallbackInformation[50];
+
+} PROCESS_KERNEL_CALLBACK_ARRAY, * PPROCESS_KERNEL_CALLBACK_ARRAY;
