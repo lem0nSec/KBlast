@@ -52,3 +52,9 @@ typedef struct _KBLAST_BUFFER {
 #define KBLAST_MOD_PRIVILEGES	L"priv|"
 #define KBLAST_MOD_TOKEN		L"tokn|"
 #define KBLAST_MOD_CALLBACK		L"call|"
+
+
+
+//KBLAST_HELP_MENU help_gen = { 0 };
+
+//L"This is the help menù for the generic KBlast module.\nThere's no need to prepend the module name to use these commands.\nCommands in this section do not open kernel interactions.\n";

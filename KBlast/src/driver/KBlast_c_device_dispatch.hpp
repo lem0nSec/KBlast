@@ -43,6 +43,15 @@ typedef struct _PROCESS_KERNEL_CALLBACK_ARRAY {
 
 } PROCESS_KERNEL_CALLBACK_ARRAY, * PPROCESS_KERNEL_CALLBACK_ARRAY;
 
+/*
+typedef struct _KBLAST_MEMORY_BUFFER {
+
+	PVOID ptr;
+	ULONG size;
+	UCHAR buffer[250];
+
+} KBLAST_MEMORY_BUFFER, * PKBLAST_MEMORY_BUFFER;
+*/
 
 BOOL KBlast_c_device_dispatch_misc(wchar_t* input);
 BOOL KBlast_c_device_dispatch_protection(wchar_t* input);

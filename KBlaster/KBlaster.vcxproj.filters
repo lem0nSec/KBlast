@@ -39,6 +39,9 @@
     <ClCompile Include="src\modules\KBlaster_k_token.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\modules\KBlaster_k_memory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\globals.hpp">
@@ -63,6 +66,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\KBlaster_k_utils.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\modules\KBlaster_k_memory.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

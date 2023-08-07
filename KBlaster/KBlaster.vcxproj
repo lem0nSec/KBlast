@@ -116,6 +116,7 @@
     <ClCompile Include="src\KBlaster.cpp" />
     <ClCompile Include="src\KBlaster_k_utils.cpp" />
     <ClCompile Include="src\modules\KBlaster_k_callbacks.cpp" />
+    <ClCompile Include="src\modules\KBlaster_k_memory.cpp" />
     <ClCompile Include="src\modules\KBlaster_k_protection.cpp" />
     <ClCompile Include="src\modules\KBlaster_k_token.cpp" />
   </ItemGroup>
@@ -125,6 +126,7 @@
     <ClInclude Include="src\KBlaster.hpp" />
     <ClInclude Include="src\KBlaster_k_utils.hpp" />
     <ClInclude Include="src\modules\KBlaster_k_callbacks.hpp" />
+    <ClInclude Include="src\modules\KBlaster_k_memory.hpp" />
     <ClInclude Include="src\modules\KBlaster_k_protection.hpp" />
     <ClInclude Include="src\modules\KBlaster_k_token.hpp" />
     <ClInclude Include="src\navigation.hpp" />

@@ -16,3 +16,12 @@
 #define KBLAST_DRV_BINARY	L"KBlaster.sys"
 #define KBLAST_DRV_FILENAME	L"\\\\.\\KBlaster"
 #define KBLAST_SRV_NAME		L"KBlaster"
+
+
+typedef struct _KBLAST_MEMORY_BUFFER {
+
+	PVOID ptr;
+	ULONG size;
+	UCHAR buffer[250];
+
+} KBLAST_MEMORY_BUFFER, * PKBLAST_MEMORY_BUFFER; // this should be written on another header file

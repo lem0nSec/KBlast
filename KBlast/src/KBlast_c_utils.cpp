@@ -55,6 +55,16 @@ int KBlast_c_utils_GetCommandLineArguments(IN char* inBuffer, IN BYTE separator,
 				pArgs->arg3 = newBuffer;
 				argc++;
 			}
+			else if (pArgs->arg4 == NULL)
+			{
+				pArgs->arg4 = newBuffer;
+				argc++;
+			}
+			else if (pArgs->arg5 == NULL)
+			{
+				pArgs->arg5 = newBuffer;
+				argc++;
+			}
 			else
 			{
 				break;
@@ -96,5 +106,39 @@ char* KBlast_c_utils_GetImageNameByFullPath(char* FullImagePath)
 	}
 
 	return (char*)((DWORD_PTR)FullImagePath + i + 1);
+
+}
+
+
+PVOID KBlast_c_utils_StringToKernelPointer(LPCSTR strPointer, DWORD szPtr)
+{
+	BYTE* buf = 0;
+	BYTE* newBuf = 0;
+	DWORD szBlob = szPtr;
+	DWORD pcbBinary = szBlob;
+	DWORD szForLoop = sizeof(PVOID);
+	DWORD i = 0;
+	PVOID res = 0;
+	
+	buf = (BYTE*)LocalAlloc(LPTR, (szBlob));
+	if (buf != 0)
+	{
+		if (CryptStringToBinaryA(strPointer, szBlob, CRYPT_STRING_HEX, buf, &pcbBinary, NULL, NULL) == TRUE)
+		{
+			newBuf = (BYTE*)((DWORD_PTR)buf + szBlob - 1);
+
+			for (i = 0; i < szForLoop; i++)
+			{
+				*(BYTE*)(BYTE*)((DWORD_PTR)newBuf - i) = *(BYTE*)(BYTE*)((DWORD_PTR)buf + i);
+			}
+			
+			memcpy(buf, (const void*)((DWORD_PTR)buf + szForLoop), szForLoop);
+			memset((void*)((DWORD_PTR)buf + szForLoop), 0, szForLoop);
+			res = (PVOID)*(PVOID*)(PVOID*)buf;
+			LocalFree(buf);
+		}
+	}
+	
+	return res;
 
 }

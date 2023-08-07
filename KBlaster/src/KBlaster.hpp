@@ -5,6 +5,7 @@
 #include "modules/KBlaster_k_token.hpp"
 #include "modules/KBlaster_k_protection.hpp"
 #include "modules/KBlaster_k_callbacks.hpp"
+#include "modules/KBlaster_k_memory.hpp"
 
 
 typedef struct _KBLAST_BUFFER {
