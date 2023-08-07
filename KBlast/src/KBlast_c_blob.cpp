@@ -155,10 +155,10 @@ BOOL KBlast_c_blob_manage(IN OPTIONAL LPCSTR strBlob, IN OPTIONAL char* containe
 				else
 				{
 					KBlast_c_blob_info(tBlob);
-					break;
 				}
 			}
 		}
+		break;
 
 	case BLOB_WRITE:
 		n = atoi(containerNumber);
