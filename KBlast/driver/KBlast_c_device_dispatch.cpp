@@ -106,6 +106,8 @@ BOOL KBlast_c_device_dispatch_misc(wchar_t* input)
 		}
 	}
 
+	KBlast_c_utils_FreeAnsiString(realInput);
+
 	return status;
 
 }
