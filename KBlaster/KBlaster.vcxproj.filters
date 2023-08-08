@@ -24,51 +24,51 @@
     </Inf>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\KBlaster.cpp">
+    <ClCompile Include="KBlaster.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\KBlaster_k_utils.cpp">
+    <ClCompile Include="KBlaster_k_utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\modules\KBlaster_k_callbacks.cpp">
+    <ClCompile Include="modules\KBlaster_k_callbacks.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\modules\KBlaster_k_protection.cpp">
+    <ClCompile Include="modules\KBlaster_k_protection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\modules\KBlaster_k_token.cpp">
+    <ClCompile Include="modules\KBlaster_k_token.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\modules\KBlaster_k_memory.cpp">
+    <ClCompile Include="modules\KBlaster_k_memory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\globals.hpp">
+    <ClInclude Include="globals.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\navigation.hpp">
+    <ClInclude Include="navigation.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ioctl.hpp">
+    <ClInclude Include="ioctl.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\modules\KBlaster_k_callbacks.hpp">
+    <ClInclude Include="modules\KBlaster_k_callbacks.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\modules\KBlaster_k_protection.hpp">
+    <ClInclude Include="modules\KBlaster_k_protection.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\modules\KBlaster_k_token.hpp">
+    <ClInclude Include="modules\KBlaster_k_token.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\KBlaster.hpp">
+    <ClInclude Include="KBlaster.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\KBlaster_k_utils.hpp">
+    <ClInclude Include="KBlaster_k_utils.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\modules\KBlaster_k_memory.hpp">
+    <ClInclude Include="modules\KBlaster_k_memory.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

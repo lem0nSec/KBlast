@@ -84,7 +84,7 @@ BOOL KBlast_c_device_dispatch_misc(wchar_t* input)
 					if (pBuf != 0)
 					{
 						pBuf->size = atoi(args.arg4);
-						pBuf->ptr = KBlast_c_utils_StringToKernelPointer(args.arg3, strlen(args.arg3)); // see if this block should be moved to KBlast_c_blob_manage
+						pBuf->ptr = KBlast_c_utils_StringToKernelPointer(args.arg3, (DWORD)strlen(args.arg3)); // see if this block should be moved to KBlast_c_blob_manage
 						if ((pBuf->size != 0) && (pBuf->ptr != 0))
 						{
 							pOutBuf = (PKBLAST_MEMORY_BUFFER)LocalAlloc(LPTR, sizeof(KBLAST_MEMORY_BUFFER));

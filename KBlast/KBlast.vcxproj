@@ -19,23 +19,23 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\driver\KBlast_c_device_dispatch.cpp" />
-    <ClCompile Include="src\KBlast.cpp" />
-    <ClCompile Include="src\KBlast_c_blob.cpp" />
-    <ClCompile Include="src\KBlast_c_privilege.cpp" />
-    <ClCompile Include="src\KBlast_c_service.cpp" />
-    <ClCompile Include="src\KBlast_c_utils.cpp" />
+    <ClCompile Include="driver\KBlast_c_device_dispatch.cpp" />
+    <ClCompile Include="KBlast.cpp" />
+    <ClCompile Include="KBlast_c_blob.cpp" />
+    <ClCompile Include="KBlast_c_privilege.cpp" />
+    <ClCompile Include="KBlast_c_service.cpp" />
+    <ClCompile Include="KBlast_c_utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="rsrc\resource.hpp" />
-    <ClInclude Include="src\driver\KBlast_c_device_dispatch.hpp" />
-    <ClInclude Include="src\globals.hpp" />
-    <ClInclude Include="src\ioctl.hpp" />
-    <ClInclude Include="src\KBlast.hpp" />
-    <ClInclude Include="src\KBlast_c_blob.hpp" />
-    <ClInclude Include="src\KBlast_c_privilege.hpp" />
-    <ClInclude Include="src\KBlast_c_utils.hpp" />
-    <ClInclude Include="src\KBlast_c_service.hpp" />
+    <ClInclude Include="driver\KBlast_c_device_dispatch.hpp" />
+    <ClInclude Include="globals.hpp" />
+    <ClInclude Include="ioctl.hpp" />
+    <ClInclude Include="KBlast.hpp" />
+    <ClInclude Include="KBlast_c_blob.hpp" />
+    <ClInclude Include="KBlast_c_privilege.hpp" />
+    <ClInclude Include="KBlast_c_utils.hpp" />
+    <ClInclude Include="KBlast_c_service.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="rsrc\resource.rc" />

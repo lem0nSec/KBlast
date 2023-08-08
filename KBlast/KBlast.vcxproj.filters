@@ -15,62 +15,56 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\KBlast.cpp">
+    <ClCompile Include="KBlast.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\KBlast_c_blob.cpp">
+    <ClCompile Include="KBlast_c_blob.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\KBlast_c_privilege.cpp">
+    <ClCompile Include="KBlast_c_privilege.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\KBlast_c_service.cpp">
+    <ClCompile Include="KBlast_c_service.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\KBlast_c_utils.cpp">
+    <ClCompile Include="KBlast_c_utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\driver\KBlast_c_device_dispatch.cpp">
+    <ClCompile Include="driver\KBlast_c_device_dispatch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\KBlast.hpp">
+    <ClInclude Include="KBlast.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\globals.hpp">
+    <ClInclude Include="globals.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ioctl.hpp">
+    <ClInclude Include="ioctl.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\KBlast_c_blob.hpp">
+    <ClInclude Include="KBlast_c_blob.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\KBlast_c_privilege.hpp">
+    <ClInclude Include="KBlast_c_privilege.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\KBlast_c_service.hpp">
+    <ClInclude Include="KBlast_c_service.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\KBlast_c_utils.hpp">
+    <ClInclude Include="KBlast_c_utils.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\driver\KBlast_c_device_dispatch.hpp">
+    <ClInclude Include="driver\KBlast_c_device_dispatch.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="resource1.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="resource2.h">
+    <ClInclude Include="rsrc\resource.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="resource.rc">
+    <ResourceCompile Include="rsrc\resource.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>

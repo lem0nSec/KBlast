@@ -191,7 +191,7 @@ BOOL KBlast_c_blob_manage(IN OPTIONAL LPCSTR strBlob, IN OPTIONAL char* containe
 					{
 						RtlCopyMemory((pBuf)->buffer, tBlob->blob, sizeof((pBuf)->buffer));
 						(pBuf)->size = tBlob->szBlob;
-						(pBuf)->ptr = KBlast_c_utils_StringToKernelPointer(strBlob, strlen(strBlob));
+						(pBuf)->ptr = KBlast_c_utils_StringToKernelPointer(strBlob, (DWORD)strlen(strBlob));
 						if ((pBuf)->ptr != 0)
 						{
 							status = TRUE;
