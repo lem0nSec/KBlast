@@ -1,13 +1,61 @@
 #include "KBlaster_k_callbacks.hpp"
 
 
+PVOID KBlast_GetCallbackLinkedListHead(IN CALLBACK_LISTENTRY_TYPE cType)
+{
+	ULONG64 pInitialFunction = 0;
+	ULONG64 pListEntryHead = 0;
+	ULONG64 i = 0, offset = 0;
+	UCHAR opcode1 = 0, opcode2 = 0;
+	UNICODE_STRING initialFunctionName = { 0 };
+
+	switch (cType)
+	{
+	case LISTENTRY_REGISTRY:
+		RtlInitUnicodeString(&initialFunctionName, L"CmUnRegisterCallback");
+		pInitialFunction = (ULONG64)MmGetSystemRoutineAddress(&initialFunctionName);
+		opcode1 = 0x48;
+		opcode2 = 0x8D;
+		break;
+
+	case LISTENTRY_OBJECT:
+		DbgPrint("Not implemented yet.\n");
+		break;
+
+	default:
+		break;
+	}
+
+	if (pInitialFunction != 0)
+	{
+		for (i = pInitialFunction; i < (pInitialFunction + 150); i++)
+		{
+			if ((*(PUCHAR)i == opcode1) && (*((PUCHAR)i + 1) == opcode2))
+			{
+				RtlCopyMemory(&offset, (PUCHAR)i + 3, 4);
+				pListEntryHead = i + offset + 7;
+			}
+		}
+	}
+
+	return (PVOID)pListEntryHead;
+
+}
+
+
+
+
+
+
+
+
 /*
 * ------------------------------------------------------------------------------------------------------------------------------------
 * KBlast_GetProcessNotifyCallbackArray gets a pointer to an array which contains
 * kernel handles to callbacks of type Process Creation
 * ------------------------------------------------------------------------------------------------------------------------------------
 */
-PVOID KBlast_GetCallbackArray(IN CALLBACK_TYPE cType)
+PVOID KBlast_GetCallbackArray(IN CALLBACK_ARRAY_TYPE cType)
 {
 	ULONG64 pInitialFunction = 0;
 	ULONG64 pInnerFunction = 0;
@@ -19,21 +67,21 @@ PVOID KBlast_GetCallbackArray(IN CALLBACK_TYPE cType)
 
 	switch (cType)
 	{
-	case CALLBACK_PROCESS:
+	case ARRAY_PROCESS:
 		RtlInitUnicodeString(&initialFunctionName, L"PsSetCreateProcessNotifyRoutine");
 		pInitialFunction = (ULONG64)MmGetSystemRoutineAddress(&initialFunctionName);
 		innerOpcode1 = 0x4C;
 		innerOpcode2 = 0x8D;
 		break;
 
-	case CALLBACK_THREAD:
+	case ARRAY_THREAD:
 		RtlInitUnicodeString(&initialFunctionName, L"PsSetCreateThreadNotifyRoutine");
 		pInitialFunction = (ULONG64)MmGetSystemRoutineAddress(&initialFunctionName);
 		innerOpcode1 = 0x48;
 		innerOpcode2 = 0x8D;
 		break;
 
-	case CALLBACK_IMAGE:
+	case ARRAY_IMAGE:
 		RtlInitUnicodeString(&initialFunctionName, L"PsSetLoadImageNotifyRoutine");
 		pInitialFunction = (ULONG64)MmGetSystemRoutineAddress(&initialFunctionName);
 		innerOpcode1 = 0x48;
@@ -204,7 +252,7 @@ cleanup:
 
 
 
-NTSTATUS KBlast_EnumProcessCallbacks(IN ULONG szAvailable, IN CALLBACK_TYPE cType, OUT PVOID pOutBuf)
+NTSTATUS KBlast_EnumProcessCallbacks(IN ULONG szAvailable, IN CALLBACK_ARRAY_TYPE cType, OUT PVOID pOutBuf)
 {
 	NTSTATUS status = STATUS_UNSUCCESSFUL;
 	PVOID pArray = 0;

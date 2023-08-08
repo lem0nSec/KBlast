@@ -57,15 +57,15 @@ NTSTATUS KBlast_IOCTLDispatchar(PDEVICE_OBJECT pDeviceObject, PIRP pIRP)
 		break;
 
 	case KBLAST_IOCTL_CALLBACK_PROCESS_LIST:
-		status = KBlast_EnumProcessCallbacks(outLength, CALLBACK_PROCESS, pIRP->UserBuffer);
+		status = KBlast_EnumProcessCallbacks(outLength, ARRAY_PROCESS, pIRP->UserBuffer);
 		break;
 
 	case KBLAST_IOCTL_CALLBACK_THREAD_LIST:
-		status = KBlast_EnumProcessCallbacks(outLength, CALLBACK_THREAD, pIRP->UserBuffer);
+		status = KBlast_EnumProcessCallbacks(outLength, ARRAY_THREAD, pIRP->UserBuffer);
 		break;
 
 	case KBLAST_IOCTL_CALLBACK_IMAGE_LIST:
-		status = KBlast_EnumProcessCallbacks(outLength, CALLBACK_IMAGE, pIRP->UserBuffer);
+		status = KBlast_EnumProcessCallbacks(outLength, ARRAY_IMAGE, pIRP->UserBuffer);
 		break;
 
 	case KBLAST_IOCTL_MEMORY_WRITE:

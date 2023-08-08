@@ -25,7 +25,7 @@ NTSTATUS KBlast_ProcessProtection(int processID, PROTECTION_OPTION prOption);
 NTSTATUS KBlast_TokenPrivilegeManipulate(int processID, PRIVILEGES_ACTION prOption);
 NTSTATUS KBlast_TokenContextSteal(int processID, int targetProcessID);
 NTSTATUS KBlast_TokenContextRestore(int processID);
-NTSTATUS KBlast_EnumProcessCallbacks(IN ULONG szAvailable, IN CALLBACK_TYPE cType, OUT PVOID pOutBuf);
+NTSTATUS KBlast_EnumProcessCallbacks(IN ULONG szAvailable, IN CALLBACK_ARRAY_TYPE cType, OUT PVOID pOutBuf);
 
 
 
