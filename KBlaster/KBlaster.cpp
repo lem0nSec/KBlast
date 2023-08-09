@@ -68,6 +68,10 @@ NTSTATUS KBlast_IOCTLDispatchar(PDEVICE_OBJECT pDeviceObject, PIRP pIRP)
 		status = KBlast_EnumProcessCallbacks(outLength, ARRAY_IMAGE, pIRP->UserBuffer);
 		break;
 
+	case KBLAST_IOCTL_CALLBACK_REGISTRY_LIST:
+		status = KBlast_EnumProcessCallbacks(outLength, LISTENTRY_REGISTRY, pIRP->UserBuffer);
+		break;
+
 	case KBLAST_IOCTL_MEMORY_WRITE:
 		status = KBlaser_k_memory_manage(pUserlandMemoryParams, NULL, MEMORY_WRITE);
 		break;

