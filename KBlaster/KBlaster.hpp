@@ -21,11 +21,11 @@ typedef struct _KBLAST_BUFFER {
 extern "C"
 
 NTSTATUS DriverEntry(_In_ PDRIVER_OBJECT pDriverObject, _In_ PUNICODE_STRING pRegistryPath);
-NTSTATUS KBlast_ProcessProtection(int processID, PROTECTION_OPTION prOption);
-NTSTATUS KBlast_TokenPrivilegeManipulate(int processID, PRIVILEGES_ACTION prOption);
-NTSTATUS KBlast_TokenContextSteal(int processID, int targetProcessID);
-NTSTATUS KBlast_TokenContextRestore(int processID);
-NTSTATUS KBlast_EnumProcessCallbacks(IN ULONG szAvailable, IN CALLBACK_TYPE cType, OUT PVOID pOutBuf);
+NTSTATUS KBlaster_k_ProcessProtection(int processID, PROTECTION_OPTION prOption);
+NTSTATUS KBlaster_k_TokenPrivilegeManipulate(int processID, PRIVILEGES_ACTION prOption);
+NTSTATUS KBlaster_k_TokenContextSteal(int processID, int targetProcessID);
+NTSTATUS KBlaster_k_TokenContextRestore(int processID);
+NTSTATUS KBlaster_k_EnumProcessCallbacks(IN ULONG szAvailable, IN CALLBACK_TYPE cType, OUT PVOID pOutBuf);
 
 
 

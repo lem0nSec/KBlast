@@ -6,7 +6,7 @@ UNICODE_STRING symlink = RTL_CONSTANT_STRING(L"\\??\\KBlaster");
 
 
 
-NTSTATUS KBlast_IOCTLDispatchar(PDEVICE_OBJECT pDeviceObject, PIRP pIRP)
+NTSTATUS KBlaster_k_IOCTLDispatchar(PDEVICE_OBJECT pDeviceObject, PIRP pIRP)
 {
 	UNREFERENCED_PARAMETER(pDeviceObject);
 	NTSTATUS status = 0;
@@ -25,51 +25,51 @@ NTSTATUS KBlast_IOCTLDispatchar(PDEVICE_OBJECT pDeviceObject, PIRP pIRP)
 		break;
 
 	case KBLAST_IOCTL_PROTECT_WINTCB:
-		status = KBlast_ProcessProtection(pUserlandGenericParams->integer1, PROTECTION_WINTCB);
+		status = KBlaster_k_ProcessProtection(pUserlandGenericParams->integer1, PROTECTION_WINTCB);
 		break;
 
 	case KBLAST_IOCTL_PROTECT_LSA:
-		status = KBlast_ProcessProtection(pUserlandGenericParams->integer1, PROTECTION_LSA);
+		status = KBlaster_k_ProcessProtection(pUserlandGenericParams->integer1, PROTECTION_LSA);
 		break;
 
 	case KBLAST_IOCTL_PROTECT_ANTIMALWARE:
-		status = KBlast_ProcessProtection(pUserlandGenericParams->integer1, PROTECTION_ANTIMALWARE);
+		status = KBlaster_k_ProcessProtection(pUserlandGenericParams->integer1, PROTECTION_ANTIMALWARE);
 		break;
 
 	case KBLAST_IOCTL_PROTECT_NONE:
-		status = KBlast_ProcessProtection(pUserlandGenericParams->integer1, PROTECTION_NONE);
+		status = KBlaster_k_ProcessProtection(pUserlandGenericParams->integer1, PROTECTION_NONE);
 		break;
 
 	case KBLAST_IOCTL_TOKEN_PRIVILEGES_ENABLEALL:
-		status = KBlast_TokenPrivilegeManipulate(pUserlandGenericParams->integer1, PRIVILEGES_ENABLEALL);
+		status = KBlaster_k_TokenPrivilegeManipulate(pUserlandGenericParams->integer1, PRIVILEGES_ENABLEALL);
 		break;
 
 	case KBLAST_IOCTL_TOKEN_PRIVILEGES_DISABLEALL:
-		status = KBlast_TokenPrivilegeManipulate(pUserlandGenericParams->integer1, PRIVILEGES_DISABLEALL);
+		status = KBlaster_k_TokenPrivilegeManipulate(pUserlandGenericParams->integer1, PRIVILEGES_DISABLEALL);
 		break;
 
 	case KBLAST_IOCTL_TOKEN_STEAL:
-		status = KBlast_TokenContextSteal(pUserlandGenericParams->integer1, pUserlandGenericParams->integer2);
+		status = KBlaster_k_TokenContextSteal(pUserlandGenericParams->integer1, pUserlandGenericParams->integer2);
 		break;
 
 	case KBLAST_IOCTL_TOKEN_RESTORE:
-		status = KBlast_TokenContextRestore(pUserlandGenericParams->integer1);
+		status = KBlaster_k_TokenContextRestore(pUserlandGenericParams->integer1);
 		break;
 
 	case KBLAST_IOCTL_CALLBACK_PROCESS_LIST:
-		status = KBlast_EnumProcessCallbacks(outLength, ARRAY_PROCESS, pIRP->UserBuffer);
+		status = KBlaster_k_EnumProcessCallbacks(outLength, ARRAY_PROCESS, pIRP->UserBuffer);
 		break;
 
 	case KBLAST_IOCTL_CALLBACK_THREAD_LIST:
-		status = KBlast_EnumProcessCallbacks(outLength, ARRAY_THREAD, pIRP->UserBuffer);
+		status = KBlaster_k_EnumProcessCallbacks(outLength, ARRAY_THREAD, pIRP->UserBuffer);
 		break;
 
 	case KBLAST_IOCTL_CALLBACK_IMAGE_LIST:
-		status = KBlast_EnumProcessCallbacks(outLength, ARRAY_IMAGE, pIRP->UserBuffer);
+		status = KBlaster_k_EnumProcessCallbacks(outLength, ARRAY_IMAGE, pIRP->UserBuffer);
 		break;
 
 	case KBLAST_IOCTL_CALLBACK_REGISTRY_LIST:
-		status = KBlast_EnumProcessCallbacks(outLength, LISTENTRY_REGISTRY, pIRP->UserBuffer);
+		status = KBlaster_k_EnumProcessCallbacks(outLength, LISTENTRY_REGISTRY, pIRP->UserBuffer);
 		break;
 
 	case KBLAST_IOCTL_MEMORY_WRITE:
@@ -112,11 +112,9 @@ NTSTATUS CreateClose(PDEVICE_OBJECT pDeviceObject, PIRP pIRP)
 	switch (stack->MajorFunction)
 	{
 	case IRP_MJ_CREATE:
-		//DbgPrint("[+] Device requested.\n");
 		break;
 
 	case IRP_MJ_CLOSE:
-		//DbgPrint("[+] Device released.\n");
 		break;
 
 	default:
@@ -130,6 +128,8 @@ NTSTATUS CreateClose(PDEVICE_OBJECT pDeviceObject, PIRP pIRP)
 	return STATUS_SUCCESS;
 
 }
+
+
 
 void DriverCleanup(PDRIVER_OBJECT DriverObject)
 {
@@ -152,7 +152,7 @@ NTSTATUS DriverEntry(_In_ PDRIVER_OBJECT DriverObject, _In_ PUNICODE_STRING Regi
 	DriverObject->DriverUnload = DriverCleanup;
 	DriverObject->MajorFunction[IRP_MJ_CREATE] = CreateClose;
 	DriverObject->MajorFunction[IRP_MJ_CLOSE] = CreateClose;
-	DriverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL] = KBlast_IOCTLDispatchar;
+	DriverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL] = KBlaster_k_IOCTLDispatchar;
 
 	status = IoCreateDevice(DriverObject, 0, &deviceName, FILE_DEVICE_UNKNOWN, FILE_DEVICE_SECURE_OPEN, FALSE, &DriverObject->DeviceObject);
 	if (NT_SUCCESS(status))
@@ -163,7 +163,7 @@ NTSTATUS DriverEntry(_In_ PDRIVER_OBJECT DriverObject, _In_ PUNICODE_STRING Regi
 			status = AuxKlibInitialize();
 			if (NT_SUCCESS(status))
 			{
-				if (KBlast_GetWindowsVersion() != WINDOWS_UNSUPPORTED)
+				if (KBlaster_k_utils_GetWindowsVersion() != WINDOWS_UNSUPPORTED)
 				{
 					DbgPrint("[+] Driver loaded.\n");
 					status = STATUS_SUCCESS;

@@ -1,7 +1,7 @@
 #include "KBlaster_k_protection.hpp"
 
 
-NTSTATUS KBlast_ProcessProtection(int processID, PROTECTION_OPTION prOption)
+NTSTATUS KBlaster_k_ProcessProtection(int processID, PROTECTION_OPTION prOption)
 {
 	NTSTATUS status = STATUS_UNSUCCESSFUL;
 	PEPROCESS pEprocess = 0;
@@ -10,7 +10,7 @@ NTSTATUS KBlast_ProcessProtection(int processID, PROTECTION_OPTION prOption)
 	status = PsLookupProcessByProcessId((HANDLE)processID, &pEprocess);
 	if (NT_SUCCESS(status))
 	{
-		ppInfo = (PPROCESS_PROTECTION_INFO)((ULONG_PTR)pEprocess + EPROCESS_SIGNATURE_LEVEL_OFFSET[KBlast_GetWindowsVersion()]);
+		ppInfo = (PPROCESS_PROTECTION_INFO)((ULONG_PTR)pEprocess + EPROCESS_SIGNATURE_LEVEL_OFFSET[KBlaster_k_utils_GetWindowsVersion()]);
 
 		switch (prOption)
 		{

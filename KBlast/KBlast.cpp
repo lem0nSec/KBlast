@@ -138,7 +138,7 @@ void KBlast_c_ConsoleInit()
 }
 
 
-BOOL KBlast_c_userland_system(wchar_t* input)
+BOOL KBlast_c_system(wchar_t* input)
 {
 	BOOL status = FALSE;
 	char* systemInput = 0;
@@ -188,7 +188,7 @@ BOOL KBlast_c_ConsoleStart()
 		}
 		if (wcsncmp(input, L"!", 1) == 0)
 		{
-			status = KBlast_c_userland_system(input);
+			status = KBlast_c_system(input);
 		}
 		if (wcsncmp(input, KBLAST_MOD_GENERIC, 5) == 0)
 		{

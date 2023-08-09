@@ -3,4 +3,4 @@
 #include "globals.hpp"
 
 
-WINDOWS_VERSION KBlast_GetWindowsVersion();
+WINDOWS_VERSION KBlaster_k_utils_GetWindowsVersion();

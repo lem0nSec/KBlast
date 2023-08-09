@@ -1,7 +1,7 @@
 #include "KBlaster_k_utils.hpp"
 
 
-WINDOWS_VERSION KBlast_GetWindowsVersion()
+WINDOWS_VERSION KBlaster_k_utils_GetWindowsVersion()
 {
 	NTSTATUS status = 0;
 	WINDOWS_VERSION iVersion = WINDOWS_UNSUPPORTED;

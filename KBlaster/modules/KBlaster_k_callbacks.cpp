@@ -3,17 +3,13 @@
 
 
 
-
-
-
-
 /*
 * ------------------------------------------------------------------------------------------------------------------------------------
 * KBlast_GetProcessNotifyCallbackArray gets a pointer to an array which contains
 * kernel handles to callbacks of type Process Creation
 * ------------------------------------------------------------------------------------------------------------------------------------
 */
-PVOID KBlast_GetCallbackStoragePointer(IN CALLBACK_TYPE cType)
+PVOID KBlaster_k_GetCallbackStoragePointer(IN CALLBACK_TYPE cType)
 {
 	ULONG64 pInitialFunction = 0;
 	ULONG64 pInnerFunction = 0;
@@ -97,6 +93,7 @@ PVOID KBlast_GetCallbackStoragePointer(IN CALLBACK_TYPE cType)
 				{
 					RtlCopyMemory(&offset, (PUCHAR)i + 3, 4);
 					pStorage = i + offset + 7;
+					break;
 				}
 			}
 		}
@@ -116,7 +113,7 @@ PVOID KBlast_GetCallbackStoragePointer(IN CALLBACK_TYPE cType)
 * exist in any driver image space.
 * ------------------------------------------------------------------------------------------------------------------------------------
 */
-ULONG KBlast_GetKernelCallbackModuleNumber(IN PVOID callback, IN ULONG nModules, IN PAUX_MODULE_EXTENDED_INFO pAuxModuleExtendedInfo)
+ULONG KBlaster_k_GetKernelCallbackModuleNumber(IN PVOID callback, IN ULONG nModules, IN PAUX_MODULE_EXTENDED_INFO pAuxModuleExtendedInfo)
 {
 	ULONG64 arithmCallback = 0;
 	ULONG64 ImageBaseAddress = 0, ImageEndAddress = 0;
@@ -141,10 +138,10 @@ ULONG KBlast_GetKernelCallbackModuleNumber(IN PVOID callback, IN ULONG nModules,
 
 
 
-NTSTATUS KBlast_GetCallbackListEntryInformation(IN PVOID pListEntryHead, OUT OPTIONAL PPROCESS_KERNEL_CALLBACK_ARRAY pOutBuf)
+NTSTATUS KBlaster_k_GetCallbackListEntryInformation(IN PVOID pListEntryHead, OUT PPROCESS_KERNEL_CALLBACK_STORAGE pOutBuf)
 {
 	NTSTATUS status = STATUS_UNSUCCESSFUL;
-	PCMREG_CALLBACK cmRegCallbackStruct = 0;
+	//PCMREG_CALLBACK cmRegCallbackStruct = 0;
 	PAUX_MODULE_EXTENDED_INFO pAuxModuleExtendedInfo = 0;
 	PVOID ret = 0;
 	ULONG bufferSize = 0, nModules = 0, moduleNumber = 0, structCounter = 0;
@@ -152,7 +149,6 @@ NTSTATUS KBlast_GetCallbackListEntryInformation(IN PVOID pListEntryHead, OUT OPT
 	int CallbackQuota = 0, zeroHandles = 0;
 
 	
-	cmRegCallbackStruct = (PCMREG_CALLBACK)pListEntryHead;
 	status = AuxKlibQueryModuleInformation(&bufferSize, sizeof(AUX_MODULE_EXTENDED_INFO), NULL);
 	if ((status == STATUS_SUCCESS) && (bufferSize != 0))
 	{
@@ -165,7 +161,7 @@ NTSTATUS KBlast_GetCallbackListEntryInformation(IN PVOID pListEntryHead, OUT OPT
 			{
 				nModules = bufferSize / sizeof(AUX_MODULE_EXTENDED_INFO); // number of modules
 				
-				pOutBuf->Array = pListEntryHead;
+				pOutBuf->Storage = pListEntryHead;
 				newStart = (ULONG64)pListEntryHead;
 				while (ret != pListEntryHead)
 				{
@@ -181,7 +177,7 @@ NTSTATUS KBlast_GetCallbackListEntryInformation(IN PVOID pListEntryHead, OUT OPT
 					if (Callback != 0)
 					{
 						CallbackQuota++;
-						moduleNumber = KBlast_GetKernelCallbackModuleNumber((PVOID)Callback, nModules, pAuxModuleExtendedInfo);
+						moduleNumber = KBlaster_k_GetKernelCallbackModuleNumber((PVOID)Callback, nModules, pAuxModuleExtendedInfo);
 						if (moduleNumber != 0xffffffff)
 						{
 							pOutBuf->CallbackInformation[structCounter].CallbackFunctionPointer = (PVOID)Callback;
@@ -208,13 +204,8 @@ NTSTATUS KBlast_GetCallbackListEntryInformation(IN PVOID pListEntryHead, OUT OPT
 				pOutBuf->CallbackQuota = CallbackQuota - zeroHandles;
 
 			}
-
-			goto cleanup;
-
 		}
 	}
-
-cleanup:
 
 	if (pAuxModuleExtendedInfo != 0)
 	{
@@ -222,7 +213,7 @@ cleanup:
 	}
 	if (!NT_SUCCESS(status))
 	{
-		pOutBuf->Array = 0;
+		pOutBuf->Storage = 0;
 	}
 
 	structCounter = 0;
@@ -242,7 +233,7 @@ cleanup:
 * struct.
 * ------------------------------------------------------------------------------------------------------------------------------------
 */
-NTSTATUS KBlast_GetCallbackArrayInformation(IN PVOID ProcessNotifyCallbackArray, OUT PULONG szNeeded, OUT OPTIONAL PPROCESS_KERNEL_CALLBACK_ARRAY pProcessKernelCallbackArray)
+NTSTATUS KBlaster_k_GetCallbackArrayInformation(IN PVOID ProcessNotifyCallbackArray, OUT PPROCESS_KERNEL_CALLBACK_STORAGE pProcessKernelCallbackArray)
 {
 	NTSTATUS status = 0;
 	ULONG bufferSize = 0, nModules = 0, moduleNumber = 0, structCounter = 0;
@@ -275,25 +266,16 @@ NTSTATUS KBlast_GetCallbackArrayInformation(IN PVOID ProcessNotifyCallbackArray,
 					i += sizeof(PVOID);
 				}
 
-				if (!pProcessKernelCallbackArray)
-				{
-					*szNeeded = CallbackQuota - zeroHandles;
-					goto cleanup;
-				}
-				else
-				{
-					*szNeeded = CallbackQuota - zeroHandles;
-					pProcessKernelCallbackArray->Array = ProcessNotifyCallbackArray;
-					pProcessKernelCallbackArray->CallbackQuota = CallbackQuota - zeroHandles;
-				}
-
+				pProcessKernelCallbackArray->Storage = ProcessNotifyCallbackArray;
+				pProcessKernelCallbackArray->CallbackQuota = CallbackQuota - zeroHandles;
+				
 				for (i = 0; i < 8 * maxCallbacks; i += sizeof(PVOID))
 				{
 					callbackHandle = (ULONG64)((*(ULONG64*)(ULONG64*)((ULONG_PTR)ProcessNotifyCallbackArray + i)));
 					if (callbackHandle != 0)
 					{
 						Callback = *(PULONG64)(callbackHandle & 0xfffffffffffffff8);
-						moduleNumber = KBlast_GetKernelCallbackModuleNumber((PVOID)Callback, nModules, pAuxModuleExtendedInfo);
+						moduleNumber = KBlaster_k_GetKernelCallbackModuleNumber((PVOID)Callback, nModules, pAuxModuleExtendedInfo);
 						if (moduleNumber != 0xffffffff)
 						{
 							// callback main info
@@ -318,7 +300,6 @@ NTSTATUS KBlast_GetCallbackArrayInformation(IN PVOID ProcessNotifyCallbackArray,
 		}
 	}
 
-cleanup:
 
 	if (pAuxModuleExtendedInfo != 0)
 	{
@@ -326,7 +307,7 @@ cleanup:
 	}
 	if (!NT_SUCCESS(status))
 	{
-		pProcessKernelCallbackArray->Array = 0;
+		pProcessKernelCallbackArray->Storage = 0;
 	}
 
 	structCounter = 0;
@@ -337,25 +318,25 @@ cleanup:
 
 
 
-NTSTATUS KBlast_EnumProcessCallbacks(IN ULONG szAvailable, IN CALLBACK_TYPE cType, OUT PVOID pOutBuf)
+NTSTATUS KBlaster_k_EnumProcessCallbacks(IN ULONG szAvailable, IN CALLBACK_TYPE cType, OUT PVOID pOutBuf)
 {
 	NTSTATUS status = STATUS_UNSUCCESSFUL;
 	PVOID pStorage = 0;
-	ULONG i = 0, szNeeded = 0;
-	PROCESS_KERNEL_CALLBACK_ARRAY* outBuffer = (PROCESS_KERNEL_CALLBACK_ARRAY*)pOutBuf;
-	PROCESS_KERNEL_CALLBACK_ARRAY pInfo = { 0 };
+	ULONG i = 0;
+	PROCESS_KERNEL_CALLBACK_STORAGE* outBuffer = (PROCESS_KERNEL_CALLBACK_STORAGE*)pOutBuf;
+	PROCESS_KERNEL_CALLBACK_STORAGE pInfo = { 0 };
 
-	if (szAvailable >= sizeof(PROCESS_KERNEL_CALLBACK_ARRAY))
+	if (szAvailable >= sizeof(PROCESS_KERNEL_CALLBACK_STORAGE))
 	{
-		pStorage = KBlast_GetCallbackStoragePointer(cType);
+		pStorage = KBlaster_k_GetCallbackStoragePointer(cType);
 		if (pStorage != 0)
 		{
 			if ((cType == ARRAY_PROCESS) || (cType == ARRAY_THREAD) || (cType == ARRAY_IMAGE))
 			{
-				status = KBlast_GetCallbackArrayInformation(pStorage, &szNeeded, &pInfo);
+				status = KBlaster_k_GetCallbackArrayInformation(pStorage, &pInfo);
 				if (NT_SUCCESS(status))
 				{
-					outBuffer->Array = pInfo.Array;
+					outBuffer->Storage = pInfo.Storage;
 					outBuffer->CallbackQuota = pInfo.CallbackQuota;
 					for (i = 0; i < pInfo.CallbackQuota; i++)
 					{
@@ -369,16 +350,16 @@ NTSTATUS KBlast_EnumProcessCallbacks(IN ULONG szAvailable, IN CALLBACK_TYPE cTyp
 						strcpy(outBuffer->CallbackInformation[i].ModuleInformation.ModuleFullPathName, pInfo.CallbackInformation[i].ModuleInformation.ModuleFullPathName);
 					}
 
-					RtlZeroMemory(&pInfo, sizeof(PROCESS_KERNEL_CALLBACK_ARRAY));
+					RtlZeroMemory(&pInfo, sizeof(PROCESS_KERNEL_CALLBACK_STORAGE));
 
 				}
 			}
 			else if ((cType == LISTENTRY_REGISTRY) || (cType == LISTENTRY_OBJECT))
 			{
-				status = KBlast_GetCallbackListEntryInformation(pStorage, &pInfo);
+				status = KBlaster_k_GetCallbackListEntryInformation(pStorage, &pInfo);
 				if (NT_SUCCESS(status))
 				{
-					outBuffer->Array = pInfo.Array;
+					outBuffer->Storage = pInfo.Storage;
 					outBuffer->CallbackQuota = pInfo.CallbackQuota;
 					for (i = 0; i < pInfo.CallbackQuota; i++)
 					{
@@ -392,7 +373,7 @@ NTSTATUS KBlast_EnumProcessCallbacks(IN ULONG szAvailable, IN CALLBACK_TYPE cTyp
 						strcpy(outBuffer->CallbackInformation[i].ModuleInformation.ModuleFullPathName, pInfo.CallbackInformation[i].ModuleInformation.ModuleFullPathName);
 					}
 
-					RtlZeroMemory(&pInfo, sizeof(PROCESS_KERNEL_CALLBACK_ARRAY));
+					RtlZeroMemory(&pInfo, sizeof(PROCESS_KERNEL_CALLBACK_STORAGE));
 
 				}
 			}
