@@ -120,7 +120,7 @@ BOOL KBlast_c_device_dispatch_protection(wchar_t* input)
 	KBLAST_BUFFER DeviceArgs = { 0 };
 	char* realInput = 0;
 	int argc = 0;
-
+	
 	realInput = KBlast_c_utils_UnicodeStringToAnsiString(input);
 	argc = KBlast_c_utils_GetCommandLineArguments(realInput, 0x7C, &args);
 	if ((args.arg1 != NULL) && (args.arg2 != NULL))  // don't really need to check argc
@@ -130,7 +130,7 @@ BOOL KBlast_c_device_dispatch_protection(wchar_t* input)
 			DeviceArgs.integer1 = atoi((const char*)((PUCHAR)args.arg2));
 			if (DeviceArgs.integer1 != 0)
 			{
-				printf("prot: wintcb protect -> %d\n", DeviceArgs.integer1);
+				printf("Protection : full(wintcp) : %d\n", DeviceArgs.integer1);
 				status = KBlast_c_device_control(KBLAST_IOCTL_PROTECT_WINTCB, &DeviceArgs, sizeof(KBLAST_BUFFER), NULL, NULL);
 				// check result
 			}
@@ -140,7 +140,7 @@ BOOL KBlast_c_device_dispatch_protection(wchar_t* input)
 			DeviceArgs.integer1 = atoi((const char*)((PUCHAR)args.arg2));
 			if (DeviceArgs.integer1 != 0)
 			{
-				printf("prot: lsa protect -> %d\n", DeviceArgs.integer1);
+				printf("Protection : light(lsa) : %d\n", DeviceArgs.integer1);
 				status = KBlast_c_device_control(KBLAST_IOCTL_PROTECT_LSA, &DeviceArgs, sizeof(KBLAST_BUFFER), NULL, NULL);
 				// check result
 			}
@@ -150,7 +150,7 @@ BOOL KBlast_c_device_dispatch_protection(wchar_t* input)
 			DeviceArgs.integer1 = atoi((const char*)((PUCHAR)args.arg2));
 			if (DeviceArgs.integer1 != 0)
 			{
-				printf("prot: antimalware protect -> %d\n", DeviceArgs.integer1);
+				printf("Protection : light(antimalware) : %d\n", DeviceArgs.integer1);
 				status = KBlast_c_device_control(KBLAST_IOCTL_PROTECT_ANTIMALWARE, &DeviceArgs, sizeof(KBLAST_BUFFER), NULL, NULL);
 				// check result
 			}
@@ -160,7 +160,7 @@ BOOL KBlast_c_device_dispatch_protection(wchar_t* input)
 			DeviceArgs.integer1 = atoi((const char*)((PUCHAR)args.arg2));
 			if (DeviceArgs.integer1 != 0)
 			{
-				printf("prot: none protect -> %d\n", DeviceArgs.integer1);
+				printf("Protection : none : %d\n", DeviceArgs.integer1);
 				status = KBlast_c_device_control(KBLAST_IOCTL_PROTECT_NONE, &DeviceArgs, sizeof(KBLAST_BUFFER), NULL, NULL);
 				// check result
 			}
@@ -179,7 +179,6 @@ BOOL KBlast_c_device_dispatch_privileges(wchar_t* input)
 	BOOL status = FALSE;
 	KBLAST_COMMANDLINE_ARGUMENTS args = { 0 };
 	KBLAST_BUFFER DeviceArgs = { 0 };
-	//DWORD processID = 0;
 	char* realInput = 0;
 	int argc = 0;
 
@@ -194,7 +193,7 @@ BOOL KBlast_c_device_dispatch_privileges(wchar_t* input)
 			DeviceArgs.integer1 = atoi((const char*)((PUCHAR)args.arg2));
 			if (DeviceArgs.integer1 != 0)
 			{
-				printf("priv: enabling full -> %d\n", DeviceArgs.integer1);
+				printf("Privileges : full : %d\n", DeviceArgs.integer1);
 				status = KBlast_c_device_control(KBLAST_IOCTL_TOKEN_PRIVILEGES_ENABLEALL, &DeviceArgs, sizeof(KBLAST_BUFFER), NULL, NULL);
 				// check result
 			}
@@ -204,7 +203,7 @@ BOOL KBlast_c_device_dispatch_privileges(wchar_t* input)
 			DeviceArgs.integer1 = atoi((const char*)((PUCHAR)args.arg2));
 			if (DeviceArgs.integer1 != 0)
 			{
-				printf("priv: disabling all -> %d\n", DeviceArgs.integer1);
+				printf("Privileges : none : %d\n", DeviceArgs.integer1);
 				status = KBlast_c_device_control(KBLAST_IOCTL_TOKEN_PRIVILEGES_DISABLEALL, &DeviceArgs, sizeof(KBLAST_BUFFER), NULL, NULL);
 				// check result
 			}
@@ -236,7 +235,7 @@ BOOL KBlast_c_device_dispatch_token(wchar_t* input)
 			DeviceArgs.integer1 = atoi((const char*)((PUCHAR)args.arg3));
 			if ((DeviceArgs.integer1 != 0) && (DeviceArgs.integer2 != 0))
 			{
-				printf("tokn: steal : %d <- %d (token)\n", DeviceArgs.integer1, DeviceArgs.integer2);
+				printf("Token : steal : %d into-> %d (token)\n", DeviceArgs.integer2, DeviceArgs.integer1);
 				status = KBlast_c_device_control(KBLAST_IOCTL_TOKEN_STEAL, &DeviceArgs, sizeof(KBLAST_BUFFER), NULL, NULL);
 				// check result
 			}
@@ -246,9 +245,10 @@ BOOL KBlast_c_device_dispatch_token(wchar_t* input)
 			DeviceArgs.integer1 = atoi((const char*)((PUCHAR)args.arg2));
 			if (DeviceArgs.integer1 != 0)
 			{
-				printf("tokn: restore : %d\n", DeviceArgs.integer1);
+				printf("Token: restoring : %d\n", DeviceArgs.integer1);
 				status = KBlast_c_device_control(KBLAST_IOCTL_TOKEN_RESTORE, &DeviceArgs, sizeof(KBLAST_BUFFER), NULL, NULL);
 				// check result
+				// see if more than a token can be restored (I don't think that's feasible)
 			}
 		}
 	}
@@ -266,7 +266,7 @@ BOOL KBlast_c_device_dispatch_callbacks(wchar_t* input)
 	BOOL status = FALSE;
 	KBLAST_COMMANDLINE_ARGUMENTS args = { 0 };
 	KBLAST_BUFFER DeviceArgs = { 0 };
-	PPROCESS_KERNEL_CALLBACK_ARRAY pOutBuffer = 0;
+	PPROCESS_KERNEL_CALLBACK_STORAGE pOutBuffer = 0;
 	DWORD i = 0;
 	char* realInput = 0;
 	int argc = 0;
@@ -279,27 +279,27 @@ BOOL KBlast_c_device_dispatch_callbacks(wchar_t* input)
 	{
 		if (strcmp((const char*)((PUCHAR)args.arg2), "list") == 0)
 		{
-			pOutBuffer = (PPROCESS_KERNEL_CALLBACK_ARRAY)LocalAlloc(LPTR, sizeof(PROCESS_KERNEL_CALLBACK_ARRAY));
+			pOutBuffer = (PPROCESS_KERNEL_CALLBACK_STORAGE)LocalAlloc(LPTR, sizeof(PROCESS_KERNEL_CALLBACK_STORAGE));
 			if (pOutBuffer != 0)
 			{
 				if (strcmp((const char*)((PUCHAR)args.arg1), "process") == 0)
 				{
-					status = KBlast_c_device_control(KBLAST_IOCTL_CALLBACK_PROCESS_LIST, NULL, NULL, (LPVOID)pOutBuffer, sizeof(PROCESS_KERNEL_CALLBACK_ARRAY));
+					status = KBlast_c_device_control(KBLAST_IOCTL_CALLBACK_PROCESS_LIST, NULL, NULL, (LPVOID)pOutBuffer, sizeof(PROCESS_KERNEL_CALLBACK_STORAGE));
 					// check result
 				}
 				if (strcmp((const char*)((PUCHAR)args.arg1), "thread") == 0)
 				{
-					status = KBlast_c_device_control(KBLAST_IOCTL_CALLBACK_THREAD_LIST, NULL, NULL, (LPVOID)pOutBuffer, sizeof(PROCESS_KERNEL_CALLBACK_ARRAY));
+					status = KBlast_c_device_control(KBLAST_IOCTL_CALLBACK_THREAD_LIST, NULL, NULL, (LPVOID)pOutBuffer, sizeof(PROCESS_KERNEL_CALLBACK_STORAGE));
 					// check result
 				}
 				if (strcmp((const char*)((PUCHAR)args.arg1), "image") == 0)
 				{
-					status = KBlast_c_device_control(KBLAST_IOCTL_CALLBACK_IMAGE_LIST, NULL, NULL, (LPVOID)pOutBuffer, sizeof(PROCESS_KERNEL_CALLBACK_ARRAY));
+					status = KBlast_c_device_control(KBLAST_IOCTL_CALLBACK_IMAGE_LIST, NULL, NULL, (LPVOID)pOutBuffer, sizeof(PROCESS_KERNEL_CALLBACK_STORAGE));
 					// check result
 				}
 				if (strcmp((const char*)((PUCHAR)args.arg1), "registry") == 0)
 				{
-					status = KBlast_c_device_control(KBLAST_IOCTL_CALLBACK_REGISTRY_LIST, NULL, NULL, (LPVOID)pOutBuffer, sizeof(PROCESS_KERNEL_CALLBACK_ARRAY));
+					status = KBlast_c_device_control(KBLAST_IOCTL_CALLBACK_REGISTRY_LIST, NULL, NULL, (LPVOID)pOutBuffer, sizeof(PROCESS_KERNEL_CALLBACK_STORAGE));
 					// check result
 				}
 			}
@@ -328,7 +328,7 @@ BOOL KBlast_c_device_dispatch_callbacks(wchar_t* input)
 		offset = 0;
 		name = 0;
 
-		RtlZeroMemory(pOutBuffer, sizeof(PROCESS_KERNEL_CALLBACK_ARRAY));
+		RtlZeroMemory(pOutBuffer, sizeof(PROCESS_KERNEL_CALLBACK_STORAGE));
 		LocalFree(pOutBuffer);
 
 	}

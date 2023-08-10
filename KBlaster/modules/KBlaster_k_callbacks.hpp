@@ -72,3 +72,5 @@ typedef struct _CMREG_CALLBACK {
 	PEX_CALLBACK_FUNCTION Function;
 
 } CMREG_CALLBACK, * PCMREG_CALLBACK;
+
+PVOID KBlaster_k_GetCallbackStoragePointer(IN CALLBACK_TYPE cType);

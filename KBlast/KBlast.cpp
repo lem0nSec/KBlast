@@ -31,7 +31,22 @@
 */
 
 
+void KBlast_c_PrintBanner()
+{
+	SYSTEMTIME sTime = { 0 };
+	DWORD dwBuild = (DWORD)(HIWORD(GetVersion()));
+	GetSystemTime(&sTime);
 
+	wprintf(
+		L"    __ __ ____  __           __\n"
+		L"   / //_// __ )/ /___ ______/ /_\t| KBlast client - OS Build #%d - System time #%d:%d\n"
+		L"  / ,<  / __  / / __ `/ ___/ __/\t| Version : %s ( first release )\n"
+		L" / /| |/ /_/ / / /_/ (__  ) /_\t\t| Angelo Frasca Caccia [ *_* ] ( lem0nSec_ )\n"
+		L"/_/ |_/_____/_/\\__,_/____/\\__/\t\t| Website: http://www.github.com/lem0nSec/KBlast\n"
+		L"------------------------------------------------------->>>\n", dwBuild, sTime.wHour, sTime.wMinute, KBLAST_VERSION
+	);
+
+}
 
 BOOL KBlast_c_init()
 {
@@ -133,8 +148,7 @@ void KBlast_c_ConsoleInit()
 	RtlZeroMemory(&cInfo, sizeof(CONSOLE_SCREEN_BUFFER_INFO));
 
 	SetConsoleTitle(KBLAST_CLT_TITLE);
-	wprintf(L"%s\n", KBlast_c_banner);
-
+	KBlast_c_PrintBanner();
 }
 
 
@@ -176,7 +190,7 @@ BOOL KBlast_c_ConsoleStart()
 		}
 		if (wcscmp(input, L"banner\n") == 0)
 		{
-			wprintf(L"%s\n", KBlast_c_banner);
+			KBlast_c_PrintBanner();
 		}
 		if (wcscmp(input, L"cls\n") == 0)
 		{
@@ -234,7 +248,7 @@ int wmain(int argc, wchar_t* argv[])
 		if (status == TRUE)
 		{
 			wprintf(L"[+] Starting console...\n");
-			Sleep(1000);
+			//Sleep(1000);
 			KBlast_c_ConsoleStart(); // see if it could be the case to create a new thread here and put the main thread to sleep
 			KBlast_c_cleanup();		// the main thread should be awaken when it's time to clean up and exit
 		}

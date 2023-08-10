@@ -9,6 +9,7 @@
 #pragma comment(lib, "ntdll.lib")
 #pragma comment(lib, "crypt32.lib")
 
+#pragma warning(disable: 4996)
 #define UNICODE 1
 
 #define KBLAST_CLT_TITLE	L"KBlast v1.0 ( by lem0nSec )"
@@ -16,6 +17,9 @@
 #define KBLAST_DRV_BINARY	L"KBlaster.sys"
 #define KBLAST_DRV_FILENAME	L"\\\\.\\KBlaster"
 #define KBLAST_SRV_NAME		L"KBlaster"
+#define KBLAST_VERSION		L"1.0"
+
+
 
 
 typedef struct _KBLAST_MEMORY_BUFFER {

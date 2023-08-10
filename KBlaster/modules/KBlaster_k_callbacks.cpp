@@ -93,7 +93,7 @@ PVOID KBlaster_k_GetCallbackStoragePointer(IN CALLBACK_TYPE cType)
 				{
 					RtlCopyMemory(&offset, (PUCHAR)i + 3, 4);
 					pStorage = i + offset + 7;
-					break;
+					// fix pattern matching
 				}
 			}
 		}
@@ -364,8 +364,8 @@ NTSTATUS KBlaster_k_EnumProcessCallbacks(IN ULONG szAvailable, IN CALLBACK_TYPE 
 					for (i = 0; i < pInfo.CallbackQuota; i++)
 					{
 						outBuffer->CallbackInformation[i].CallbackFunctionPointer = pInfo.CallbackInformation[i].CallbackFunctionPointer;
-						outBuffer->CallbackInformation[i].CallbackHandle = pInfo.CallbackInformation[i].CallbackHandle;
-						outBuffer->CallbackInformation[i].PointerToHandle = pInfo.CallbackInformation[i].PointerToHandle;
+						//outBuffer->CallbackInformation[i].CallbackHandle = pInfo.CallbackInformation[i].CallbackHandle;
+						//outBuffer->CallbackInformation[i].PointerToHandle = pInfo.CallbackInformation[i].PointerToHandle;
 
 						outBuffer->CallbackInformation[i].ModuleInformation.ModuleBase = pInfo.CallbackInformation[i].ModuleInformation.ModuleBase;
 						outBuffer->CallbackInformation[i].ModuleInformation.ModuleFileNameOffset = pInfo.CallbackInformation[i].ModuleInformation.ModuleFileNameOffset;
