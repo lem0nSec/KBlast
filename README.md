@@ -30,3 +30,7 @@ This tool has two parts. KBlaster.sys is the actual core where all central featu
 
 ## Modules
 Right now KBlast\(er\) supports five modules, which do not include generic commands. Modules are 'misc', 'prot', 'priv', 'tokn', 'call'. These modules reflect specific techniques. The fun part is that some misc functionalities can be combined to functionalities from other modules, thus offering a chance to diversify widely known techniques.
+
+
+## Important note
+This tool is still under development. It is being developed on a Windows 10 Pro build 9200 machine. Some functionalities support other Windows versions. Others don't. Since the Windows Kernel is mostly composed of 'opaque' data structures, this tool is likely to trigger bsods at this stage of development. ... I hope you understand.
