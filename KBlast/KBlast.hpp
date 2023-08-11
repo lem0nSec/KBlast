@@ -1,3 +1,10 @@
+/*
+* Author:	Angelo Frasca Caccia ( lem0nSec_ )
+* Title:	KBlast.exe ( client )
+* Website:	https://github.com/lem0nSec/KBlast
+*/
+
+
 #pragma once
 
 #include "globals.hpp"
@@ -23,6 +30,25 @@ typedef struct _KBLAST_BUFFER {
 #define KBLAST_MOD_PRIVILEGES	L"priv|"
 #define KBLAST_MOD_TOKEN		L"tokn|"
 #define KBLAST_MOD_CALLBACK		L"call|"
+
+
+typedef struct _KBLAST_HELP_GENERIC_MENU {
+
+	const wchar_t* Command;
+	const wchar_t* Description;
+
+} KBLAST_HELP_GENERIC_MENU, *PKBLAST_HELP_GENERIC_MENU;
+
+
+KBLAST_HELP_GENERIC_MENU Generic_Cmds[7] = {
+	{L"help", L"Show this help"},
+	{L"quit", L"Quit KBlast"},
+	{L"cls", L"Clear the screen"},
+	{L"banner", L"Print KBlast banner"},
+	{L"pid", L"Show current pid"},
+	{L"time", L"Display system time"},
+	{L"!{cmd}", L"Execute system command"}
+};
 
 
 

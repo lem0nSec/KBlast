@@ -1,3 +1,10 @@
+/*
+* Author:	Angelo Frasca Caccia ( lem0nSec_ )
+* Title:	KBlaster.sys ( driver )
+* Website:	https://github.com/lem0nSec/KBlast
+*/
+
+
 #include "KBlaster_k_protection.hpp"
 
 

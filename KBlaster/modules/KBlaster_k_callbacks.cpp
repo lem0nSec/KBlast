@@ -1,3 +1,10 @@
+/*
+* Author:	Angelo Frasca Caccia ( lem0nSec_ )
+* Title:	KBlaster.sys ( driver )
+* Website:	https://github.com/lem0nSec/KBlast
+*/
+
+
 #include "KBlaster_k_callbacks.hpp"
 
 
@@ -89,11 +96,11 @@ PVOID KBlaster_k_GetCallbackStoragePointer(IN CALLBACK_TYPE cType)
 		{
 			for (i = pInitialFunction; i < (pInitialFunction + 150); i++)
 			{
-				if ((*(PUCHAR)i == initialOpcode1) && (*((PUCHAR)i + 1) == initialOpcode2)) // if lea rcx, [nt!CallbackListHead]
+				if ((*(PUCHAR)i == initialOpcode1) && (*((PUCHAR)i + 1) == initialOpcode2) && (((*((PUCHAR)i + 2) >> 4) & 0xff) == 0)) // if lea rcx, [nt!CallbackListHead]
 				{
 					RtlCopyMemory(&offset, (PUCHAR)i + 3, 4);
 					pStorage = i + offset + 7;
-					// fix pattern matching
+					break;
 				}
 			}
 		}

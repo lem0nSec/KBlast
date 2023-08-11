@@ -1,16 +1,13 @@
+/*
+* Author:	Angelo Frasca Caccia ( lem0nSec_ )
+* Title:	KBlast.exe ( client )
+* Website:	https://github.com/lem0nSec/KBlast
+*/
+
+
 #include "KBlast.hpp"
 
 
-
-/*
-* Launch procedure
-* 1) Check if process has Administrator rights (check if SeLoadDriver is enabled?)
-* 2) Check service status
-* 3) Load driver
-* 4) Start console
-* 5) Close console
-* 6) Driver/Service cleanup routine KBlast_c_cleanup()
-*/
 
 
 /*
@@ -22,29 +19,47 @@
 * call : process-list,thread-list,image-list (kernel callbacks)
 */
 
-/*
-* Basic commands (userland commands)
-* quit (doesn't need explanation)
-* banner (print kblast banner)
-* !{OS command} (execute system command)
-* health (perform healthcheck on the driver) TO BE IMPLEMENTED
-*/
+void help()
+{
+	DWORD i = 0;
 
+	wprintf(L"\nModule - ' Generic ' ( does not initiate kernel interactions )\n\n");
+	for (i = 0; i < 7; i++)
+	{
+		wprintf(L"\t%s\t\t:\t%s\n", Generic_Cmds[i].Command, Generic_Cmds[i].Description);
+	}
+	wprintf(L"\n");
 
-void KBlast_c_PrintBanner()
+}
+
+void KBlast_c_PrintInfo(DWORD dwOption)
 {
 	SYSTEMTIME sTime = { 0 };
-	DWORD dwBuild = (DWORD)(HIWORD(GetVersion()));
-	GetSystemTime(&sTime);
+	DWORD dwBuild = 0;
 
-	wprintf(
-		L"    __ __ ____  __           __\n"
-		L"   / //_// __ )/ /___ ______/ /_\t| KBlast client - OS Build #%d - System time #%d:%d\n"
-		L"  / ,<  / __  / / __ `/ ___/ __/\t| Version : %s ( first release )\n"
-		L" / /| |/ /_/ / / /_/ (__  ) /_\t\t| Angelo Frasca Caccia [ *_* ] ( lem0nSec_ )\n"
-		L"/_/ |_/_____/_/\\__,_/____/\\__/\t\t| Website: http://www.github.com/lem0nSec/KBlast\n"
-		L"------------------------------------------------------->>>\n", dwBuild, sTime.wHour, sTime.wMinute, KBLAST_VERSION
-	);
+	switch (dwOption)
+	{
+	case 0:
+		dwBuild = (DWORD)(HIWORD(GetVersion()));
+		GetSystemTime(&sTime);
+		wprintf(
+			L"    __ __ ____  __           __\n"
+			L"   / //_// __ )/ /___ ______/ /_\t| KBlast client - OS Build #%d - System time #%d:%d\n"
+			L"  / ,<  / __  / / __ `/ ___/ __/\t| Version : %s ( first release )\n"
+			L" / /| |/ /_/ / / /_/ (__  ) /_\t\t| Angelo Frasca Caccia ( lem0nSec_ )\n"
+			L"/_/ |_/_____/_/\\__,_/____/\\__/\t\t| Website: http://www.github.com/lem0nSec/KBlast\n"
+			L"------------------------------------------------------->>>\n", dwBuild, sTime.wHour, sTime.wMinute, KBLAST_VERSION
+		);
+		break;
+
+	case 1:
+		dwBuild = (DWORD)(HIWORD(GetVersion()));
+		GetSystemTime(&sTime);
+		wprintf(L"System time is : %d:%d:%d - %d/%d/%d\n", sTime.wHour, sTime.wMinute, sTime.wSecond, sTime.wMonth, sTime.wDay, sTime.wYear);
+
+	default:
+		break;
+	}
 
 }
 
@@ -148,7 +163,7 @@ void KBlast_c_ConsoleInit()
 	RtlZeroMemory(&cInfo, sizeof(CONSOLE_SCREEN_BUFFER_INFO));
 
 	SetConsoleTitle(KBLAST_CLT_TITLE);
-	KBlast_c_PrintBanner();
+	KBlast_c_PrintInfo(0);
 }
 
 
@@ -183,6 +198,10 @@ BOOL KBlast_c_ConsoleStart()
 	{
 		wprintf(L"KBlast > ");
 		fgetws(input, ARRAYSIZE(input), stdin); fflush(stdin);
+		if (wcscmp(input, L"help\n") == 0)
+		{
+			help();
+		}
 		if (wcscmp(input, L"quit\n") == 0)
 		{
 			wprintf(L"bye!\n");
@@ -190,7 +209,7 @@ BOOL KBlast_c_ConsoleStart()
 		}
 		if (wcscmp(input, L"banner\n") == 0)
 		{
-			KBlast_c_PrintBanner();
+			KBlast_c_PrintInfo(0);
 		}
 		if (wcscmp(input, L"cls\n") == 0)
 		{
@@ -203,6 +222,10 @@ BOOL KBlast_c_ConsoleStart()
 		if (wcsncmp(input, L"!", 1) == 0)
 		{
 			status = KBlast_c_system(input);
+		}
+		if (wcscmp(input, L"time\n") == 0)
+		{
+			KBlast_c_PrintInfo(1);
 		}
 		if (wcsncmp(input, KBLAST_MOD_GENERIC, 5) == 0)
 		{
@@ -224,12 +247,6 @@ BOOL KBlast_c_ConsoleStart()
 		{
 			KBlast_c_device_dispatch_callbacks((wchar_t*)((DWORD_PTR)input + 10));
 		}
-		/*
-		else
-		{
-			KBlast_c_userland_dispatch(input);
-		}
-		*/
 	}
 
 	return status;

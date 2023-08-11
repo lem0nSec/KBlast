@@ -1,3 +1,10 @@
+/*
+* Author:	Angelo Frasca Caccia ( lem0nSec_ )
+* Title:	KBlast.exe ( client )
+* Website:	https://github.com/lem0nSec/KBlast
+*/
+
+
 #include "KBlast_c_service.hpp"
 
 BOOL KBlast_c_ServiceManagement(IN SERVICE_ACTION sAction, IN OPTIONAL LPCWSTR lpBinaryPath, OUT OPTIONAL SERVICE_STATUS_PROCESS* sInfoBuffer)

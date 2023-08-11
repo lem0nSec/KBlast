@@ -1,3 +1,10 @@
+/*
+* Author:	Angelo Frasca Caccia ( lem0nSec_ )
+* Title:	KBlaster.sys ( driver )
+* Website:	https://github.com/lem0nSec/KBlast
+*/
+
+
 #pragma once
 
 
@@ -13,24 +20,6 @@ typedef enum _CALLBACK_TYPE {
 	LISTENTRY_OBJECT
 
 } CALLBACK_TYPE;
-
-/*
-typedef enum _CALLBACK_LISTENTRY_TYPE {
-
-	LISTENTRY_REGISTRY,
-	LISTENTRY_OBJECT
-
-} CALLBACK_LISTENTRY_TYPE;
-*/
-
-/*
-typedef enum _CALLBACK_GENERIC_TYPE {
-
-	CALLBACK_GENERIC_ARRAY,
-	CALLBACK_GENERIC_LISTENTRY
-
-} CALLBACK_GENERIC_TYPE;
-*/
 
 
 typedef struct _CALLBACK_MODULE_INFORMATION {

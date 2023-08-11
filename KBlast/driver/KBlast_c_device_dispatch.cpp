@@ -1,3 +1,10 @@
+/*
+* Author:	Angelo Frasca Caccia ( lem0nSec_ )
+* Title:	KBlast.exe ( client )
+* Website:	https://github.com/lem0nSec/KBlast
+*/
+
+
 #include "KBlast_c_device_dispatch.hpp"
 
 
@@ -70,6 +77,7 @@ BOOL KBlast_c_device_dispatch_misc(wchar_t* input)
 						status = KBlast_c_blob_manage(args.arg3, (char*)args.arg4, pBuf, BLOB_WRITE);
 						if (status == TRUE)
 						{
+							printf("[*] Writing %d bytes at 0x%-016p\n", pBuf->size, pBuf->ptr);
 							status = KBlast_c_device_control(KBLAST_IOCTL_MEMORY_WRITE, (LPVOID)pBuf, sizeof(KBLAST_MEMORY_BUFFER), NULL, NULL);
 						}
 						LocalFree(pBuf);
@@ -90,6 +98,7 @@ BOOL KBlast_c_device_dispatch_misc(wchar_t* input)
 							pOutBuf = (PKBLAST_MEMORY_BUFFER)LocalAlloc(LPTR, sizeof(KBLAST_MEMORY_BUFFER));
 							if (pOutBuf != 0)
 							{
+								printf("[*] Reading %d bytes at 0x%-016p\n", pBuf->size, pBuf->ptr);
 								status = KBlast_c_device_control(KBLAST_IOCTL_MEMORY_READ, (LPVOID)pBuf, sizeof(KBLAST_MEMORY_BUFFER), (LPVOID)pOutBuf, sizeof(KBLAST_MEMORY_BUFFER));
 								if (status == TRUE)
 								{
@@ -245,7 +254,7 @@ BOOL KBlast_c_device_dispatch_token(wchar_t* input)
 			DeviceArgs.integer1 = atoi((const char*)((PUCHAR)args.arg2));
 			if (DeviceArgs.integer1 != 0)
 			{
-				printf("Token: restoring : %d\n", DeviceArgs.integer1);
+				printf("Token : restore : %d\n", DeviceArgs.integer1);
 				status = KBlast_c_device_control(KBLAST_IOCTL_TOKEN_RESTORE, &DeviceArgs, sizeof(KBLAST_BUFFER), NULL, NULL);
 				// check result
 				// see if more than a token can be restored (I don't think that's feasible)
