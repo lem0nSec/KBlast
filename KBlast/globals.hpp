@@ -36,3 +36,11 @@ typedef struct _KBLAST_MEMORY_BUFFER {
 	UCHAR buffer[250];
 
 } KBLAST_MEMORY_BUFFER, * PKBLAST_MEMORY_BUFFER; // this should be written on another header file
+
+
+typedef struct _KBLAST_HELP_MENU {
+
+	const wchar_t* Command;
+	const wchar_t* Description;
+
+} KBLAST_HELP_MENU, * PKBLAST_HELP_MENU;

@@ -19,7 +19,7 @@
 * call : process-list,thread-list,image-list (kernel callbacks)
 */
 
-void help()
+void KBlast_c_generic_help()
 {
 	DWORD i = 0;
 
@@ -200,7 +200,7 @@ BOOL KBlast_c_ConsoleStart()
 		fgetws(input, ARRAYSIZE(input), stdin); fflush(stdin);
 		if (wcscmp(input, L"help\n") == 0)
 		{
-			help();
+			KBlast_c_generic_help();
 		}
 		if (wcscmp(input, L"quit\n") == 0)
 		{
@@ -227,7 +227,7 @@ BOOL KBlast_c_ConsoleStart()
 		{
 			KBlast_c_PrintInfo(1);
 		}
-		if (wcsncmp(input, KBLAST_MOD_GENERIC, 5) == 0)
+		if (wcsncmp(input, KBLAST_MOD_MISC, 5) == 0)
 		{
 			KBlast_c_device_dispatch_misc((wchar_t*)((DWORD_PTR)input + 10));
 		}
@@ -265,7 +265,6 @@ int wmain(int argc, wchar_t* argv[])
 		if (status == TRUE)
 		{
 			wprintf(L"[+] Starting console...\n");
-			//Sleep(1000);
 			KBlast_c_ConsoleStart(); // see if it could be the case to create a new thread here and put the main thread to sleep
 			KBlast_c_cleanup();		// the main thread should be awaken when it's time to clean up and exit
 		}

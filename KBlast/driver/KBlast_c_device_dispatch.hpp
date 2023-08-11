@@ -50,15 +50,16 @@ typedef struct _PROCESS_KERNEL_CALLBACK_STORAGE {
 
 } PROCESS_KERNEL_CALLBACK_STORAGE, * PPROCESS_KERNEL_CALLBACK_STORAGE;
 
-/*
-typedef struct _KBLAST_MEMORY_BUFFER {
+typedef enum _HELP_MODULE {
 
-	PVOID ptr;
-	ULONG size;
-	UCHAR buffer[250];
+	MISC,
+	PROTECTION,
+	TOKEN,
+	CALLBACKS
 
-} KBLAST_MEMORY_BUFFER, * PKBLAST_MEMORY_BUFFER;
-*/
+} HELP_MENU;
+
+
 
 BOOL KBlast_c_device_dispatch_misc(wchar_t* input);
 BOOL KBlast_c_device_dispatch_protection(wchar_t* input);

@@ -25,22 +25,14 @@ typedef struct _KBLAST_BUFFER {
 
 // Driver upper commands
 
-#define KBLAST_MOD_GENERIC		L"misc|"
+#define KBLAST_MOD_MISC			L"misc|"
 #define KBLAST_MOD_PROTECTION	L"prot|"
 #define KBLAST_MOD_PRIVILEGES	L"priv|"
 #define KBLAST_MOD_TOKEN		L"tokn|"
 #define KBLAST_MOD_CALLBACK		L"call|"
 
 
-typedef struct _KBLAST_HELP_GENERIC_MENU {
-
-	const wchar_t* Command;
-	const wchar_t* Description;
-
-} KBLAST_HELP_GENERIC_MENU, *PKBLAST_HELP_GENERIC_MENU;
-
-
-KBLAST_HELP_GENERIC_MENU Generic_Cmds[7] = {
+KBLAST_HELP_MENU Generic_Cmds[7] = {
 	{L"help", L"Show this help"},
 	{L"quit", L"Quit KBlast"},
 	{L"cls", L"Clear the screen"},

@@ -8,6 +8,77 @@
 #include "KBlast_c_device_dispatch.hpp"
 
 
+KBLAST_HELP_MENU Misc_Cmds[2] = {
+	{L"bsod", L"Guess what this command does"},
+	{L"blob", L"blobs management"},
+};
+
+KBLAST_HELP_MENU Prot_Cmds[4] = {
+	{L"wintcb", L"Enable PPL full(wintcb)"},
+	{L"lsa", L"Enable PPL light(lsa)"},
+	{L"antimalware", L"Enable PPL light(antimalware)"},
+	{L"none", L"Disable PPL"}
+};
+
+KBLAST_HELP_MENU Tokn_Cmds[4] = {
+	{L"enable", L"Enable all privileges for a given process"},
+	{L"disable", L"Disable all privileges for a given process"},
+	{L"steal", L"Steal token and give it to a given process"},
+	{L"restore", L"Restore the original token of a given process"}
+};
+
+KBLAST_HELP_MENU Call_Cmds[4] = {
+	{L"process", L"Process creation kernel callbacks"},
+	{L"thread", L"Thread creation kernel callbacks"},
+	{L"image", L"Image loading kernel callbacks"},
+	{L"reg", L"registry kernel callbacks"}
+};
+
+void KBlast_c_module_help(HELP_MENU help)
+{
+	DWORD i = 0, maxSize = 0;
+	PKBLAST_HELP_MENU menu = 0;
+
+	switch (help)
+	{
+	case CALLBACKS:
+		wprintf(L"\nModule - ' call ' ( kernel callbacks interaction )\n\n");
+		menu = (PKBLAST_HELP_MENU)&Call_Cmds;
+		maxSize = 4;
+		break;
+
+	case TOKEN:
+		wprintf(L"\nModule - ' tokn ' ( token manipulation )\n\n");
+		menu = (PKBLAST_HELP_MENU)&Tokn_Cmds;
+		maxSize = 4;
+		break;
+
+	case PROTECTION:
+		wprintf(L"\nModule - ' prot ' ( process protection )\n\n");
+		menu = (PKBLAST_HELP_MENU)&Prot_Cmds;
+		maxSize = 4;
+		break;
+
+	case MISC:
+		wprintf(L"\nModule - ' misc ' ( misc functionalities. Kernel memory reading/writing, etc... )\n\n");
+		menu = (PKBLAST_HELP_MENU)&Misc_Cmds;
+		maxSize = 2;
+		break;
+
+	default:
+		break;
+	}
+
+	if (maxSize != 0)
+	{
+		for (i = 0; i < maxSize; i++)
+		{
+			wprintf(L"\t%10s:\t%s\n", menu[i].Command, menu[i].Description);
+		}
+		wprintf(L"\n");
+	}
+
+}
 
 BOOL KBlast_c_device_control(IN DWORD ControlCode, IN OPTIONAL LPVOID pCommandLine, IN OPTIONAL DWORD szIn, OUT OPTIONAL LPVOID outBuffer, IN OPTIONAL DWORD szOutBuffer)
 {
@@ -43,6 +114,10 @@ BOOL KBlast_c_device_dispatch_misc(wchar_t* input)
 	argc = KBlast_c_utils_GetCommandLineArguments(realInput, 0x7C, &args);
 	if (args.arg1 != 0)
 	{
+		if (strcmp(args.arg1, "help") == 0)
+		{
+			KBlast_c_module_help(MISC);
+		}
 		if (strcmp(args.arg1, "bsod") == 0)
 		{
 			status = KBlast_c_device_control(KBLAST_IOCTL_BUG_CHECK, NULL, NULL, NULL, NULL);
@@ -134,6 +209,10 @@ BOOL KBlast_c_device_dispatch_protection(wchar_t* input)
 	argc = KBlast_c_utils_GetCommandLineArguments(realInput, 0x7C, &args);
 	if ((args.arg1 != NULL) && (args.arg2 != NULL))  // don't really need to check argc
 	{
+		if (strcmp(args.arg1, "help") == 0)
+		{
+			KBlast_c_module_help(PROTECTION);
+		}
 		if (strcmp((const char*)((PUCHAR)args.arg1), "wintcb") == 0)
 		{
 			DeviceArgs.integer1 = atoi((const char*)((PUCHAR)args.arg2));
@@ -174,6 +253,10 @@ BOOL KBlast_c_device_dispatch_protection(wchar_t* input)
 				// check result
 			}
 		}
+	}
+	else
+	{
+		KBlast_c_module_help(PROTECTION);
 	}
 
 	KBlast_c_utils_FreeAnsiString(realInput);
@@ -238,6 +321,10 @@ BOOL KBlast_c_device_dispatch_token(wchar_t* input)
 	argc = KBlast_c_utils_GetCommandLineArguments(realInput, 0x7C, &args);
 	if ((argc > 0) && (args.arg1 != NULL) && (args.arg2 != NULL) && (args.arg3 != NULL)) // don't really need to check argc
 	{
+		if (strcmp(args.arg1, "help") == 0)
+		{
+			KBlast_c_module_help(TOKEN);
+		}
 		if (strcmp((const char*)((PUCHAR)args.arg1), "steal") == 0)
 		{
 			DeviceArgs.integer2 = atoi((const char*)((PUCHAR)args.arg2));
@@ -260,6 +347,10 @@ BOOL KBlast_c_device_dispatch_token(wchar_t* input)
 				// see if more than a token can be restored (I don't think that's feasible)
 			}
 		}
+	}
+	else
+	{
+		KBlast_c_module_help(TOKEN);
 	}
 
 
@@ -286,6 +377,10 @@ BOOL KBlast_c_device_dispatch_callbacks(wchar_t* input)
 
 	if ((args.arg1 != NULL) && (args.arg2 != NULL))
 	{
+		if (strcmp(args.arg1, "help") == 0)
+		{
+			KBlast_c_module_help(CALLBACKS);
+		}
 		if (strcmp((const char*)((PUCHAR)args.arg2), "list") == 0)
 		{
 			pOutBuffer = (PPROCESS_KERNEL_CALLBACK_STORAGE)LocalAlloc(LPTR, sizeof(PROCESS_KERNEL_CALLBACK_STORAGE));
@@ -306,13 +401,17 @@ BOOL KBlast_c_device_dispatch_callbacks(wchar_t* input)
 					status = KBlast_c_device_control(KBLAST_IOCTL_CALLBACK_IMAGE_LIST, NULL, NULL, (LPVOID)pOutBuffer, sizeof(PROCESS_KERNEL_CALLBACK_STORAGE));
 					// check result
 				}
-				if (strcmp((const char*)((PUCHAR)args.arg1), "registry") == 0)
+				if (strcmp((const char*)((PUCHAR)args.arg1), "reg") == 0)
 				{
 					status = KBlast_c_device_control(KBLAST_IOCTL_CALLBACK_REGISTRY_LIST, NULL, NULL, (LPVOID)pOutBuffer, sizeof(PROCESS_KERNEL_CALLBACK_STORAGE));
 					// check result
 				}
 			}
 		}
+	}
+	else
+	{
+		KBlast_c_module_help(CALLBACKS);
 	}
 
 	KBlast_c_utils_FreeAnsiString(realInput);
