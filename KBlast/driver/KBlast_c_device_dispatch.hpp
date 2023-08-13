@@ -60,7 +60,6 @@ typedef enum _HELP_MODULE {
 } HELP_MENU;
 
 
-
 BOOL KBlast_c_device_dispatch_misc(wchar_t* input);
 BOOL KBlast_c_device_dispatch_protection(wchar_t* input);
 BOOL KBlast_c_device_dispatch_token(wchar_t* input);

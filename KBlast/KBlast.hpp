@@ -12,16 +12,7 @@
 #include "KBlast_c_privilege.hpp"
 #include "driver/KBlast_c_device_dispatch.hpp"
 
-/*
-typedef struct _KBLAST_BUFFER {
-
-	int integer1;
-	int integer2;
-	char* string1;
-	char* string2;
-
-} KBLAST_BUFFER, * PKBLAST_BUFFER;
-*/
+typedef NTSTATUS(NTAPI* PRTLGETVERSION) (OUT PRTL_OSVERSIONINFOW lpVersionInformation);
 
 // Driver upper commands
 
@@ -32,18 +23,13 @@ typedef struct _KBLAST_BUFFER {
 #define KBLAST_MOD_CALLBACK		L"call|"
 
 
-KBLAST_HELP_MENU Generic_Cmds[7] = {
+KBLAST_HELP_MENU Generic_Cmds[8] = {
 	{L"help", L"Show this help"},
 	{L"quit", L"Quit KBlast"},
 	{L"cls", L"Clear the screen"},
 	{L"banner", L"Print KBlast banner"},
 	{L"pid", L"Show current pid"},
 	{L"time", L"Display system time"},
+	{L"version", L"Display system version information"},
 	{L"!{cmd}", L"Execute system command"}
 };
-
-
-
-//KBLAST_HELP_MENU help_gen = { 0 };
-
-//L"This is the help menù for the generic KBlast module.\nThere's no need to prepend the module name to use these commands.\nCommands in this section do not open kernel interactions.\n";

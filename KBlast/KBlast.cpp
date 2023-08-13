@@ -19,12 +19,21 @@
 * call : process-list,thread-list,image-list (kernel callbacks)
 */
 
+
+/* todo
+* merge priv and into tokn
+* Add examples to the help menu (a lot of examples. At least one per command)
+* The help menu should be handled by one single function inside KBlast_c_device_dispatch.cpp
+*/
+
+RTL_OSVERSIONINFOW OSinfo = { 0 };
+
 void KBlast_c_generic_help()
 {
 	DWORD i = 0;
 
-	wprintf(L"\nModule - ' Generic ' ( does not initiate kernel interactions )\n\n");
-	for (i = 0; i < 7; i++)
+	wprintf(L"\nCommands - ' Generic ' ( do not initiate kernel interactions )\n\n");
+	for (i = 0; i < 8; i++)
 	{
 		wprintf(L"\t%s\t\t:\t%s\n", Generic_Cmds[i].Command, Generic_Cmds[i].Description);
 	}
@@ -36,26 +45,45 @@ void KBlast_c_PrintInfo(DWORD dwOption)
 {
 	SYSTEMTIME sTime = { 0 };
 	DWORD dwBuild = 0;
+	HMODULE ntdll = 0;
+	PRTLGETVERSION RtlGetVersion = 0;
+
+	if (OSinfo.dwOSVersionInfoSize == 0)
+	{
+		OSinfo.dwOSVersionInfoSize = sizeof(RTL_OSVERSIONINFOW);
+		ntdll = GetModuleHandleW(L"ntdll.dll");
+		if (ntdll != 0)
+		{
+			RtlGetVersion = (PRTLGETVERSION)GetProcAddress(ntdll, "RtlGetVersion");
+			if (RtlGetVersion != 0)
+			{
+				RtlGetVersion(&OSinfo);
+			}
+		}
+	}
 
 	switch (dwOption)
 	{
 	case 0:
-		dwBuild = (DWORD)(HIWORD(GetVersion()));
 		GetSystemTime(&sTime);
 		wprintf(
 			L"    __ __ ____  __           __\n"
-			L"   / //_// __ )/ /___ ______/ /_\t| KBlast client - OS Build #%d - System time #%d:%d\n"
+			L"   / //_// __ )/ /___ ______/ /_\t| KBlast client - OS Build #%d - Major version #%d\n"
 			L"  / ,<  / __  / / __ `/ ___/ __/\t| Version : %s ( first release )\n"
 			L" / /| |/ /_/ / / /_/ (__  ) /_\t\t| Angelo Frasca Caccia ( lem0nSec_ )\n"
 			L"/_/ |_/_____/_/\\__,_/____/\\__/\t\t| Website: http://www.github.com/lem0nSec/KBlast\n"
-			L"------------------------------------------------------->>>\n", dwBuild, sTime.wHour, sTime.wMinute, KBLAST_VERSION
+			L"------------------------------------------------------->>>\n", OSinfo.dwBuildNumber, OSinfo.dwMajorVersion, KBLAST_VERSION
 		);
 		break;
 
 	case 1:
-		dwBuild = (DWORD)(HIWORD(GetVersion()));
 		GetSystemTime(&sTime);
 		wprintf(L"System time is : %d:%d:%d - %d/%d/%d\n", sTime.wHour, sTime.wMinute, sTime.wSecond, sTime.wMonth, sTime.wDay, sTime.wYear);
+		break;
+
+	case 2:
+		wprintf(L"Build number : %d\nMajor version : %d\nMinor version : %d\nPlatform ID : %d\n", OSinfo.dwBuildNumber, OSinfo.dwMajorVersion, OSinfo.dwMinorVersion, OSinfo.dwPlatformId);
+		break;
 
 	default:
 		break;
@@ -226,6 +254,10 @@ BOOL KBlast_c_ConsoleStart()
 		if (wcscmp(input, L"time\n") == 0)
 		{
 			KBlast_c_PrintInfo(1);
+		}
+		if (wcscmp(input, L"version\n") == 0)
+		{
+			KBlast_c_PrintInfo(2);
 		}
 		if (wcsncmp(input, KBLAST_MOD_MISC, 5) == 0)
 		{

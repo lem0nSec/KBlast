@@ -42,25 +42,25 @@ void KBlast_c_module_help(HELP_MENU help)
 	switch (help)
 	{
 	case CALLBACKS:
-		wprintf(L"\nModule - ' call ' ( kernel callbacks interaction )\n\n");
+		wprintf(L"\nCommands - ' call ' ( kernel callbacks interactions )\n\n");
 		menu = (PKBLAST_HELP_MENU)&Call_Cmds;
 		maxSize = 4;
 		break;
 
 	case TOKEN:
-		wprintf(L"\nModule - ' tokn ' ( token manipulation )\n\n");
+		wprintf(L"\nCommands - ' tokn ' ( token manipulation interactions )\n\n");
 		menu = (PKBLAST_HELP_MENU)&Tokn_Cmds;
 		maxSize = 4;
 		break;
 
 	case PROTECTION:
-		wprintf(L"\nModule - ' prot ' ( process protection )\n\n");
+		wprintf(L"\nnCommands - ' prot ' ( process protection interactions )\n\n");
 		menu = (PKBLAST_HELP_MENU)&Prot_Cmds;
 		maxSize = 4;
 		break;
 
 	case MISC:
-		wprintf(L"\nModule - ' misc ' ( misc functionalities. Kernel memory reading/writing, etc... )\n\n");
+		wprintf(L"\nCommands - ' misc ' ( misc functionalities. Kernel memory reading/writing interactions, etc... )\n\n");
 		menu = (PKBLAST_HELP_MENU)&Misc_Cmds;
 		maxSize = 2;
 		break;
