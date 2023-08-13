@@ -1,5 +1,5 @@
 # KBlast\(er\)
-**Windows Kernel Offensive Security Toolset**
+**Windows ring0 Offensive Toolset**
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------
 `KBlast(er)` is a small application I built while experimenting Windows ring0 offensive security techniques. It puts together almost all the techniques discussed in the [Offensive Driver Development](https://training.zeropointsecurity.co.uk/courses/offensive-driver-development) course from Zero Point Security, plus some extra techniques. I thought that building up this tool rather than writing down a cheatsheet was a better way to both put into practice the concepts learned and provide the community with a comprehensive learning resource.
