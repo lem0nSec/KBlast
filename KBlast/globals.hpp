@@ -25,8 +25,11 @@
 #define KBLAST_DRV_FILENAME	L"\\\\.\\KBlaster"
 #define KBLAST_SRV_NAME		L"KBlaster"
 #define KBLAST_VERSION		L"1.0"
-
-
+#if defined(_M_X64)
+#define KBLAST_ARCH			L"x64"
+#elif defined(_M_IX86)
+#define KBLAST_ARCH			L"x86"
+#endif
 
 
 typedef struct _KBLAST_MEMORY_BUFFER {
@@ -36,11 +39,3 @@ typedef struct _KBLAST_MEMORY_BUFFER {
 	UCHAR buffer[250];
 
 } KBLAST_MEMORY_BUFFER, * PKBLAST_MEMORY_BUFFER; // this should be written on another header file
-
-
-typedef struct _KBLAST_HELP_MENU {
-
-	const wchar_t* Command;
-	const wchar_t* Description;
-
-} KBLAST_HELP_MENU, * PKBLAST_HELP_MENU;

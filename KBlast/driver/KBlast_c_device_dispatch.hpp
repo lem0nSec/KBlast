@@ -52,6 +52,7 @@ typedef struct _PROCESS_KERNEL_CALLBACK_STORAGE {
 
 typedef enum _HELP_MODULE {
 
+	GENERIC,
 	MISC,
 	PROTECTION,
 	TOKEN,
@@ -60,8 +61,16 @@ typedef enum _HELP_MODULE {
 } HELP_MENU;
 
 
+typedef struct _KBLAST_HELP_MENU {
+
+	const wchar_t* Command;
+	const wchar_t* Description;
+
+} KBLAST_HELP_MENU, * PKBLAST_HELP_MENU;
+
+
+void KBlast_c_module_help(HELP_MENU help);
 BOOL KBlast_c_device_dispatch_misc(wchar_t* input);
 BOOL KBlast_c_device_dispatch_protection(wchar_t* input);
 BOOL KBlast_c_device_dispatch_token(wchar_t* input);
-BOOL KBlast_c_device_dispatch_privileges(wchar_t* input);
 BOOL KBlast_c_device_dispatch_callbacks(wchar_t* input);

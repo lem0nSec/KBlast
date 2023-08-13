@@ -14,8 +14,7 @@
 * Modules (modules consists of command sets for interaction with the driver. They shouldn't support userland functionalities.)
 * misc : bsod (generic)
 * prot : protect,unprotect (process protection PPL)
-* priv : enable,disable (token privileges)
-* tokn : steal, restore (token management)
+* tokn : enablepriv, disablepriv, steal, restore (token management)
 * call : process-list,thread-list,image-list (kernel callbacks)
 */
 
@@ -23,23 +22,10 @@
 /* todo
 * merge priv and into tokn
 * Add examples to the help menu (a lot of examples. At least one per command)
-* The help menu should be handled by one single function inside KBlast_c_device_dispatch.cpp
+* Fix 'restore' in tokn
 */
 
 RTL_OSVERSIONINFOW OSinfo = { 0 };
-
-void KBlast_c_generic_help()
-{
-	DWORD i = 0;
-
-	wprintf(L"\nCommands - ' Generic ' ( do not initiate kernel interactions )\n\n");
-	for (i = 0; i < 8; i++)
-	{
-		wprintf(L"\t%s\t\t:\t%s\n", Generic_Cmds[i].Command, Generic_Cmds[i].Description);
-	}
-	wprintf(L"\n");
-
-}
 
 void KBlast_c_PrintInfo(DWORD dwOption)
 {
@@ -69,10 +55,10 @@ void KBlast_c_PrintInfo(DWORD dwOption)
 		wprintf(
 			L"    __ __ ____  __           __\n"
 			L"   / //_// __ )/ /___ ______/ /_\t| KBlast client - OS Build #%d - Major version #%d\n"
-			L"  / ,<  / __  / / __ `/ ___/ __/\t| Version : %s ( first release )\n"
+			L"  / ,<  / __  / / __ `/ ___/ __/\t| Version : %s ( first release ) - Architecture : %s\n"
 			L" / /| |/ /_/ / / /_/ (__  ) /_\t\t| Angelo Frasca Caccia ( lem0nSec_ )\n"
 			L"/_/ |_/_____/_/\\__,_/____/\\__/\t\t| Website: http://www.github.com/lem0nSec/KBlast\n"
-			L"------------------------------------------------------->>>\n", OSinfo.dwBuildNumber, OSinfo.dwMajorVersion, KBLAST_VERSION
+			L"------------------------------------------------------->>>\n", OSinfo.dwBuildNumber, OSinfo.dwMajorVersion, KBLAST_VERSION, KBLAST_ARCH
 		);
 		break;
 
@@ -215,7 +201,6 @@ BOOL KBlast_c_system(wchar_t* input)
 }
 
 
-
 BOOL KBlast_c_ConsoleStart()
 {
 	BOOL status = FALSE;
@@ -228,7 +213,7 @@ BOOL KBlast_c_ConsoleStart()
 		fgetws(input, ARRAYSIZE(input), stdin); fflush(stdin);
 		if (wcscmp(input, L"help\n") == 0)
 		{
-			KBlast_c_generic_help();
+			KBlast_c_module_help(GENERIC);
 		}
 		if (wcscmp(input, L"quit\n") == 0)
 		{
@@ -266,10 +251,6 @@ BOOL KBlast_c_ConsoleStart()
 		if (wcsncmp(input, KBLAST_MOD_PROTECTION, 5) == 0)
 		{
 			KBlast_c_device_dispatch_protection((wchar_t*)((DWORD_PTR)input + 10));
-		}
-		if (wcsncmp(input, KBLAST_MOD_PRIVILEGES, 5) == 0)
-		{
-			KBlast_c_device_dispatch_privileges((wchar_t*)((DWORD_PTR)input + 10));
 		}
 		if (wcsncmp(input, KBLAST_MOD_TOKEN, 5) == 0)
 		{
