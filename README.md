@@ -2,35 +2,39 @@
 **Windows Kernel Offensive Security Toolset**
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------
-`KBlast(er)` is a small application composed of a Windows driver plus a client application. The tool combines some Windows ring0 offensive security techniques in one tool. After completing the course [Offensive Driver Development](https://training.zeropointsecurity.co.uk/courses/offensive-driver-development) from Zero Point Security, I decided to put together the techniques I learned plus some extra stuff in one single application rather taking notes or writing down a cheatsheet.
+`KBlast(er)` is a small application I built while experimenting Windows ring0 offensive security techniques. It puts together almost all the techniques discussed in the [Offensive Driver Development](https://training.zeropointsecurity.co.uk/courses/offensive-driver-development) course from Zero Point Security, plus some extra techniques. I thought that building up this tool rather than writing down a cheatsheet was a better way to both put into practice the concepts learned and provide the community with a comprehensive learning resource.
 
 ```
     __ __ ____  __           __
-   / //_// __ )/ /___ ______/ /_        | KBlast client - OS Build #9200 - System time #19:36
-  / ,<  / __  / / __ `/ ___/ __/        | Version : 1.0 ( first release )
+   / //_// __ )/ /___ ______/ /_        | KBlast client - OS Build #19045 - Major version #10
+  / ,<  / __  / / __ `/ ___/ __/        | Version : 1.0 ( first release ) - Architecture : x64
  / /| |/ /_/ / / /_/ (__  ) /_          | Angelo Frasca Caccia ( lem0nSec_ )
 /_/ |_/_____/_/\__,_/____/\__/          | Website: http://www.github.com/lem0nSec/KBlast
 ------------------------------------------------------->>>
-KBlast > help
+KBlast > call|help
 
-Module - ' Generic ' ( does not initiate kernel interactions )
+Commands - ' call ' ( kernel callbacks interactions )
 
-        help            :       Show this help
-        quit            :       Quit KBlast
-        cls             :       Clear the screen
-        banner          :       Print KBlast banner
-        pid             :       Show current pid
-        time            :       Display system time
-        !{cmd}          :       Execute system command
+           process:     Process creation kernel callbacks
+            thread:     Thread creation kernel callbacks
+             image:     Image loading kernel callbacks
+               reg:     registry kernel callbacks
+
+Examples:
+
+$ call|process|list
+$ call|thread|list
+$ call|image|list
+$ call|reg|list
 
 KBlast >
 ```
 ## How it works
-This tool has two parts. KBlaster.sys is the actual core where all central features live. Since the goal of the project was putting puting together Windows kernel offensive security techniques, there must be driver that is loaded onto the kernel space. On the other hand, KBlast.exe is the client application. KBlast.exe takes user commands, generate a specific input to be sent to KBlaster, and once the driver has finished its operation the client may or may not return the result of the operation depending on what has been done.
+This tool has two components. KBlaster.sys is the application's driver, the actual core where all central features live. In contrast, KBlast.exe is the client application. KBlast.exe takes user commands, generate a specific input to be sent to KBlaster, and once the driver has finished its operation the client may or may not return the result of the operation depending on what was done.
 
-## Modules
-Right now KBlast\(er\) supports five modules, which do not include generic commands. Modules are 'misc', 'prot', 'priv', 'tokn', 'call'. These modules reflect specific techniques. The fun part is that some misc functionalities can be combined to functionalities from other modules, thus offering a chance to diversify widely known techniques.
+## Commands and Features
+KBlast\(er\) commands can fall into four categories which must be prepended to the actual command (generic commands can be just typed and run right away). Categories can be 'misc', 'prot', 'tokn', 'call'. The fun part is that some misc functionalities can be combined with commands from other modules, thus offering a chance to diversify already known approaches.
 
 
 ## Important note
-This tool is still under development. It is being developed on a Windows 10 Pro build 9200 machine. Some functionalities support other Windows versions. Others don't. Since the Windows Kernel is mostly composed of 'opaque' data structures, this tool is likely to trigger bsods at this stage of development. ... I hope you understand.
+This tool is still at an early stage of development. KBlast(er) is being actively tested on a Windows 10 Pro build 19045 x64 machine. Some functionalities support other Windows versions. Others don't. Since the Windows Kernel is mostly composed of 'opaque' data structures, this tool is likely to trigger bsods at this stage of development if a version other than the one mentioned is used. Development of these tools often requires months. If you like the idea, please consider supporting me here! 

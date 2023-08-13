@@ -42,7 +42,7 @@ KBLAST_HELP_MENU Call_Cmds[4] = {
 	{L"process", L"Process creation kernel callbacks"},
 	{L"thread", L"Thread creation kernel callbacks"},
 	{L"image", L"Image loading kernel callbacks"},
-	{L"reg", L"registry kernel callbacks"}
+	{L"reg", L"Registry kernel callbacks"}
 };
 
 
