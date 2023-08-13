@@ -39,6 +39,7 @@ BOOL KBlast_c_CheckTokenIntegrity()
 			}
 		}
 
+		CloseHandle(hToken);
 		LocalFree(pTokenIntegrity);
 	}
 
