@@ -68,7 +68,7 @@ void KBlast_c_PrintInfo(DWORD dwOption)
 		break;
 
 	case 2:
-		wprintf(L"Build number : %d\nMajor version : %d\nMinor version : %d\nPlatform ID : %d\n", OSinfo.dwBuildNumber, OSinfo.dwMajorVersion, OSinfo.dwMinorVersion, OSinfo.dwPlatformId);
+		wprintf(L"Architecture : %s\nBuild number : %d\nMajor version : %d\nMinor version : %d\nPlatform ID : %d\n", KBLAST_ARCH, OSinfo.dwBuildNumber, OSinfo.dwMajorVersion, OSinfo.dwMinorVersion, OSinfo.dwPlatformId);
 		break;
 
 	default:
