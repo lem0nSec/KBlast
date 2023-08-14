@@ -24,7 +24,7 @@ void KBlast_c_blob_info(PKBLAST_USERLAND_BLOBS_CONTAINER container)
 			wprintf(L"\n");
 			break;
 		}
-		wprintf(L"%02x ", *(BYTE*)(BYTE*)((DWORD_PTR)container->blob + i));
+		wprintf(L"%02x ", *(BYTE*)(BYTE*)((DWORD_PTR)container->blob + i)); // should be *(PBYTE)((DWORD_PTR)container->blob + i);
 	}
 }
 

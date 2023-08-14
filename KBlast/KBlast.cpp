@@ -8,20 +8,7 @@
 #include "KBlast.hpp"
 
 
-
-
-/*
-* Modules (modules consists of command sets for interaction with the driver. They shouldn't support userland functionalities.)
-* misc : bsod (generic)
-* prot : protect,unprotect (process protection PPL)
-* tokn : enablepriv, disablepriv, steal, restore (token management)
-* call : process-list,thread-list,image-list (kernel callbacks)
-*/
-
-
 /* todo
-* merge priv and into tokn
-* Add examples to the help menu (a lot of examples. At least one per command)
 * Fix 'restore' in tokn
 */
 
