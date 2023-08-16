@@ -365,7 +365,7 @@ BOOL KBlast_c_device_dispatch_token(wchar_t* input)
 				printf("Token : restore : %d\n", DeviceArgs.integer1);
 				status = KBlast_c_device_control(KBLAST_IOCTL_TOKEN_RESTORE, &DeviceArgs, sizeof(KBLAST_BUFFER), NULL, NULL);
 				// check result
-				// see if more than a token can be restored (I don't think that's feasible)
+				// see if more than a token can be restored (I don't think that's feasible right now)
 			}
 		}
 	}
@@ -473,7 +473,7 @@ BOOL KBlast_c_device_dispatch_callbacks(wchar_t* input)
 			{
 				//printf("[+] Handle : 0x%-016p | Pointer : 0x%-016p ( %s + %lu )\n", (PVOID)pOutBuffer->CallbackInformation[i].CallbackHandle, (PVOID)pOutBuffer->CallbackInformation[i].CallbackFunctionPointer, name, offset);
 				printf(
-					"\n[+] %s\n\t\t[*] Handle : 0x%-016p\n\t\t[*] Pointer : 0x%-016p ( %s + %lu )\n\n",
+					"\n[+] %s\n\t\t[*] Handle : 0x%-016p\n\t\t[*] Pointer : 0x%-016p ( %s + %lu )\n",
 					name, (PVOID)pOutBuffer->CallbackInformation[i].CallbackHandle, (PVOID)pOutBuffer->CallbackInformation[i].CallbackFunctionPointer, name, offset
 				);
 			}
@@ -481,7 +481,7 @@ BOOL KBlast_c_device_dispatch_callbacks(wchar_t* input)
 			{
 				//printf("[+] Pointer : 0x%-016p ( %s + %lu )\n", (PVOID)pOutBuffer->CallbackInformation[i].CallbackFunctionPointer, name, offset);
 				printf(
-					"\n[+] %s\n\t\t[*] Pointer : 0x%-016p ( %s + %lu )\n\n",
+					"\n[+] %s\n\t\t[*] Pointer : 0x%-016p ( %s + %lu )\n",
 					name, (PVOID)pOutBuffer->CallbackInformation[i].CallbackFunctionPointer, name, offset
 				);
 			}
