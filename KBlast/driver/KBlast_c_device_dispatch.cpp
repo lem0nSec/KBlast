@@ -52,7 +52,7 @@ L"$ call|process|remove|ffffffff12121212\n";
 
 wchar_t Tokn_Examples[] =
 L"$ tokn|enablepriv|123 - ( enable all privileges for process 123 )\n"
-L"$ tokn|disablepriv|123 - (disable all privileges for process 123 )\n"
+L"$ tokn|disablepriv|123 - ( disable all privileges for process 123 )\n"
 L"$ tokn|steal|4|123 - ( replace 123's token with System's [ 4 ] )\n"
 L"$ tokn|restore|123 - ( restore 123's token [ ! experimental ! ] )\n";
 
@@ -70,6 +70,7 @@ L"$ misc|read|ffffffff12121212|300 - ( read 300 bytes at the given kernel addres
 L"$ misc|blob|write|ffffffff12121212|1 - ( write 1's blob at the given kernel address )\n";
 
 wchar_t Generic_Examples[] = L"No example is available for ' generic ' commands\n";
+
 
 void KBlast_c_module_help(HELP_MENU help)
 {
@@ -481,7 +482,7 @@ BOOL KBlast_c_device_dispatch_callbacks(wchar_t* input)
 			{
 				//printf("[+] Pointer : 0x%-016p ( %s + %lu )\n", (PVOID)pOutBuffer->CallbackInformation[i].CallbackFunctionPointer, name, offset);
 				printf(
-					"\n[+] %s\n\t\t[*] Pointer : 0x%-016p ( %s + %lu )\n",
+					"\n[+] %s\n\t\t[*] Pointer/Handle : 0x%-016p ( %s + %lu )\n",
 					name, (PVOID)pOutBuffer->CallbackInformation[i].CallbackFunctionPointer, name, offset
 				);
 			}
