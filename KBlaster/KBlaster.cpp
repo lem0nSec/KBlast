@@ -20,6 +20,7 @@ NTSTATUS KBlaster_k_IOCTLDispatchar(PDEVICE_OBJECT pDeviceObject, PIRP pIRP)
 	PIO_STACK_LOCATION stack = IoGetCurrentIrpStackLocation(pIRP);
 	PKBLAST_BUFFER pUserlandGenericParams = 0;
 	PKBLAST_MEMORY_BUFFER pUserlandMemoryParams = 0;
+	
 	ULONG length = 0;
 	ULONG outLength = stack->Parameters.DeviceIoControl.OutputBufferLength;
 
@@ -77,6 +78,22 @@ NTSTATUS KBlaster_k_IOCTLDispatchar(PDEVICE_OBJECT pDeviceObject, PIRP pIRP)
 
 	case KBLAST_IOCTL_CALLBACK_REGISTRY_LIST:
 		status = KBlaster_k_EnumProcessCallbacks(outLength, LISTENTRY_REGISTRY, pIRP->UserBuffer);
+		break;
+
+	case KBLAST_IOCTL_CALLBACK_PROCESS_REMOVE:
+		status = KBlaster_k_RemoveCallbackRoutine(pUserlandGenericParams->pointer, ARRAY_PROCESS);
+		break;
+
+	case KBLAST_IOCTL_CALLBACK_THREAD_REMOVE:
+		status = KBlaster_k_RemoveCallbackRoutine(pUserlandGenericParams->pointer, ARRAY_THREAD);
+		break;
+
+	case KBLAST_IOCTL_CALLBACK_IMAGE_REMOVE:
+		status = KBlaster_k_RemoveCallbackRoutine(pUserlandGenericParams->pointer, ARRAY_IMAGE);
+		break;
+
+	case KBLAST_IOCTL_CALLBACK_REGISTRY_REMOVE:
+		status = KBlaster_k_RemoveCallbackRoutine(pUserlandGenericParams->pointer, LISTENTRY_REGISTRY);
 		break;
 
 	case KBLAST_IOCTL_MEMORY_WRITE:

@@ -62,4 +62,41 @@ typedef struct _CMREG_CALLBACK {
 
 } CMREG_CALLBACK, * PCMREG_CALLBACK;
 
+/*
+typedef struct _OBJECT_TYPE {
+	LIST_ENTRY TypeList;
+	UNICODE_STRING Name;
+	PVOID DefaultObject;
+	UCHAR Index;
+	ULONG TotalNumberOfObjects;
+	ULONG TotalNumberOfHandles;
+	ULONG HighWaterNumberOfObjects;
+	ULONG HighWaterNumberOfHandles;
+	unsigned char TypeInfo[0x78]; // OBJECT_TYPE_INITIALIZER TypeInfo;
+	EX_PUSH_LOCK TypeLock;
+	ULONG Key;
+	LIST_ENTRY CallbackList; //offset 0xC8
+} OBJECT_TYPE, * POBJECT_TYPE;
+
+typedef struct _CALLBACK_ENTRY
+{
+	INT16 Version;
+	unsigned char unknown[6];
+	POB_OPERATION_REGISTRATION RegistrationContext;
+	UNICODE_STRING Altitude;
+} CALLBACK_ENTRY, * PCALLBACK_ENTRY;
+
+
+typedef struct _CALLBACK_ENTRY_ITEM {
+	LIST_ENTRY EntryItemList;
+	OB_OPERATION Operations;
+	OB_OPERATION Active; // DWORD Active
+	PCALLBACK_ENTRY CallbackEntry;
+	POBJECT_TYPE ObjectType;
+	POB_PRE_OPERATION_CALLBACK PreOperation; //offset 0x28
+	POB_POST_OPERATION_CALLBACK PostOperation; //offset 0x30
+	__int64 unk;
+} CALLBACK_ENTRY_ITEM, * PCALLBACK_ENTRY_ITEM;
+*/
+
 PVOID KBlaster_k_GetCallbackStoragePointer(IN CALLBACK_TYPE cType);

@@ -15,21 +15,24 @@ NTSTATUS KBlaser_k_memory_manage(IN PKBLAST_MEMORY_BUFFER InBuf, OUT OPTIONAL PV
 	MM_COPY_ADDRESS mmCAddress = { 0 };
 	SIZE_T old = 0;
 
-	switch (action)
+	if (MmIsAddressValid(InBuf->ptr) == TRUE)
 	{
-	case MEMORY_WRITE:
-		mmCAddress.VirtualAddress = (PVOID)InBuf->buffer;
-		status = MmCopyMemory(InBuf->ptr, mmCAddress, (SIZE_T)InBuf->size, MM_COPY_MEMORY_VIRTUAL, &old);
-		break;
+		switch (action)
+		{
+		case MEMORY_WRITE:
+			mmCAddress.VirtualAddress = (PVOID)InBuf->buffer;
+			status = MmCopyMemory(InBuf->ptr, mmCAddress, (SIZE_T)InBuf->size, MM_COPY_MEMORY_VIRTUAL, &old);
+			break;
 
-	case MEMORY_READ:
-		mmCAddress.VirtualAddress = InBuf->ptr;
-		status = MmCopyMemory((PVOID)buf->buffer, mmCAddress, InBuf->size, MM_COPY_MEMORY_VIRTUAL, &old);
-		break;
+		case MEMORY_READ:
+			mmCAddress.VirtualAddress = InBuf->ptr;
+			status = MmCopyMemory((PVOID)buf->buffer, mmCAddress, InBuf->size, MM_COPY_MEMORY_VIRTUAL, &old);
+			break;
 
-	default:
-		break;
-	}	
+		default:
+			break;
+		}
+	}
 
 	return status;
 

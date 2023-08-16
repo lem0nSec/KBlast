@@ -19,6 +19,8 @@ typedef struct _KBLAST_BUFFER {
 
 	int integer1;
 	int integer2;
+	PVOID pointer;
+	ULONG64 uPointer;
 	char* string1;
 	char* string2;
 
@@ -33,6 +35,7 @@ NTSTATUS KBlaster_k_TokenPrivilegeManipulate(int processID, PRIVILEGES_ACTION pr
 NTSTATUS KBlaster_k_TokenContextSteal(int processID, int targetProcessID);
 NTSTATUS KBlaster_k_TokenContextRestore(int processID);
 NTSTATUS KBlaster_k_EnumProcessCallbacks(IN ULONG szAvailable, IN CALLBACK_TYPE cType, OUT PVOID pOutBuf);
+NTSTATUS KBlaster_k_RemoveCallbackRoutine(IN PVOID pObject, IN CALLBACK_TYPE cType);
 
 
 

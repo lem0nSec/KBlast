@@ -7,6 +7,13 @@
 
 #include "KBlaster_k_callbacks.hpp"
 
+/*
+PVOID* find()
+{
+	POBJECT_TYPE pObType = *PsProcessType;
+	return (PVOID*)((__int64)pObType + 0xC8);
+}
+*/
 
 
 
@@ -152,7 +159,7 @@ NTSTATUS KBlaster_k_GetCallbackListEntryInformation(IN PVOID pListEntryHead, OUT
 	PAUX_MODULE_EXTENDED_INFO pAuxModuleExtendedInfo = 0;
 	PVOID ret = 0;
 	ULONG bufferSize = 0, nModules = 0, moduleNumber = 0, structCounter = 0;
-	ULONG64 Callback = 0, newStart = 0;
+	ULONG64 Callback = 0, PointerToCallback = 0, newStart = 0;
 	int CallbackQuota = 0, zeroHandles = 0;
 
 	
@@ -175,10 +182,12 @@ NTSTATUS KBlaster_k_GetCallbackListEntryInformation(IN PVOID pListEntryHead, OUT
 					if ((ULONG64)newStart == (ULONG64)pListEntryHead)
 					{
 						Callback = *(PULONG64)((DWORD_PTR)newStart + FIELD_OFFSET(CMREG_CALLBACK, Function) + sizeof(PVOID));
+						PointerToCallback = (ULONG64)((DWORD_PTR)newStart + FIELD_OFFSET(CMREG_CALLBACK, Function) + sizeof(PVOID));
 					}
 					else
 					{
 						Callback = *(PULONG64)((DWORD_PTR)newStart + FIELD_OFFSET(CMREG_CALLBACK, Function));
+						PointerToCallback = (ULONG64)((DWORD_PTR)newStart + FIELD_OFFSET(CMREG_CALLBACK, Function));
 					}
 
 					if (Callback != 0)
@@ -188,6 +197,7 @@ NTSTATUS KBlaster_k_GetCallbackListEntryInformation(IN PVOID pListEntryHead, OUT
 						if (moduleNumber != 0xffffffff)
 						{
 							pOutBuf->CallbackInformation[structCounter].CallbackFunctionPointer = (PVOID)Callback;
+							pOutBuf->CallbackInformation[structCounter].PointerToHandle = (PVOID)PointerToCallback;
 							pOutBuf->CallbackInformation[structCounter].ModuleInformation.ModuleBase = pAuxModuleExtendedInfo[moduleNumber].BasicInfo.ImageBase;
 							pOutBuf->CallbackInformation[structCounter].ModuleInformation.ModuleFileNameOffset = pAuxModuleExtendedInfo[moduleNumber].FileNameOffset;
 							pOutBuf->CallbackInformation[structCounter].ModuleInformation.ModuleImageSize = pAuxModuleExtendedInfo[moduleNumber].ImageSize;
@@ -325,6 +335,60 @@ NTSTATUS KBlaster_k_GetCallbackArrayInformation(IN PVOID ProcessNotifyCallbackAr
 
 
 
+NTSTATUS KBlaster_k_RemoveCallbackRoutine(IN PVOID pObject, IN CALLBACK_TYPE cType)
+{
+	NTSTATUS status = STATUS_UNSUCCESSFUL;
+	PVOID pStorage = 0;
+	ULONG i = 0;
+	PROCESS_KERNEL_CALLBACK_STORAGE pInfo = { 0 };
+
+	pStorage = KBlaster_k_GetCallbackStoragePointer(cType);
+	if (pStorage != 0)
+	{
+		if ((cType == ARRAY_PROCESS) || (cType == ARRAY_THREAD) || (cType == ARRAY_IMAGE))
+		{
+			status = KBlaster_k_GetCallbackArrayInformation(pStorage, &pInfo);
+			if (NT_SUCCESS(status))
+			{
+				for (i = 0; i < pInfo.CallbackQuota; i++)
+				{
+					if (pInfo.CallbackInformation[i].CallbackHandle == (ULONG64)pObject)
+					{
+						RtlZeroMemory(pInfo.CallbackInformation[i].PointerToHandle, sizeof(ULONG64));
+						status = STATUS_SUCCESS;
+						break;
+					}
+				}
+
+				RtlZeroMemory(&pInfo, sizeof(PROCESS_KERNEL_CALLBACK_STORAGE));
+
+			}
+		}
+		else if ((cType == LISTENTRY_REGISTRY) || (cType == LISTENTRY_OBJECT))
+		{
+			status = KBlaster_k_GetCallbackListEntryInformation(pStorage, &pInfo);
+			if (NT_SUCCESS(status))
+			{
+				for (i = 0; i < pInfo.CallbackQuota; i++)
+				{
+					if (pInfo.CallbackInformation[i].CallbackFunctionPointer == pObject)
+					{
+						status = CmUnRegisterCallback((LARGE_INTEGER)(*(PLARGE_INTEGER)((ULONG64)pInfo.CallbackInformation[i].PointerToHandle - (sizeof(ULONG64) * 2))));
+					}
+				}
+
+				RtlZeroMemory(&pInfo, sizeof(PROCESS_KERNEL_CALLBACK_STORAGE));
+
+			}
+		}
+	}
+
+	return status;
+
+}
+
+
+
 NTSTATUS KBlaster_k_EnumProcessCallbacks(IN ULONG szAvailable, IN CALLBACK_TYPE cType, OUT PVOID pOutBuf)
 {
 	NTSTATUS status = STATUS_UNSUCCESSFUL;
@@ -372,8 +436,7 @@ NTSTATUS KBlaster_k_EnumProcessCallbacks(IN ULONG szAvailable, IN CALLBACK_TYPE 
 					{
 						outBuffer->CallbackInformation[i].CallbackFunctionPointer = pInfo.CallbackInformation[i].CallbackFunctionPointer;
 						//outBuffer->CallbackInformation[i].CallbackHandle = pInfo.CallbackInformation[i].CallbackHandle;
-						//outBuffer->CallbackInformation[i].PointerToHandle = pInfo.CallbackInformation[i].PointerToHandle;
-
+						outBuffer->CallbackInformation[i].PointerToHandle = pInfo.CallbackInformation[i].PointerToHandle;
 						outBuffer->CallbackInformation[i].ModuleInformation.ModuleBase = pInfo.CallbackInformation[i].ModuleInformation.ModuleBase;
 						outBuffer->CallbackInformation[i].ModuleInformation.ModuleFileNameOffset = pInfo.CallbackInformation[i].ModuleInformation.ModuleFileNameOffset;
 						outBuffer->CallbackInformation[i].ModuleInformation.ModuleImageSize = pInfo.CallbackInformation[i].ModuleInformation.ModuleImageSize;
@@ -394,3 +457,5 @@ NTSTATUS KBlaster_k_EnumProcessCallbacks(IN ULONG szAvailable, IN CALLBACK_TYPE 
 	return status;
 
 }
+
+

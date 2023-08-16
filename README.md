@@ -2,14 +2,14 @@
 **Windows ring0 Offensive Toolset**
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------
-`KBlast(er)` is a small application I built while experimenting Windows ring0 offensive security techniques. It puts together almost all the techniques discussed in the [Offensive Driver Development](https://training.zeropointsecurity.co.uk/courses/offensive-driver-development) course from Zero Point Security, plus some extra techniques. I thought that building up this tool rather than writing down a cheatsheet was a better way to both put into practice the concepts learned and provide the community with a comprehensive learning resource.
+`KBlast(er)` is a small application I built while experimenting with Windows kernel offensive security techniques. It puts together almost all the techniques discussed in the [Offensive Driver Development](https://training.zeropointsecurity.co.uk/courses/offensive-driver-development) course from Zero Point Security, plus some extra techniques. I thought that building up this tool rather than writing down a cheatsheet was a better way to both put into practice the concepts learned and provide the community with a comprehensive learning resource.
 
 ```
     __ __ ____  __           __
    / //_// __ )/ /___ ______/ /_        | KBlast client - OS Build #19045 - Major version #10
   / ,<  / __  / / __ `/ ___/ __/        | Version : 1.0 ( first release ) - Architecture : x64
  / /| |/ /_/ / / /_/ (__  ) /_          | Angelo Frasca Caccia ( lem0nSec_ )
-/_/ |_/_____/_/\__,_/____/\__/          | Website: http://www.github.com/lem0nSec/KBlast
+/_/ |_/_____/_/\__,_/____/\__/          | Website : http://www.github.com/lem0nSec/KBlast
 ------------------------------------------------------->>>
 KBlast > call|help
 
@@ -18,14 +18,12 @@ Commands - ' call ' ( kernel callbacks interactions )
            process:     Process creation kernel callbacks
             thread:     Thread creation kernel callbacks
              image:     Image loading kernel callbacks
-               reg:     registry kernel callbacks
+               reg:     Registry kernel callbacks
 
 Examples:
 
 $ call|process|list
-$ call|thread|list
-$ call|image|list
-$ call|reg|list
+$ call|process|remove|ffffffff12121212
 
 KBlast >
 ```

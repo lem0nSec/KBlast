@@ -48,9 +48,7 @@ KBLAST_HELP_MENU Call_Cmds[4] = {
 
 wchar_t Call_Examples[] =
 L"$ call|process|list\n"
-L"$ call|thread|list\n"
-L"$ call|image|list\n"
-L"$ call|reg|list\n";
+L"$ call|process|remove|ffffffff12121212\n";
 
 wchar_t Tokn_Examples[] =
 L"$ tokn|enablepriv|123 - ( enable all privileges for process 123 )\n"
@@ -431,15 +429,39 @@ BOOL KBlast_c_device_dispatch_callbacks(wchar_t* input)
 				}
 			}
 		}
+		if (strcmp((const char*)((PUCHAR)args.arg2), "remove") == 0)
+		{
+			DeviceArgs.pointer = KBlast_c_utils_StringToKernelPointer(args.arg3, (DWORD)strlen(args.arg3));
+			if ((strcmp((const char*)((PUCHAR)args.arg1), "process") == 0) && (DeviceArgs.pointer != 0))
+			{
+				printf("Callback : process : remove : 0x%-016p\n", DeviceArgs.pointer);
+				status = KBlast_c_device_control(KBLAST_IOCTL_CALLBACK_PROCESS_REMOVE, (LPVOID)&DeviceArgs, sizeof(KBLAST_BUFFER), NULL, NULL);
+			}
+			if ((strcmp((const char*)((PUCHAR)args.arg1), "thread") == 0) && (DeviceArgs.pointer != 0))
+			{
+				printf("Callback : thread : remove : 0x%-016p\n", DeviceArgs.pointer);
+				status = KBlast_c_device_control(KBLAST_IOCTL_CALLBACK_THREAD_REMOVE, (LPVOID)&DeviceArgs, sizeof(KBLAST_BUFFER), NULL, NULL);
+			}
+			if ((strcmp((const char*)((PUCHAR)args.arg1), "image") == 0) && (DeviceArgs.pointer != 0))
+			{
+				printf("Callback : image : remove : 0x%-016p\n", DeviceArgs.pointer);
+				status = KBlast_c_device_control(KBLAST_IOCTL_CALLBACK_IMAGE_REMOVE, (LPVOID)&DeviceArgs, sizeof(KBLAST_BUFFER), NULL, NULL);
+			}
+			if ((strcmp((const char*)((PUCHAR)args.arg1), "reg") == 0) && (DeviceArgs.pointer != 0))
+			{
+				printf("Callback : reg : remove : 0x%-016p\n", DeviceArgs.pointer);
+				status = KBlast_c_device_control(KBLAST_IOCTL_CALLBACK_REGISTRY_REMOVE, (LPVOID)&DeviceArgs, sizeof(KBLAST_BUFFER), NULL, NULL);
+			}
+		}
 	}
 	else
 	{
 		KBlast_c_module_help(CALLBACKS);
 	}
 
-	KBlast_c_utils_FreeAnsiString(realInput);
+	
 
-	if (status == TRUE)
+	if ((status == TRUE) && ((strcmp((const char*)((PUCHAR)args.arg2), "list") == 0)))
 	{
 		ULONG offset = 0;
 		char* name = 0;
@@ -449,11 +471,19 @@ BOOL KBlast_c_device_dispatch_callbacks(wchar_t* input)
 			name = KBlast_c_utils_GetImageNameByFullPath(pOutBuffer->CallbackInformation[i].ModuleInformation.ModuleFullPathName);
 			if (pOutBuffer->CallbackInformation[i].CallbackHandle != 0)
 			{
-				printf("[+] Handle : 0x%-016p | Pointer : 0x%-016p ( %s + %lu )\n", (PVOID)pOutBuffer->CallbackInformation[i].CallbackHandle, (PVOID)pOutBuffer->CallbackInformation[i].CallbackFunctionPointer, name, offset);
+				//printf("[+] Handle : 0x%-016p | Pointer : 0x%-016p ( %s + %lu )\n", (PVOID)pOutBuffer->CallbackInformation[i].CallbackHandle, (PVOID)pOutBuffer->CallbackInformation[i].CallbackFunctionPointer, name, offset);
+				printf(
+					"\n[+] %s\n\t\t[*] Handle : 0x%-016p\n\t\t[*] Pointer : 0x%-016p ( %s + %lu )\n\n",
+					name, (PVOID)pOutBuffer->CallbackInformation[i].CallbackHandle, (PVOID)pOutBuffer->CallbackInformation[i].CallbackFunctionPointer, name, offset
+				);
 			}
 			else
 			{
-				printf("[+] Pointer : 0x%-016p ( %s + %lu )\n", (PVOID)pOutBuffer->CallbackInformation[i].CallbackFunctionPointer, name, offset);
+				//printf("[+] Pointer : 0x%-016p ( %s + %lu )\n", (PVOID)pOutBuffer->CallbackInformation[i].CallbackFunctionPointer, name, offset);
+				printf(
+					"\n[+] %s\n\t\t[*] Pointer : 0x%-016p ( %s + %lu )\n\n",
+					name, (PVOID)pOutBuffer->CallbackInformation[i].CallbackFunctionPointer, name, offset
+				);
 			}
 		}
 		offset = 0;
@@ -463,6 +493,8 @@ BOOL KBlast_c_device_dispatch_callbacks(wchar_t* input)
 		LocalFree(pOutBuffer);
 
 	}
+
+	KBlast_c_utils_FreeAnsiString(realInput);
 
 	return status;
 }
