@@ -17,12 +17,6 @@ PVOID* find()
 
 
 
-/*
-* ------------------------------------------------------------------------------------------------------------------------------------
-* KBlast_GetProcessNotifyCallbackArray gets a pointer to an array which contains
-* kernel handles to callbacks of type Process Creation
-* ------------------------------------------------------------------------------------------------------------------------------------
-*/
 PVOID KBlaster_k_GetCallbackStoragePointer(IN CALLBACK_TYPE cType)
 {
 	ULONG64 pInitialFunction = 0;
@@ -120,13 +114,7 @@ PVOID KBlaster_k_GetCallbackStoragePointer(IN CALLBACK_TYPE cType)
 }
 
 
-/*
-* ------------------------------------------------------------------------------------------------------------------------------------
-* Given a number of modules X, KBlast_GetKernelCallbackModuleNumber gets the module number
-* a specified callback belongs to. It returns 0xffffffff if the callback address does not
-* exist in any driver image space.
-* ------------------------------------------------------------------------------------------------------------------------------------
-*/
+
 ULONG KBlaster_k_GetKernelCallbackModuleNumber(IN PVOID callback, IN ULONG nModules, IN PAUX_MODULE_EXTENDED_INFO pAuxModuleExtendedInfo)
 {
 	ULONG64 arithmCallback = 0;
@@ -155,7 +143,6 @@ ULONG KBlaster_k_GetKernelCallbackModuleNumber(IN PVOID callback, IN ULONG nModu
 NTSTATUS KBlaster_k_GetCallbackListEntryInformation(IN PVOID pListEntryHead, OUT PPROCESS_KERNEL_CALLBACK_STORAGE pOutBuf)
 {
 	NTSTATUS status = STATUS_UNSUCCESSFUL;
-	//PCMREG_CALLBACK cmRegCallbackStruct = 0;
 	PAUX_MODULE_EXTENDED_INFO pAuxModuleExtendedInfo = 0;
 	PVOID ret = 0;
 	ULONG bufferSize = 0, nModules = 0, moduleNumber = 0, structCounter = 0;
@@ -241,15 +228,6 @@ NTSTATUS KBlaster_k_GetCallbackListEntryInformation(IN PVOID pListEntryHead, OUT
 
 
 
-
-
-/*
-* ------------------------------------------------------------------------------------------------------------------------------------
-* KBlast_GetProcessKernelCallbackArrayInformation retrieves extensive information about the entire PspSetCreateProcessNotifyRoutine,
-* including information about the single callback routines. This information gets stored inside a PROCESS_KERNEL_CALLBACK_ARRAY
-* struct.
-* ------------------------------------------------------------------------------------------------------------------------------------
-*/
 NTSTATUS KBlaster_k_GetCallbackArrayInformation(IN PVOID ProcessNotifyCallbackArray, OUT PPROCESS_KERNEL_CALLBACK_STORAGE pProcessKernelCallbackArray)
 {
 	NTSTATUS status = 0;
