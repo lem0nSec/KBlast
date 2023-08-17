@@ -1,5 +1,13 @@
 # KBlast
-**Windows Kernel Offensive Toolset**
+
+
+<p align="center">
+  <img src="pictures/KBlast_logo.png">
+</p>
+
+
+
+__Windows Kernel Offensive Toolset__
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------
 `KBlast` is a small application I built while experimenting with Windows kernel offensive security techniques. It puts together almost all the techniques discussed in the [Offensive Driver Development](https://training.zeropointsecurity.co.uk/courses/offensive-driver-development) course from Zero Point Security, plus some extra techniques. I thought that building up this tool rather than writing down a cheatsheet was a better way to both put into practice the concepts learned and provide the community with a comprehensive learning resource.
