@@ -1,8 +1,8 @@
-# KBlast\(er\)
-**Windows ring0 Offensive Toolset**
+# KBlast
+**Windows Kernel Offensive Toolset**
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------
-`KBlast(er)` is a small application I built while experimenting with Windows kernel offensive security techniques. It puts together almost all the techniques discussed in the [Offensive Driver Development](https://training.zeropointsecurity.co.uk/courses/offensive-driver-development) course from Zero Point Security, plus some extra techniques. I thought that building up this tool rather than writing down a cheatsheet was a better way to both put into practice the concepts learned and provide the community with a comprehensive learning resource.
+`KBlast` is a small application I built while experimenting with Windows kernel offensive security techniques. It puts together almost all the techniques discussed in the [Offensive Driver Development](https://training.zeropointsecurity.co.uk/courses/offensive-driver-development) course from Zero Point Security, plus some extra techniques. I thought that building up this tool rather than writing down a cheatsheet was a better way to both put into practice the concepts learned and provide the community with a comprehensive learning resource.
 
 ```
     __ __ ____  __           __
@@ -31,7 +31,7 @@ KBlast >
 This tool has two components. KBlaster.sys is the application's driver, the actual core where all central features live. In contrast, KBlast.exe is the client application. KBlast.exe takes user commands, generate a specific input to be sent to KBlaster, and once the driver has finished its operation the client may or may not return the result of the operation depending on what was done.
 
 ## Commands and Features
-KBlast\(er\) commands can fall into four categories which must be prepended to the actual command (generic commands can be just typed and run right away). Categories can be 'misc', 'prot', 'tokn', 'call'. The fun part is that some misc functionalities can be combined with commands from other modules, thus offering a chance to diversify already known approaches.
+KBlast commands can fall into four categories which must be prepended to the actual command (generic commands can be just typed and run right away). Categories can be 'misc', 'prot', 'tokn', 'call'. The fun part is that some misc functionalities can be combined with commands from other modules, thus offering a chance to diversify already known approaches.
 
 
 ## Important note
