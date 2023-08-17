@@ -29,7 +29,7 @@ $ call|process|remove|ffffffff12121212
 KBlast >
 ```
 ## How it works
-This tool has two components. KBlaster.sys is the application's driver, the actual core where all central features live. In contrast, KBlast.exe is the client application. KBlast.exe takes user commands, generate a specific input to be sent to KBlaster, and once the driver has finished its operation the client may or may not return the result of the operation depending on what was done.
+This tool has two components. KBlaster.sys is the application's driver, the actual core where all central features reside. In contrast, KBlast.exe is the client application. KBlast.exe takes user commands, generate a specific input to be sent to KBlaster, and once the driver has finished its operation the client may or may not return the result of the operation depending on what was done.
 
 ## Commands and Features
 KBlast commands can fall into four categories which must be prepended to the actual command (generic commands can be just typed and run right away). Categories can be:
@@ -43,4 +43,4 @@ The fun part is that some misc functionalities can be combined with commands fro
 
 
 ## Important note
-This tool is still at an early stage of development. KBlast is being actively tested on a Windows 10 Pro build 19045 x64 machine. Some functionalities support other Windows versions. Others don't. Since the Windows Kernel is mostly composed of 'opaque' data structures, this tool is likely to trigger bsods at this stage of development if a version other than the one mentioned is used. Development of these tools often requires months. If you like the idea, please consider supporting me here!
+This tool is still at an early stage of development. KBlast is being actively tested on a Windows 10 Pro build 19045 x64 machine. Some functionalities support other Windows versions. Others don't. Since the Windows Kernel is mostly composed of 'opaque' data structures, this tool is likely to trigger bsods at this stage of development if a version other than the one mentioned is used. Development of these tools often requires months. I hope you understand and appreciate the project and the idea behind!
