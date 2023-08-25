@@ -12,19 +12,21 @@ __Windows Kernel Offensive Toolset__
  / /| |/ /_/ / / /_/ (__  ) /_          | Angelo Frasca Caccia ( lem0nSec_ )
 /_/ |_/_____/_/\__,_/____/\__/          | Website : http://www.github.com/lem0nSec/KBlast
 ------------------------------------------------------->>>
-KBlast > call|help
+KBlast > tokn|help
 
-Commands - ' call ' ( kernel callbacks interactions )
+Commands - ' tokn ' ( token manipulation interactions )
 
-           process:     Process creation kernel callbacks
-            thread:     Thread creation kernel callbacks
-             image:     Image loading kernel callbacks
-               reg:     Registry kernel callbacks
+        enablepriv:     Enable all privileges for a given process
+        disablepriv:    Disable all privileges for a given process
+             steal:     Steal token and give it to a given process
+           restore:     Restore the original token of a given process
 
 Examples:
 
-$ call|process|list
-$ call|process|remove|ffffffff12121212
+$ tokn|enablepriv|123 - ( enable all privileges for process 123 )
+$ tokn|disablepriv|123 - ( disable all privileges for process 123 )
+$ tokn|steal|4|123 - ( replace 123's token with System's [ 4 ] )
+$ tokn|restore|123 - ( restore 123's token [ ! experimental ! ] )
 
 KBlast >
 ```
