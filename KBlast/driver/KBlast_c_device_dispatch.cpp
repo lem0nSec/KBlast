@@ -66,7 +66,7 @@ wchar_t Misc_Examples[] =
 L"$ misc|blob|save|90909090 - ( save the given blob [ requires a free container ] )\n"
 L"$ misc|blob|info|1 - ( dump container 1 )\n"
 L"$ misc|blob|delete|1 - ( free container 1 )\n"
-L"$ misc|read|ffffffff12121212|300 - ( read 300 bytes at the given kernel address )\n"
+L"$ misc|blob|read|ffffffff12121212|300 - ( read 300 bytes at the given kernel address )\n"
 L"$ misc|blob|write|ffffffff12121212|1 - ( write 1's blob at the given kernel address )\n";
 
 wchar_t Generic_Examples[] = L"No example is available for ' generic ' commands\n";
