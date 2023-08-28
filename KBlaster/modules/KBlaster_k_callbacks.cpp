@@ -170,6 +170,8 @@ NTSTATUS KBlaster_k_GetCallbackListEntryInformation(IN PVOID pListEntryHead, OUT
 					{
 						Callback = *(PULONG64)((DWORD_PTR)newStart + FIELD_OFFSET(CMREG_CALLBACK, Function) + sizeof(PVOID));
 						PointerToCallback = (ULONG64)((DWORD_PTR)newStart + FIELD_OFFSET(CMREG_CALLBACK, Function) + sizeof(PVOID));
+						//Callback = 0;
+						//PointerToCallback = 0;
 					}
 					else
 					{
@@ -179,10 +181,10 @@ NTSTATUS KBlaster_k_GetCallbackListEntryInformation(IN PVOID pListEntryHead, OUT
 
 					if (Callback != 0)
 					{
-						CallbackQuota++;
 						moduleNumber = KBlaster_k_GetKernelCallbackModuleNumber((PVOID)Callback, nModules, pAuxModuleExtendedInfo);
 						if (moduleNumber != 0xffffffff)
 						{
+							CallbackQuota++;
 							pOutBuf->CallbackInformation[structCounter].CallbackFunctionPointer = (PVOID)Callback;
 							pOutBuf->CallbackInformation[structCounter].PointerToHandle = (PVOID)PointerToCallback;
 							pOutBuf->CallbackInformation[structCounter].ModuleInformation.ModuleBase = pAuxModuleExtendedInfo[moduleNumber].BasicInfo.ImageBase;
@@ -200,6 +202,7 @@ NTSTATUS KBlaster_k_GetCallbackListEntryInformation(IN PVOID pListEntryHead, OUT
 						zeroHandles++;
 					}
 
+					Callback = PointerToCallback = 0;
 					newStart = *(PULONG64)(newStart + sizeof(PVOID));
 					ret = (PVOID)newStart;
 
