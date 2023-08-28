@@ -186,7 +186,7 @@ BOOL KBlast_c_device_dispatch_misc(wchar_t* input)
 			{
 				status = KBlast_c_blob_manage(NULL, (char*)args.arg3, NULL, BLOB_INFO);
 			}
-			if ((strcmp(args.arg2, "write") == 0)) // |||	args : arg1(blob), arg2(write), arg3(ptr), arg4(container)		blob|write|0x...|1		{submodule, operation, dest, source} -> kernel memory write
+			if ((strcmp(args.arg2, "write") == 0))
 			{
 				if ((args.arg3 != NULL) && (args.arg4 != NULL))
 				{
@@ -205,13 +205,13 @@ BOOL KBlast_c_device_dispatch_misc(wchar_t* input)
 			}
 			if ((strcmp(args.arg2, "read") == 0))
 			{
-				if ((args.arg3 != NULL) && (args.arg4 != NULL) && (args.arg5 != NULL)) // args : arg1(blob), arg2(read), arg3(ptr), arg4(size), arg5()
+				if ((args.arg3 != NULL) && (args.arg4 != NULL) && (args.arg5 != NULL))
 				{
 					pBuf = (PKBLAST_MEMORY_BUFFER)LocalAlloc(LPTR, sizeof(KBLAST_MEMORY_BUFFER));
 					if (pBuf != 0)
 					{
 						pBuf->size = atoi(args.arg4);
-						pBuf->ptr = KBlast_c_utils_StringToKernelPointer(args.arg3, (DWORD)strlen(args.arg3)); // see if this block should be moved to KBlast_c_blob_manage
+						pBuf->ptr = KBlast_c_utils_StringToKernelPointer(args.arg3, (DWORD)strlen(args.arg3));
 						if ((pBuf->size != 0) && (pBuf->ptr != 0))
 						{
 							pOutBuf = (PKBLAST_MEMORY_BUFFER)LocalAlloc(LPTR, sizeof(KBLAST_MEMORY_BUFFER));
@@ -472,19 +472,19 @@ BOOL KBlast_c_device_dispatch_callbacks(wchar_t* input)
 			name = KBlast_c_utils_GetImageNameByFullPath(pOutBuffer->CallbackInformation[i].ModuleInformation.ModuleFullPathName);
 			if (pOutBuffer->CallbackInformation[i].CallbackHandle != 0)
 			{
-				//printf("[+] Handle : 0x%-016p | Pointer : 0x%-016p ( %s + %lu )\n", (PVOID)pOutBuffer->CallbackInformation[i].CallbackHandle, (PVOID)pOutBuffer->CallbackInformation[i].CallbackFunctionPointer, name, offset);
+				//printf("[+] Handle : 0x%-016p | Pointer : 0x%-016p ( %s + %lu )\n", (PVOID)pOutBuffer->CallbackInformation[i].CallbackHandle, (PVOID)pOutBuffer->CallbackInformation[i].CallbackFunctionPointer, name, offset); format 1
 				printf(
 					"\n[+] %s\n\t\t[*] Handle : 0x%-016p\n\t\t[*] Pointer : 0x%-016p ( %s + %lu )\n",
 					name, (PVOID)pOutBuffer->CallbackInformation[i].CallbackHandle, (PVOID)pOutBuffer->CallbackInformation[i].CallbackFunctionPointer, name, offset
-				);
+				); // format 2
 			}
 			else
 			{
-				//printf("[+] Pointer : 0x%-016p ( %s + %lu )\n", (PVOID)pOutBuffer->CallbackInformation[i].CallbackFunctionPointer, name, offset);
+				//printf("[+] Pointer : 0x%-016p ( %s + %lu )\n", (PVOID)pOutBuffer->CallbackInformation[i].CallbackFunctionPointer, name, offset); format 1
 				printf(
 					"\n[+] %s\n\t\t[*] Pointer/Handle : 0x%-016p ( %s + %lu )\n",
 					name, (PVOID)pOutBuffer->CallbackInformation[i].CallbackFunctionPointer, name, offset
-				);
+				); // format 2
 			}
 		}
 		offset = 0;

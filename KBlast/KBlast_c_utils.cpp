@@ -39,9 +39,9 @@ int KBlast_c_utils_GetCommandLineArguments(IN char* inBuffer, IN BYTE separator,
 		*(BYTE*)(BYTE*)((DWORD_PTR)newBuffer + initialSize - 1) = separator;
 		for (DWORD i = 0; i < initialSize; i++)
 		{
-			if (*(BYTE*)(BYTE*)((DWORD_PTR)newBuffer + i) == separator)
+			if (*(PBYTE)((DWORD_PTR)newBuffer + i) == separator)
 			{
-				*(BYTE*)(BYTE*)((DWORD_PTR)newBuffer + i) = 0x00;
+				*(PBYTE)((DWORD_PTR)newBuffer + i) = 0x00;
 			}
 		}
 
@@ -136,7 +136,7 @@ PVOID KBlast_c_utils_StringToKernelPointer(LPCSTR strPointer, DWORD szPtr)
 
 			for (i = 0; i < szForLoop; i++)
 			{
-				*(BYTE*)(BYTE*)((DWORD_PTR)newBuf - i) = *(BYTE*)(BYTE*)((DWORD_PTR)buf + i);
+				*(PBYTE)((DWORD_PTR)newBuf - i) = *(BYTE*)(BYTE*)((DWORD_PTR)buf + i);
 			}
 			
 			memcpy(buf, (const void*)((DWORD_PTR)buf + szForLoop), szForLoop);
