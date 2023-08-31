@@ -14,7 +14,7 @@
 
 RTL_OSVERSIONINFOW OSinfo = { 0 };
 
-void KBlast_c_PrintInfo(DWORD dwOption)
+void KBlast_c_GetInfo(DWORD dwOption)
 {
 	SYSTEMTIME sTime = { 0 };
 	DWORD dwBuild = 0;
@@ -61,6 +61,35 @@ void KBlast_c_PrintInfo(DWORD dwOption)
 	default:
 		break;
 	}
+
+}
+
+BOOL KBlast_c_CheckOSVersion()
+{
+	BOOL status = FALSE;
+	HMODULE ntdll = 0;
+	PRTLGETVERSION RtlGetVersion = 0;
+
+	if (OSinfo.dwOSVersionInfoSize == 0)
+	{
+		OSinfo.dwOSVersionInfoSize = sizeof(RTL_OSVERSIONINFOW);
+		ntdll = GetModuleHandleW(L"ntdll.dll");
+		if (ntdll != 0)
+		{
+			RtlGetVersion = (PRTLGETVERSION)GetProcAddress(ntdll, "RtlGetVersion");
+			if (RtlGetVersion != 0)
+			{
+				RtlGetVersion(&OSinfo);
+			}
+		}
+	}
+
+	if ((OSinfo.dwBuildNumber == 19045) && (OSinfo.dwMajorVersion == 10))
+	{
+		status = TRUE;
+	}
+
+	return status;
 
 }
 
@@ -164,7 +193,7 @@ void KBlast_c_ConsoleInit()
 	RtlZeroMemory(&cInfo, sizeof(CONSOLE_SCREEN_BUFFER_INFO));
 
 	SetConsoleTitle(KBLAST_CLT_TITLE);
-	KBlast_c_PrintInfo(0);
+	KBlast_c_GetInfo(0);
 }
 
 
@@ -193,6 +222,11 @@ BOOL KBlast_c_ConsoleStart()
 	BOOL status = FALSE;
 	KBlast_c_ConsoleInit();
 
+	if (KBlast_c_CheckOSVersion() == FALSE)
+	{
+		wprintf(L"[!] Warning : This OS version might not be fully supported. Critical issues may rise.\n");
+	}
+
 	wchar_t input[MAX_PATH];
 	while (TRUE)
 	{
@@ -209,7 +243,7 @@ BOOL KBlast_c_ConsoleStart()
 		}
 		if (wcscmp(input, L"banner\n") == 0)
 		{
-			KBlast_c_PrintInfo(0);
+			KBlast_c_GetInfo(0);
 		}
 		if (wcscmp(input, L"cls\n") == 0)
 		{
@@ -225,11 +259,11 @@ BOOL KBlast_c_ConsoleStart()
 		}
 		if (wcscmp(input, L"time\n") == 0)
 		{
-			KBlast_c_PrintInfo(1);
+			KBlast_c_GetInfo(1);
 		}
 		if (wcscmp(input, L"version\n") == 0)
 		{
-			KBlast_c_PrintInfo(2);
+			KBlast_c_GetInfo(2);
 		}
 		if (wcsncmp(input, KBLAST_MOD_MISC, 5) == 0)
 		{

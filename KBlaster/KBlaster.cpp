@@ -187,20 +187,3 @@ NTSTATUS DriverEntry(_In_ PDRIVER_OBJECT DriverObject, _In_ PUNICODE_STRING Regi
 	return status;
 
 }
-
-
-
-
-
-
-//UNREFERENCED_PARAMETER(DriverObject);
-//UNREFERENCED_PARAMETER(DriverObject);
-/*
-		// test IOCTL
-	case KBLAST_IOCTL_TEST:
-		DbgPrint("[i] WARNING: THIS IS A TEST IOCTL\n");
-		//pUserlandGenericParams = (PKBLAST_BUFFER)stack->Parameters.DeviceIoControl.Type3InputBuffer;
-		//DbgPrint("[i] Userland parameter: %d\n", pUserlandGenericParams->integer1);
-
-		break;
-		*/
