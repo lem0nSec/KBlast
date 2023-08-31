@@ -299,8 +299,8 @@ int wmain(int argc, wchar_t* argv[])
 		if (status == TRUE)
 		{
 			wprintf(L"[+] Starting console...\n");
-			KBlast_c_ConsoleStart(); // see if it could be the case to create a new thread here and put the main thread to sleep
-			KBlast_c_cleanup();		// the main thread should be awaken when it's time to clean up and exit
+			KBlast_c_ConsoleStart();
+			KBlast_c_cleanup();
 		}
 	}
 	if (argc < 3)
