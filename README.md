@@ -44,6 +44,12 @@ KBlast commands can fall into four categories which must be prepended to the act
 The fun part is that some misc functionalities can be combined with commands from other modules, thus offering a chance to diversify already known approaches.
 
 
+## Installation Notes
+Since KBlaster.sys is just a driver I built for my own learning, it does not come with signing. Disabling DSE with the following command is required to play with this tool.
+
+- `bcdedit /set testsigning on`
+
+
 ## Important note :warning:
 __This tool is still at an early stage of development.__ KBlast is being actively tested on a Windows 10 Pro build 19045 x64 machine. Some functionalities support other Windows versions. Others don't. Since the Windows Kernel is mostly composed of 'opaque' data structures, this tool is likely to trigger bsods at this stage of development if a version other than the one mentioned is used. Development of these tools often requires months. I hope you understand and appreciate the project and the idea behind!
 Last but not least, I might consider adding new features such as process hiding or DSE management if the project will turn out a useful resource for learners.
