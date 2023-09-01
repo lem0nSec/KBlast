@@ -262,7 +262,7 @@ BOOL KBlast_c_device_dispatch_protection(wchar_t* input)
 			DeviceArgs.integer1 = atoi((const char*)((PUCHAR)args.arg2));
 			if (DeviceArgs.integer1 != 0)
 			{
-				printf("Protection : full(wintcp) : %d\n", DeviceArgs.integer1);
+				printf("Protection : full(wintcb) : %d\n", DeviceArgs.integer1);
 				status = KBlast_c_device_control(KBLASTER_IOCTL_PROTECT_WINTCB, &DeviceArgs, sizeof(KBLAST_BUFFER), NULL, NULL);
 				// check result
 			}
