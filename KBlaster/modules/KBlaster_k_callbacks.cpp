@@ -251,7 +251,7 @@ NTSTATUS KBlaster_k_GetCallbackArrayInformation(IN PVOID ProcessNotifyCallbackAr
 
 				while (i < (8 * maxCallbacks)) // enumerate up to 44 callbacks
 				{
-					callbackHandle = (ULONG64)((*(ULONG64*)(ULONG64*)((ULONG_PTR)ProcessNotifyCallbackArray + i)));
+					callbackHandle = (ULONG64)((*(PULONG64)((ULONG_PTR)ProcessNotifyCallbackArray + i)));
 					if (callbackHandle == 0)
 					{
 						zeroHandles++;
@@ -266,7 +266,7 @@ NTSTATUS KBlaster_k_GetCallbackArrayInformation(IN PVOID ProcessNotifyCallbackAr
 				
 				for (i = 0; i < 8 * maxCallbacks; i += sizeof(PVOID))
 				{
-					callbackHandle = (ULONG64)((*(ULONG64*)(ULONG64*)((ULONG_PTR)ProcessNotifyCallbackArray + i)));
+					callbackHandle = (ULONG64)((*(PULONG64)((ULONG_PTR)ProcessNotifyCallbackArray + i)));
 					if (callbackHandle != 0)
 					{
 						Callback = *(PULONG64)(callbackHandle & 0xfffffffffffffff8);
