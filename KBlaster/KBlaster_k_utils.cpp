@@ -18,13 +18,11 @@ WINDOWS_VERSION KBlaster_k_utils_GetWindowsVersion()
 	status = RtlGetVersion(&RtlOSVersion);
 	if (status != STATUS_SUCCESS)
 	{
-		DbgPrint("[-] RtlGetVersion failed.\n");
 		return WINDOWS_UNSUPPORTED;
 	}
 
 	if (RtlOSVersion.dwMajorVersion != 10)
 	{
-		DbgPrint("[-] Windows version is too old.\n");
 		return WINDOWS_UNSUPPORTED;
 	}
 

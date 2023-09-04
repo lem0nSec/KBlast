@@ -17,7 +17,7 @@ typedef enum _CALLBACK_TYPE {
 	ARRAY_THREAD,
 	ARRAY_IMAGE,
 	LISTENTRY_REGISTRY,
-	LISTENTRY_OBJECT
+	// LISTENTRY_OBJECT // todo
 
 } CALLBACK_TYPE;
 
@@ -99,4 +99,4 @@ typedef struct _CALLBACK_ENTRY_ITEM {
 } CALLBACK_ENTRY_ITEM, * PCALLBACK_ENTRY_ITEM;
 */
 
-PVOID KBlaster_k_GetCallbackStoragePointer(IN CALLBACK_TYPE cType);
+//PVOID KBlaster_k_GetCallbackStoragePointer(IN CALLBACK_TYPE cType);

@@ -57,9 +57,8 @@ PVOID KBlaster_k_GetCallbackStoragePointer(IN CALLBACK_TYPE cType)
 		initialOpcode2 = 0x8D;
 		break;
 
-	case LISTENTRY_OBJECT:
-		DbgPrint("Not implemented yet.\n");
-		break;
+	//case LISTENTRY_OBJECT: // todo
+	//	break;
 
 	default:
 		break;
@@ -91,7 +90,7 @@ PVOID KBlaster_k_GetCallbackStoragePointer(IN CALLBACK_TYPE cType)
 		}
 	}
 
-	if ((cType == LISTENTRY_REGISTRY) || (cType == LISTENTRY_OBJECT))
+	if ((cType == LISTENTRY_REGISTRY) /* || (cType == LISTENTRY_OBJECT) */) // todo
 	{
 		if (pInitialFunction != 0)
 		{
@@ -170,8 +169,6 @@ NTSTATUS KBlaster_k_GetCallbackListEntryInformation(IN PVOID pListEntryHead, OUT
 					{
 						Callback = *(PULONG64)((DWORD_PTR)newStart + FIELD_OFFSET(CMREG_CALLBACK, Function) + sizeof(PVOID));
 						PointerToCallback = (ULONG64)((DWORD_PTR)newStart + FIELD_OFFSET(CMREG_CALLBACK, Function) + sizeof(PVOID));
-						//Callback = 0;
-						//PointerToCallback = 0;
 					}
 					else
 					{
@@ -345,7 +342,7 @@ NTSTATUS KBlaster_k_RemoveCallbackRoutine(IN PVOID pObject, IN CALLBACK_TYPE cTy
 
 			}
 		}
-		else if ((cType == LISTENTRY_REGISTRY) || (cType == LISTENTRY_OBJECT))
+		else if ((cType == LISTENTRY_REGISTRY) /* || (cType == LISTENTRY_OBJECT) */ ) // todo
 		{
 			status = KBlaster_k_GetCallbackListEntryInformation(pStorage, &pInfo);
 			if (NT_SUCCESS(status))
@@ -406,7 +403,7 @@ NTSTATUS KBlaster_k_EnumProcessCallbacks(IN ULONG szAvailable, IN CALLBACK_TYPE 
 
 				}
 			}
-			else if ((cType == LISTENTRY_REGISTRY) || (cType == LISTENTRY_OBJECT))
+			else if ((cType == LISTENTRY_REGISTRY) /* || (cType == LISTENTRY_OBJECT) */ ) // todo
 			{
 				status = KBlaster_k_GetCallbackListEntryInformation(pStorage, &pInfo);
 				if (NT_SUCCESS(status))

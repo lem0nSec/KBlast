@@ -10,7 +10,6 @@
 // Windows versions
 typedef enum _WINDOWS_VERSION
 {
-
     WINDOWS_UNSUPPORTED,
     WINDOWS_REDSTONE_1,		// 14393,
     WINDOWS_REDSTONE_2,		// 15063,
