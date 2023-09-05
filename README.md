@@ -9,8 +9,8 @@ __Windows Kernel Offensive Toolset__
     __ __ ____  __           __
    / //_// __ )/ /___ ______/ /_        | KBlast client - OS Build #19045 - Major version #10
   / ,<  / __  / / __ `/ ___/ __/        | Version : 1.0 ( first release ) - Architecture : x64
- / /| |/ /_/ / / /_/ (__  ) /_          | Angelo Frasca Caccia ( lem0nSec_ )
-/_/ |_/_____/_/\__,_/____/\__/          | Website : http://www.github.com/lem0nSec/KBlast
+ / /| |/ /_/ / / /_/ (__  ) /_          | Website : http://www.github.com/lem0nSec/KBlast
+/_/ |_/_____/_/\__,_/____/\__/          | Author  : lem0nSec_
 ------------------------------------------------------->>>
 KBlast > tokn|help
 
