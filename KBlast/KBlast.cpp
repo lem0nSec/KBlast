@@ -43,8 +43,8 @@ void KBlast_c_GetInfo(DWORD dwOption)
 			L"    __ __ ____  __           __\n"
 			L"   / //_// __ )/ /___ ______/ /_\t| KBlast client - OS Build #%d - Major version #%d\n"
 			L"  / ,<  / __  / / __ `/ ___/ __/\t| Version : %s ( first release ) - Architecture : %s\n"
-			L" / /| |/ /_/ / / /_/ (__  ) /_\t\t| Angelo Frasca Caccia ( lem0nSec_ )\n"
-			L"/_/ |_/_____/_/\\__,_/____/\\__/\t\t| Website : http://www.github.com/lem0nSec/KBlast\n"
+			L" / /| |/ /_/ / / /_/ (__  ) /_\t\t| Website : http://www.github.com/lem0nSec/KBlast\n"
+			L"/_/ |_/_____/_/\\__,_/____/\\__/\t\t| Author  : lem0nSec_\n"
 			L"------------------------------------------------------->>>\n", OSinfo.dwBuildNumber, OSinfo.dwMajorVersion, KBLAST_VERSION, KBLAST_ARCH
 		);
 		break;
