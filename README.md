@@ -56,7 +56,7 @@ The following screenshot shows the elevation of mimikatz PPL to LSA. Mimikatz is
 
 
 ## Installation Notes
-Since KBlaster.sys is just a driver I built for my own learning, it does not come with signing. Disabling DSE with the following command is required to play with this tool.
+Since KBlaster.sys is just a driver I built for my own learning, it does not come with signing. Enabling testsigning mode with the following command is required to play with this tool.
 
 - `bcdedit /set testsigning on`
 
