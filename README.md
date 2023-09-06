@@ -44,6 +44,12 @@ KBlast commands can fall into four categories which must be prepended to the act
 The fun part is that some misc functionalities can be combined with commands from other modules, thus offering a chance to diversify already known approaches.
 
 
+## Examples
+The following screenshot shows the the swapping of a high-integrity powershell token with a system-level token (System process pid 4).
+
+![](pictures/token_stealing.png)
+
+
 ## Installation Notes
 Since KBlaster.sys is just a driver I built for my own learning, it does not come with signing. Disabling DSE with the following command is required to play with this tool.
 
