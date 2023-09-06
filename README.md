@@ -45,9 +45,14 @@ The fun part is that some misc functionalities can be combined with commands fro
 
 
 ## Examples
-The following screenshot shows the the swapping of a high-integrity powershell token with a system-level token (System process pid 4).
+The following screenshot shows the swapping of a high-integrity powershell token with a system-level token (System process pid 4).
 
 ![](pictures/token_stealing.png)
+
+
+The following screenshot shows the elevation of mimikatz PPL to LSA. Mimikatz is now granted read access to lsass.
+
+![](pictures/ppl_lsa.png)
 
 
 ## Installation Notes
