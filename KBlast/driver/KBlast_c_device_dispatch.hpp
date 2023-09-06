@@ -18,6 +18,7 @@ typedef struct _KBLAST_BUFFER {
 	int integer2;
 	PVOID pointer;
 	ULONG64 uPointer;
+	ULONG uGeneric;
 	char* string1;
 	char* string2;
 

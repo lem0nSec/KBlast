@@ -15,18 +15,6 @@
 #include "modules/KBlaster_k_memory.hpp"
 
 
-typedef struct _KBLAST_BUFFER {
-
-	int integer1;
-	int integer2;
-	PVOID pointer;
-	ULONG64 uPointer;
-	char* string1;
-	char* string2;
-
-} KBLAST_BUFFER, * PKBLAST_BUFFER;
-
-
 extern "C"
 
 NTSTATUS DriverEntry(_In_ PDRIVER_OBJECT pDriverObject, _In_ PUNICODE_STRING pRegistryPath);

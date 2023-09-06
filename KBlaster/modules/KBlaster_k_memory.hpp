@@ -29,3 +29,4 @@ typedef struct _KBLAST_MEMORY_BUFFER {
 
 
 NTSTATUS KBlaser_k_memory_manage(IN PKBLAST_MEMORY_BUFFER InBuf, OUT OPTIONAL PVOID OutBuf, KBLAST_MEMORY_ACTION action);
+NTSTATUS KBlaster_k_memory_dse(IN ULONG offset, OUT PVOID pOutBuf);

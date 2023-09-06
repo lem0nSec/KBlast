@@ -19,8 +19,9 @@ KBLAST_HELP_MENU Generic_Cmds[8] = {
 	{L"!{cmd}", L"Execute system command"}
 };
 
-KBLAST_HELP_MENU Misc_Cmds[2] = {
+KBLAST_HELP_MENU Misc_Cmds[3] = {
 	{L"bsod", L"Guess what this command does"},
+	{L"dse", L"Print current DSE configuration"},
 	{L"blob", L"blobs management"},
 };
 
@@ -83,35 +84,35 @@ void KBlast_c_module_help(HELP_MENU help)
 	case CALLBACKS:
 		wprintf(L"\nCommands - ' call ' ( kernel callbacks interactions )\n\n");
 		menu = (PKBLAST_HELP_MENU)&Call_Cmds;
-		maxSize = 4;
+		maxSize = sizeof(Call_Cmds) / sizeof(KBLAST_HELP_MENU);
 		examples = Call_Examples;
 		break;
 
 	case TOKEN:
 		wprintf(L"\nCommands - ' tokn ' ( token manipulation interactions )\n\n");
 		menu = (PKBLAST_HELP_MENU)&Tokn_Cmds;
-		maxSize = 4;
+		maxSize = sizeof(Tokn_Cmds) / sizeof(KBLAST_HELP_MENU);
 		examples = Tokn_Examples;
 		break;
 
 	case PROTECTION:
 		wprintf(L"\nCommands - ' prot ' ( process protection interactions )\n\n");
 		menu = (PKBLAST_HELP_MENU)&Prot_Cmds;
-		maxSize = 4;
+		maxSize = sizeof(Prot_Cmds) / sizeof(KBLAST_HELP_MENU);
 		examples = Prot_Examples;
 		break;
 
 	case MISC:
 		wprintf(L"\nCommands - ' misc ' ( misc functionalities. Kernel memory reading/writing interactions, etc... )\n\n");
 		menu = (PKBLAST_HELP_MENU)&Misc_Cmds;
-		maxSize = 2;
+		maxSize = sizeof(Misc_Cmds) / sizeof(KBLAST_HELP_MENU);
 		examples = Misc_Examples;
 		break;
 
 	case GENERIC:
 		wprintf(L"\nCommands - ' generic ' ( generic commands. Do not initiate kernel interactions )\n\n");
 		menu = (PKBLAST_HELP_MENU)&Generic_Cmds;
-		maxSize = 8;
+		maxSize = sizeof(Generic_Cmds) / sizeof(KBLAST_HELP_MENU);
 		examples = Generic_Examples;
 		break;
 
@@ -153,12 +154,16 @@ BOOL KBlast_c_device_dispatch_misc(wchar_t* input)
 	BOOL status = FALSE;
 	KBLAST_COMMANDLINE_ARGUMENTS args = { 0 };
 	KBLAST_BUFFER DeviceArgs = { 0 };
+	PKBLAST_BUFFER pOutBufferGeneric = 0;
 	PKBLAST_MEMORY_BUFFER pBuf = 0;
 	PKBLAST_MEMORY_BUFFER pOutBuf = 0;
 	char* realInput = 0;
 	int argc = 0;
 	DWORD i = 0;
 
+	HMODULE hCi = 0;
+	PVOID pCiInitialize = 0;
+	ULONG offset = 0;
 
 	realInput = KBlast_c_utils_UnicodeStringToAnsiString(input);
 	argc = KBlast_c_utils_GetCommandLineArguments(realInput, 0x7C, &args);
@@ -232,6 +237,30 @@ BOOL KBlast_c_device_dispatch_misc(wchar_t* input)
 				}
 			}
 		}
+		if (strcmp(args.arg1, "dse") == 0)
+		{
+			hCi = GetModuleHandle(L"CI.dll");
+			if (hCi == 0)
+			{
+				hCi = LoadLibraryEx(L"CI.dll", NULL, DONT_RESOLVE_DLL_REFERENCES);
+			}
+			pCiInitialize = GetProcAddress(hCi, "CiInitialize");
+			if (pCiInitialize != 0)
+			{
+				pOutBufferGeneric = (PKBLAST_BUFFER)LocalAlloc(LPTR, sizeof(KBLAST_BUFFER));
+				if (pOutBufferGeneric != 0)
+				{
+					DeviceArgs.uGeneric = (ULONG)((DWORD_PTR)pCiInitialize - (DWORD_PTR)hCi);
+					status = KBlast_c_device_control(KBLASTER_IOCTL_DSE, (LPVOID)&DeviceArgs, sizeof(KBLAST_BUFFER), (LPVOID)pOutBufferGeneric, sizeof(KBLAST_BUFFER));
+					if ((status == TRUE) && (strcmp(args.arg1, "dse") == 0))
+					{
+						printf("[+] g_CiOptions : 0x%-016p\n[+] DSE : 0x%04lx\n\n", pOutBufferGeneric->pointer, pOutBufferGeneric->uGeneric);
+						RtlZeroMemory(pOutBufferGeneric, sizeof(KBLAST_BUFFER));
+						LocalFree(pOutBufferGeneric);
+					}
+				}
+			}
+		}
 	}
 
 	KBlast_c_utils_FreeAnsiString(realInput);
@@ -297,10 +326,6 @@ BOOL KBlast_c_device_dispatch_protection(wchar_t* input)
 				// check result
 			}
 		}
-	}
-	else
-	{
-		KBlast_c_module_help(PROTECTION);
 	}
 
 	KBlast_c_utils_FreeAnsiString(realInput);

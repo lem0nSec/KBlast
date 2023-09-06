@@ -17,3 +17,16 @@
 #pragma warning(disable: 4996)
 
 #define POOL_TAG 'lemS'
+
+
+typedef struct _KBLAST_BUFFER {
+
+	int integer1;
+	int integer2;
+	PVOID pointer;
+	ULONG64 uPointer;
+	ULONG uGeneric;
+	char* string1;
+	char* string2;
+
+} KBLAST_BUFFER, * PKBLAST_BUFFER;

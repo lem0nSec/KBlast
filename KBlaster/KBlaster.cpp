@@ -103,6 +103,10 @@ NTSTATUS KBlaster_k_IOCTLDispatchar(PDEVICE_OBJECT pDeviceObject, PIRP pIRP)
 		status = KBlaser_k_memory_manage(pUserlandMemoryParams, pIRP->UserBuffer, MEMORY_READ);
 		break;
 
+	case KBLASTER_IOCTL_DSE:
+		status = KBlaster_k_memory_dse(pUserlandGenericParams->uGeneric, pIRP->UserBuffer);
+		break;
+
 	default:
 		break;
 	}
