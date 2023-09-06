@@ -62,5 +62,16 @@ Since KBlaster.sys is just a driver I built for my own learning, it does not com
 
 
 ## Important note :warning:
-__This tool is still at an early stage of development.__ KBlast is being actively tested on a Windows 10 Pro build 19045 x64 machine. Some functionalities support other Windows versions. Others don't. Since the Windows Kernel is mostly composed of 'opaque' data structures, this tool is likely to trigger bsods at this stage of development if a version other than the one mentioned is used. Development of these tools often requires months. I hope you understand and appreciate the project and the idea behind!
+__This tool is still at an early stage of development.__ KBlast is being actively tested on a Windows 10 Pro build 19045 x64 machine. Some functionalities support other Windows versions. Others don't. To clarify, the following is the output of 'version' command on the system I'm using to build the tool.
+
+```
+KBlast > version
+Architecture : x64
+Build number : 19045
+Major version : 10
+Minor version : 0
+Platform ID : 2
+```
+
+Since the Windows Kernel is mostly composed of 'opaque' data structures, this tool is likely to trigger bsods at this stage of development if a version other than the one mentioned is used. Development of these tools often requires months. I hope you understand and appreciate the project and the idea behind!
 Last but not least, I might consider adding new features such as process hiding if the project will turn out a useful resource for learners.
