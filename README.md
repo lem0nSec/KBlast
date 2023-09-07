@@ -1,5 +1,11 @@
 # KBlast
 
+![Static Badge](https://img.shields.io/badge/Version-1.0.0-red?style=flat&color=red) ![Static Badge](https://img.shields.io/badge/License-GPL_3.0-red?style=flat&color=blue) ![Static Badge](https://img.shields.io/badge/Author-lem0nSec-red?style=flat&color=yellow)
+
+<p align="center">
+  <img src="pictures/KBlast_logo.png">
+</p>
+
 __Windows Kernel Offensive Toolset__
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------
