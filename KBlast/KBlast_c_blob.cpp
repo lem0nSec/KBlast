@@ -21,7 +21,7 @@ void KBlast_c_blob_info(PKBLAST_USERLAND_BLOBS_CONTAINER container)
 	{
 		if (i == container->szBlob)
 		{
-			wprintf(L"\n");
+			wprintf(L"\n\n");
 			break;
 		}
 		wprintf(L"%02x ", *(BYTE*)(BYTE*)((DWORD_PTR)container->blob + i)); // should be *(PBYTE)((DWORD_PTR)container->blob + i);
@@ -60,7 +60,7 @@ BOOL KBlast_c_blob_manage(IN OPTIONAL LPCSTR strBlob, IN OPTIONAL char* containe
 		}
 		else
 		{
-			wprintf(L"[!] Blob containers are all full.\n");
+			wprintf(L"[!] Blob containers are all full.\n\n");
 			break;
 		}
 		
@@ -74,12 +74,12 @@ BOOL KBlast_c_blob_manage(IN OPTIONAL LPCSTR strBlob, IN OPTIONAL char* containe
 			if (status == TRUE)
 			{
 				tBlob->szBlob = szBlob / 2; // szBlob should be divided by 2 because it is initially equal to the size of the string, where each character is actually a byte.
-				wprintf(L"[+] Blob saved in local container %d.\n", n);
+				wprintf(L"[+] Blob saved in local container %d.\n\n", n);
 				n = 0;
 			}
 			else
 			{
-				wprintf(L"[!] Invalid input.\n");
+				wprintf(L"[!] Invalid input.\n\n");
 			}
 			break;
 		}
@@ -103,7 +103,7 @@ BOOL KBlast_c_blob_manage(IN OPTIONAL LPCSTR strBlob, IN OPTIONAL char* containe
 				break;
 
 			default:
-				wprintf(L"[!] %d container does not exist.\n", n);
+				wprintf(L"[!] %d container does not exist.\n\n", n);
 				break;
 			}
 
@@ -117,13 +117,13 @@ BOOL KBlast_c_blob_manage(IN OPTIONAL LPCSTR strBlob, IN OPTIONAL char* containe
 					status = TRUE;
 					if (status == TRUE)
 					{
-						wprintf(L"[+] Container %d cleared.\n", n);
+						wprintf(L"[+] Container %d cleared.\n\n", n);
 					}
 					break;
 				}
 				else
 				{
-					wprintf(L"[!] Container %d is empty.\n", n);
+					wprintf(L"[!] Container %d is empty.\n\n", n);
 					break;
 				}
 			}
@@ -148,7 +148,7 @@ BOOL KBlast_c_blob_manage(IN OPTIONAL LPCSTR strBlob, IN OPTIONAL char* containe
 				break;
 
 			default:
-				wprintf(L"[!] Container %d does not exist.\n", n);
+				wprintf(L"[!] Container %d does not exist.\n\n", n);
 				break;
 			}
 
@@ -157,7 +157,7 @@ BOOL KBlast_c_blob_manage(IN OPTIONAL LPCSTR strBlob, IN OPTIONAL char* containe
 				status = TRUE;
 				if (tBlob->isFull == FALSE)
 				{
-					wprintf(L"[!] Container %d is empty.\n", n);
+					wprintf(L"[!] Container %d is empty.\n\n", n);
 				}
 				else
 				{
@@ -186,7 +186,7 @@ BOOL KBlast_c_blob_manage(IN OPTIONAL LPCSTR strBlob, IN OPTIONAL char* containe
 				break;
 
 			default:
-				wprintf(L"[!] Container %d does not exist.\n", n);
+				wprintf(L"[!] Container %d does not exist.\n\n", n);
 				break;
 			}
 
@@ -206,13 +206,13 @@ BOOL KBlast_c_blob_manage(IN OPTIONAL LPCSTR strBlob, IN OPTIONAL char* containe
 					}
 					else
 					{
-						wprintf(L"[!] Blob buffer is too large.\n");
+						wprintf(L"[!] Blob buffer is too large.\n\n");
 						LocalFree(pBuf);
 					}
 				}
 				else
 				{
-					wprintf(L"[!] Blob buffer empty.\n");
+					wprintf(L"[!] Blob buffer empty.\n\n");
 				}
 			}
 		}
@@ -237,7 +237,7 @@ BOOL KBlast_c_blob_manage(IN OPTIONAL LPCSTR strBlob, IN OPTIONAL char* containe
 		}
 		else
 		{
-			wprintf(L"[!] Blob containers are all full.\n");
+			wprintf(L"[!] Blob containers are all full.\n\n");
 			break;
 		}
 
@@ -249,7 +249,7 @@ BOOL KBlast_c_blob_manage(IN OPTIONAL LPCSTR strBlob, IN OPTIONAL char* containe
 				tBlob->szBlob = (DWORD)pBuf->size;
 				RtlCopyMemory(tBlob->blob, pBuf->buffer, tBlob->szBlob);
 				tBlob->isFull = TRUE;
-				wprintf(L"[+] Blob saved in container %d\n", n);
+				wprintf(L"[+] Blob saved in container %d\n\n", n);
 			}
 		}
 		break;

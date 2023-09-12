@@ -13,6 +13,7 @@
 */
 
 RTL_OSVERSIONINFOW OSinfo = { 0 };
+SYSTEM_INFO OSinfo2 = { 0 };
 
 void KBlast_c_GetInfo(DWORD dwOption)
 {
@@ -20,6 +21,7 @@ void KBlast_c_GetInfo(DWORD dwOption)
 	DWORD dwBuild = 0;
 	HMODULE ntdll = 0;
 	PRTLGETVERSION RtlGetVersion = 0;
+	const wchar_t* kArch = 0;
 
 	if (OSinfo.dwOSVersionInfoSize == 0)
 	{
@@ -34,6 +36,40 @@ void KBlast_c_GetInfo(DWORD dwOption)
 			}
 		}
 	}
+
+	GetSystemInfo(&OSinfo2);
+
+	switch (OSinfo2.wProcessorArchitecture)
+	{
+	case PROCESSOR_ARCHITECTURE_AMD64:
+		kArch = OSARCH_X64;
+		break;
+
+	case PROCESSOR_ARCHITECTURE_INTEL:
+		kArch = OSARCH_X86;
+		break;
+
+	case PROCESSOR_ARCHITECTURE_ARM:
+		kArch = OSARCH_ARM;
+		break;
+
+	case PROCESSOR_ARCHITECTURE_ARM64:
+		kArch = OSARCH_ARM64;
+		break;
+
+	case PROCESSOR_ARCHITECTURE_IA64:
+		kArch = OSARCH_IA64;
+		break;
+
+	case PROCESSOR_ARCHITECTURE_UNKNOWN:
+		kArch = OSARCH_UNKNOWN;
+		break;
+
+	default:
+		break;
+	}
+
+	SecureZeroMemory(&OSinfo2, sizeof(SYSTEM_INFO));
 
 	switch (dwOption)
 	{
@@ -51,11 +87,11 @@ void KBlast_c_GetInfo(DWORD dwOption)
 
 	case 1:
 		GetSystemTime(&sTime);
-		wprintf(L"System time is : %d:%d:%d - %d/%d/%d\n", sTime.wHour, sTime.wMinute, sTime.wSecond, sTime.wMonth, sTime.wDay, sTime.wYear);
+		wprintf(L"System time is : %d:%d:%d - %d/%d/%d\n\n", sTime.wHour, sTime.wMinute, sTime.wSecond, sTime.wMonth, sTime.wDay, sTime.wYear);
 		break;
 
 	case 2:
-		wprintf(L"Architecture : %s\nBuild number : %d\nMajor version : %d\nMinor version : %d\nPlatform ID : %d\n", KBLAST_ARCH, OSinfo.dwBuildNumber, OSinfo.dwMajorVersion, OSinfo.dwMinorVersion, OSinfo.dwPlatformId);
+		wprintf(L"Microsoft Windows NT %d.%d OS Build %d ( Arch %s )\nKBlast v%s ( Arch %s )\n\n", OSinfo.dwMajorVersion, OSinfo.dwMinorVersion, OSinfo.dwBuildNumber, kArch, KBLAST_VERSION, KBLAST_ARCH);
 		break;
 
 	default:
