@@ -16,7 +16,9 @@ typedef NTSTATUS(NTAPI* PRTLGETVERSION) (OUT PRTL_OSVERSIONINFOW lpVersionInform
 
 // Driver upper commands
 
-#define KBLAST_MOD_MISC			L"misc|"
-#define KBLAST_MOD_PROTECTION	L"prot|"
-#define KBLAST_MOD_TOKEN		L"tokn|"
-#define KBLAST_MOD_CALLBACK		L"call|"
+#define KBLAST_MOD_MISC			L"misc"
+#define KBLAST_MOD_BLOB			L"blob"
+#define KBLAST_MOD_PROTECTION	L"protection"
+#define KBLAST_MOD_TOKEN		L"token"
+#define KBLAST_MOD_CALLBACK		L"callback"
+#define KBLAST_MOD_PROCESS		L"process"

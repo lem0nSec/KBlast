@@ -118,6 +118,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="KBlaster.cpp" />
+    <ClCompile Include="modules\KBlaster_k_process.cpp" />
     <ClCompile Include="KBlaster_k_utils.cpp" />
     <ClCompile Include="modules\KBlaster_k_callbacks.cpp" />
     <ClCompile Include="modules\KBlaster_k_memory.cpp" />
@@ -128,6 +129,7 @@
     <ClInclude Include="globals.hpp" />
     <ClInclude Include="ioctl.hpp" />
     <ClInclude Include="KBlaster.hpp" />
+    <ClInclude Include="modules\KBlaster_k_process.hpp" />
     <ClInclude Include="KBlaster_k_utils.hpp" />
     <ClInclude Include="modules\KBlaster_k_callbacks.hpp" />
     <ClInclude Include="modules\KBlaster_k_memory.hpp" />

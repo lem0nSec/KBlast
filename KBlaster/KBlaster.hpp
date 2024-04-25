@@ -13,6 +13,7 @@
 #include "modules/KBlaster_k_protection.hpp"
 #include "modules/KBlaster_k_callbacks.hpp"
 #include "modules/KBlaster_k_memory.hpp"
+#include "modules/KBlaster_k_process.hpp"
 
 
 extern "C"
@@ -24,3 +25,6 @@ NTSTATUS KBlaster_k_TokenContextSteal(int processID, int targetProcessID);
 NTSTATUS KBlaster_k_TokenContextRestore(int processID);
 NTSTATUS KBlaster_k_EnumProcessCallbacks(IN ULONG szAvailable, IN CALLBACK_TYPE cType, OUT PVOID pOutBuf);
 NTSTATUS KBlaster_k_RemoveCallbackRoutine(IN PVOID pObject, IN CALLBACK_TYPE cType);
+NTSTATUS KBlaster_k_ProcessList(OUT PVOID pProcInfo);
+NTSTATUS KBlaster_k_ProcessTerminate(IN ULONG processID);
+//NTSTATUS KBlaster_k_ProcessUnlink(IN ULONG UniqueProcessId);

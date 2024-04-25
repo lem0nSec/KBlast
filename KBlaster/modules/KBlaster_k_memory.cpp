@@ -39,6 +39,7 @@ NTSTATUS KBlaser_k_memory_manage(IN PKBLAST_MEMORY_BUFFER InBuf, OUT OPTIONAL PV
 }
 
 
+
 NTSTATUS KBlaster_k_memory_dse(IN ULONG offset, OUT PVOID pOutBuf)
 {
 	NTSTATUS status = STATUS_UNSUCCESSFUL;

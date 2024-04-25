@@ -8,10 +8,6 @@
 #include "KBlast.hpp"
 
 
-/* todo
-* Fix 'restore' in tokn
-*/
-
 RTL_OSVERSIONINFOW OSinfo = { 0 };
 SYSTEM_INFO OSinfo2 = { 0 };
 
@@ -80,18 +76,18 @@ void KBlast_c_GetInfo(DWORD dwOption)
 			L"   / //_// __ )/ /___ ______/ /_\t| KBlast client - OS Build #%d - Major version #%d\n"
 			L"  / ,<  / __  / / __ `/ ___/ __/\t| Version : %s ( first release ) - Architecture : %s\n"
 			L" / /| |/ /_/ / / /_/ (__  ) /_\t\t| Website : http://www.github.com/lem0nSec/KBlast\n"
-			L"/_/ |_/_____/_/\\__,_/____/\\__/\t\t| Author  : lem0nSec_\n"
+			L"/_/ |_/_____/_/\\__,_/____/\\__/\t\t| Author  : < lem0nSec_@world:~$ >\n"
 			L"------------------------------------------------------->>>\n", OSinfo.dwBuildNumber, OSinfo.dwMajorVersion, KBLAST_VERSION, KBLAST_ARCH
 		);
 		break;
 
 	case 1:
 		GetSystemTime(&sTime);
-		wprintf(L"System time is : %d:%d:%d - %d/%d/%d\n\n", sTime.wHour, sTime.wMinute, sTime.wSecond, sTime.wMonth, sTime.wDay, sTime.wYear);
+		wprintf(L"System time is : %d:%d:%d - %d/%d/%d\n", sTime.wHour, sTime.wMinute, sTime.wSecond, sTime.wMonth, sTime.wDay, sTime.wYear);
 		break;
 
 	case 2:
-		wprintf(L"Microsoft Windows NT %d.%d OS Build %d ( Arch %s )\nKBlast v%s ( Arch %s )\n\n", OSinfo.dwMajorVersion, OSinfo.dwMinorVersion, OSinfo.dwBuildNumber, kArch, KBLAST_VERSION, KBLAST_ARCH);
+		wprintf(L"Microsoft Windows NT %d.%d OS Build %d ( Arch %s )\nKBlast v%s ( Arch %s )\n", OSinfo.dwMajorVersion, OSinfo.dwMinorVersion, OSinfo.dwBuildNumber, kArch, KBLAST_VERSION, KBLAST_ARCH);
 		break;
 
 	default:
@@ -143,7 +139,7 @@ BOOL KBlast_c_init()
 		{
 		case KBLAST_SD_SUCCESS:
 			initStatus = TRUE;
-			wprintf(L"[+] Driver up.\n");
+			//wprintf(L"[+] Driver up.\n");
 			break;
 
 		case KBLAST_SD_FAILED:
@@ -152,7 +148,7 @@ BOOL KBlast_c_init()
 
 		case KBLAST_D_SUCCESS:
 			initStatus = TRUE;
-			wprintf(L"[+] Driver up.\n");
+			//wprintf(L"[+] Driver up.\n");
 			break;
 
 		case KBLAST_D_FAILED:
@@ -161,7 +157,7 @@ BOOL KBlast_c_init()
 
 		case KBLAST_SD_EXIST:
 			initStatus = TRUE;
-			wprintf(L"[+] Driver up.\n");
+			//wprintf(L"[+] Driver up.\n");
 			break;
 
 		case KBLAST_BINARY_NOT_FOUND:
@@ -197,15 +193,10 @@ BOOL KBlast_c_cleanup()
 	if (adminStatus == TRUE)
 	{
 		szServiceStatus = KBlast_c_ServiceInitialize(SERVICE_UNLOAD_AND_DELETE);
-		if (szServiceStatus == KBLAST_SD_SUCCESS)
+		if (szServiceStatus != KBLAST_SD_SUCCESS)
 		{
-			wprintf(L"[+] Success.\n");
+			wprintf(L"[-] Failed to unload driver\n");
 		}
-		else
-		{
-			wprintf(L"[-] Failed.\n");
-		}
-
 	}
 
 	return status;
@@ -215,19 +206,6 @@ BOOL KBlast_c_cleanup()
 
 void KBlast_c_ConsoleInit()
 {
-	COORD topLeft = { 0, 0 };
-	HANDLE hConsole = 0;
-	CONSOLE_SCREEN_BUFFER_INFO cInfo = { 0 };
-	DWORD dwWritten;
-
-	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-	GetConsoleScreenBufferInfo(hConsole, &cInfo);
-	FillConsoleOutputCharacterW(hConsole, ' ', cInfo.dwSize.X, topLeft, &dwWritten);
-	FillConsoleOutputCharacterW(hConsole, ' ', cInfo.dwSize.Y, topLeft, &dwWritten);
-	SetConsoleCursorPosition(hConsole, topLeft);
-
-	RtlZeroMemory(&cInfo, sizeof(CONSOLE_SCREEN_BUFFER_INFO));
-
 	SetConsoleTitle(KBLAST_CLT_TITLE);
 	KBlast_c_GetInfo(0);
 }
@@ -242,7 +220,6 @@ BOOL KBlast_c_system(wchar_t* input)
 	if (systemInput != 0)
 	{
 		system((char*)((DWORD_PTR)systemInput + 1));
-		wprintf(L"\n");
 		status = TRUE;
 	}
 
@@ -266,56 +243,73 @@ BOOL KBlast_c_ConsoleStart()
 	wchar_t input[MAX_PATH];
 	while (TRUE)
 	{
-		wprintf(L"KBlast > ");
+		wprintf(L"\n[ KBlast ] --> ");
 		fgetws(input, ARRAYSIZE(input), stdin); fflush(stdin);
 		if (wcscmp(input, L"help\n") == 0)
 		{
 			KBlast_c_module_help(GENERIC);
 		}
-		if (wcscmp(input, L"quit\n") == 0)
+		else if (wcscmp(input, L"quit\n") == 0)
 		{
 			wprintf(L"bye!\n");
 			break;
 		}
-		if (wcscmp(input, L"banner\n") == 0)
+		else if (wcscmp(input, L"banner\n") == 0)
 		{
 			KBlast_c_GetInfo(0);
 		}
-		if (wcscmp(input, L"cls\n") == 0)
+		else if (wcscmp(input, L"cls\n") == 0)
 		{
 			system("cls");
 		}
-		if (wcscmp(input, L"pid\n") == 0)
+		else if (wcscmp(input, L"pid\n") == 0)
 		{
 			wprintf(L"PID : %d\n", GetCurrentProcessId());
 		}
-		if (wcsncmp(input, L"!", 1) == 0)
+		else if (wcsncmp(input, L"!", 1) == 0)
 		{
 			status = KBlast_c_system(input);
 		}
-		if (wcscmp(input, L"time\n") == 0)
+		else if (wcscmp(input, L"time\n") == 0)
 		{
 			KBlast_c_GetInfo(1);
 		}
-		if (wcscmp(input, L"version\n") == 0)
+		else if (wcscmp(input, L"version\n") == 0)
 		{
 			KBlast_c_GetInfo(2);
 		}
-		if (wcsncmp(input, KBLAST_MOD_MISC, 5) == 0)
+		else if (wcsncmp(input, KBLAST_MOD_MISC, wcslen(KBLAST_MOD_MISC)) == 0)
 		{
-			KBlast_c_device_dispatch_misc((wchar_t*)((DWORD_PTR)input + 10));
+			KBlast_c_device_dispatch_misc(input);
 		}
-		if (wcsncmp(input, KBLAST_MOD_PROTECTION, 5) == 0)
+		else if (wcsncmp(input, KBLAST_MOD_BLOB, wcslen(KBLAST_MOD_BLOB)) == 0)
 		{
-			KBlast_c_device_dispatch_protection((wchar_t*)((DWORD_PTR)input + 10));
+			KBlast_c_device_dispatch_blob(input);
 		}
-		if (wcsncmp(input, KBLAST_MOD_TOKEN, 5) == 0)
+		else if (wcsncmp(input, KBLAST_MOD_PROTECTION, wcslen(KBLAST_MOD_PROTECTION)) == 0)
 		{
-			KBlast_c_device_dispatch_token((wchar_t*)((DWORD_PTR)input + 10));
+			KBlast_c_device_dispatch_protection(input);
 		}
-		if (wcsncmp(input, KBLAST_MOD_CALLBACK, 5) == 0)
+		else if (wcsncmp(input, KBLAST_MOD_TOKEN, wcslen(KBLAST_MOD_TOKEN)) == 0)
 		{
-			KBlast_c_device_dispatch_callbacks((wchar_t*)((DWORD_PTR)input + 10));
+			KBlast_c_device_dispatch_token(input);
+		}
+		else if (wcsncmp(input, KBLAST_MOD_CALLBACK, wcslen(KBLAST_MOD_CALLBACK)) == 0)
+		{
+			KBlast_c_device_dispatch_callbacks(input);
+		}
+		else if (wcsncmp(input, KBLAST_MOD_PROCESS, wcslen(KBLAST_MOD_PROCESS)) == 0)
+		{
+			KBlaster_c_device_dispatch_process(input);
+		}
+		else if (wcscmp(input, L"\n") == 0)
+		{
+			continue;
+		}
+		else
+		{
+			wprintf(L"[!] Command not found.\n");
+			KBlast_c_module_help(GENERIC);
 		}
 	}
 
@@ -324,34 +318,40 @@ BOOL KBlast_c_ConsoleStart()
 }
 
 
-int wmain(int argc, wchar_t* argv[])
+BOOL wmain(int argc, wchar_t* argv[])
 {
-	BOOL status = FALSE;
-	BOOL start = TRUE;
-
 	if (argc < 2)
 	{
-		status = KBlast_c_init();
-		if (status == TRUE)
+		if (KBlast_c_init())
 		{
-			wprintf(L"[+] Starting console...\n");
 			KBlast_c_ConsoleStart();
-			KBlast_c_cleanup();
+			return KBlast_c_cleanup();
 		}
+		else
+			return FALSE;
 	}
-	if (argc < 3)
+	else if (argc < 3)
 	{
-		start = FALSE;
-		if (wcscmp(argv[1], L"/load") == 0) // load driver and exit
+		if (wcscmp(argv[1], L"/?") == 0)
 		{
-			status = KBlast_c_init();
+			goto help;
 		}
-		if (wcscmp(argv[1], L"/unload") == 0) // unload driver and exit
+		else if (wcscmp(argv[1], L"/load") == 0) // load driver and exit
 		{
-			status = KBlast_c_cleanup();
+			return KBlast_c_init();
+		}
+		else if (wcscmp(argv[1], L"/unload") == 0) // unload driver and exit
+		{
+			return KBlast_c_cleanup();
 		}
 	}
 
-	return status;
+help:
+	wprintf(
+		L"Usage: %s {optional_argument}\n\n/load\t\t:\tload %s\n/unload\t\t:\tunload %s\n",
+		argv[0], KBLAST_DRV_BINARY, KBLAST_DRV_BINARY
+	);
+
+	return TRUE;
 
 }

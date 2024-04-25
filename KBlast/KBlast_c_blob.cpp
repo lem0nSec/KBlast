@@ -16,20 +16,21 @@ void KBlast_c_blob_info(PKBLAST_USERLAND_BLOBS_CONTAINER container)
 	BOOL status = FALSE;
 	DWORD i = 0;
 
+	PRINT_INFO(L"Current blob size is %d\n", container->szBlob);
 	wprintf(L"[ binary blob ] : ");
 	for (i = 0; i <= container->szBlob; i++)
 	{
 		if (i == container->szBlob)
 		{
-			wprintf(L"\n\n");
+			wprintf(L"\n");
 			break;
 		}
-		wprintf(L"%02x ", *(BYTE*)(BYTE*)((DWORD_PTR)container->blob + i)); // should be *(PBYTE)((DWORD_PTR)container->blob + i);
+		wprintf(L"%02x ", *(PBYTE)((DWORD_PTR)container->blob + i));
 	}
 }
 
 
-BOOL KBlast_c_blob_manage(IN OPTIONAL LPCSTR strBlob, IN OPTIONAL char* containerNumber, OUT OPTIONAL PKBLAST_MEMORY_BUFFER pBuf, IN KBLAST_USERLAND_BLOB_DO action)
+BOOL KBlast_c_blob_manage(IN OPTIONAL LPCSTR strBlob, IN OPTIONAL int containerNumber, OUT OPTIONAL PKBLAST_MEMORY_BUFFER pBuf, IN KBLAST_USERLAND_BLOB_DO action)
 {
 	BOOL status = FALSE;
 	DWORD dwReturningFlags = 0;
@@ -60,7 +61,7 @@ BOOL KBlast_c_blob_manage(IN OPTIONAL LPCSTR strBlob, IN OPTIONAL char* containe
 		}
 		else
 		{
-			wprintf(L"[!] Blob containers are all full.\n\n");
+			wprintf(L"[!] Blob containers are all full.\n");
 			break;
 		}
 		
@@ -74,18 +75,18 @@ BOOL KBlast_c_blob_manage(IN OPTIONAL LPCSTR strBlob, IN OPTIONAL char* containe
 			if (status == TRUE)
 			{
 				tBlob->szBlob = szBlob / 2; // szBlob should be divided by 2 because it is initially equal to the size of the string, where each character is actually a byte.
-				wprintf(L"[+] Blob saved in local container %d.\n\n", n);
+				wprintf(L"[+] Blob saved in local container %d.\n", n);
 				n = 0;
 			}
 			else
 			{
-				wprintf(L"[!] Invalid input.\n\n");
+				wprintf(L"[!] Invalid input.\n");
 			}
 			break;
 		}
 
 	case BLOB_DELETE:
-		n = atoi(containerNumber);
+		n = containerNumber;
 		if (n != 0)
 		{
 			switch (n)
@@ -103,7 +104,7 @@ BOOL KBlast_c_blob_manage(IN OPTIONAL LPCSTR strBlob, IN OPTIONAL char* containe
 				break;
 
 			default:
-				wprintf(L"[!] %d container does not exist.\n\n", n);
+				wprintf(L"[!] %d container does not exist.\n", n);
 				break;
 			}
 
@@ -117,20 +118,20 @@ BOOL KBlast_c_blob_manage(IN OPTIONAL LPCSTR strBlob, IN OPTIONAL char* containe
 					status = TRUE;
 					if (status == TRUE)
 					{
-						wprintf(L"[+] Container %d cleared.\n\n", n);
+						wprintf(L"[+] Container %d cleared.\n", n);
 					}
 					break;
 				}
 				else
 				{
-					wprintf(L"[!] Container %d is empty.\n\n", n);
+					wprintf(L"[!] Container %d is empty.\n", n);
 					break;
 				}
 			}
 		}
 
 	case BLOB_INFO:
-		n = atoi(containerNumber);
+		n = containerNumber;
 		if (n != 0)
 		{
 			switch (n)
@@ -148,7 +149,7 @@ BOOL KBlast_c_blob_manage(IN OPTIONAL LPCSTR strBlob, IN OPTIONAL char* containe
 				break;
 
 			default:
-				wprintf(L"[!] Container %d does not exist.\n\n", n);
+				wprintf(L"[!] Container %d does not exist.\n", n);
 				break;
 			}
 
@@ -157,7 +158,7 @@ BOOL KBlast_c_blob_manage(IN OPTIONAL LPCSTR strBlob, IN OPTIONAL char* containe
 				status = TRUE;
 				if (tBlob->isFull == FALSE)
 				{
-					wprintf(L"[!] Container %d is empty.\n\n", n);
+					wprintf(L"[!] Container %d is empty.\n", n);
 				}
 				else
 				{
@@ -168,7 +169,7 @@ BOOL KBlast_c_blob_manage(IN OPTIONAL LPCSTR strBlob, IN OPTIONAL char* containe
 		break;
 
 	case BLOB_WRITE:
-		n = atoi(containerNumber);
+		n = containerNumber;
 		if (n != 0)
 		{
 			switch (n)
@@ -186,7 +187,7 @@ BOOL KBlast_c_blob_manage(IN OPTIONAL LPCSTR strBlob, IN OPTIONAL char* containe
 				break;
 
 			default:
-				wprintf(L"[!] Container %d does not exist.\n\n", n);
+				wprintf(L"[!] Container %d does not exist.\n", n);
 				break;
 			}
 
@@ -197,22 +198,22 @@ BOOL KBlast_c_blob_manage(IN OPTIONAL LPCSTR strBlob, IN OPTIONAL char* containe
 					if (tBlob->szBlob <= sizeof((pBuf)->buffer))
 					{
 						RtlCopyMemory((pBuf)->buffer, tBlob->blob, sizeof((pBuf)->buffer));
-						(pBuf)->size = tBlob->szBlob;
-						(pBuf)->ptr = KBlast_c_utils_StringToKernelPointer(strBlob, (DWORD)strlen(strBlob));
-						if ((pBuf)->ptr != 0)
+						pBuf->size = tBlob->szBlob;
+						pBuf->ptr = (PVOID)strBlob;
+						if ((PVOID)pBuf->ptr != 0)
 						{
 							status = TRUE;
 						}
 					}
 					else
 					{
-						wprintf(L"[!] Blob buffer is too large.\n\n");
+						wprintf(L"[!] Blob buffer is too large.\n");
 						LocalFree(pBuf);
 					}
 				}
 				else
 				{
-					wprintf(L"[!] Blob buffer empty.\n\n");
+					wprintf(L"[!] Blob buffer empty.\n");
 				}
 			}
 		}
@@ -237,7 +238,7 @@ BOOL KBlast_c_blob_manage(IN OPTIONAL LPCSTR strBlob, IN OPTIONAL char* containe
 		}
 		else
 		{
-			wprintf(L"[!] Blob containers are all full.\n\n");
+			wprintf(L"[!] Blob containers are all full.\n");
 			break;
 		}
 
@@ -249,7 +250,7 @@ BOOL KBlast_c_blob_manage(IN OPTIONAL LPCSTR strBlob, IN OPTIONAL char* containe
 				tBlob->szBlob = (DWORD)pBuf->size;
 				RtlCopyMemory(tBlob->blob, pBuf->buffer, tBlob->szBlob);
 				tBlob->isFull = TRUE;
-				wprintf(L"[+] Blob saved in container %d\n\n", n);
+				wprintf(L"[+] Blob saved in container %d\n", n);
 			}
 		}
 		break;

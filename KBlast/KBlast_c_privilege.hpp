@@ -10,3 +10,4 @@
 #include "globals.hpp"
 
 BOOL KBlast_c_CheckTokenIntegrity();
+BOOL KBlast_c_EnableTokenPrivilege(LPCWSTR privName);

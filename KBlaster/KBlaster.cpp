@@ -95,6 +95,20 @@ NTSTATUS KBlaster_k_IOCTLDispatchar(PDEVICE_OBJECT pDeviceObject, PIRP pIRP)
 		status = KBlaster_k_RemoveCallbackRoutine(pUserlandGenericParams->pointer, LISTENTRY_REGISTRY);
 		break;
 
+	case KBLASTER_IOCTL_PROCESS_LIST:
+		status = KBlaster_k_ProcessList(pIRP->UserBuffer);
+		break;
+
+	case KBLASTER_IOCTL_PROCESS_TERMINATE:
+		status = KBlaster_k_ProcessTerminate(pUserlandGenericParams->uGeneric);
+		break;
+
+	/*
+	case KBLASTER_IOCTL_PROCESS_UNLINK:
+		status = KBlaster_k_ProcessUnlink(pUserlandGenericParams->uGeneric);
+		break;
+	*/
+
 	case KBLASTER_IOCTL_MEMORY_WRITE:
 		status = KBlaser_k_memory_manage(pUserlandMemoryParams, NULL, MEMORY_WRITE);
 		break;
@@ -147,14 +161,11 @@ NTSTATUS KBlaster_k_CreateClose(PDEVICE_OBJECT pDeviceObject, PIRP pIRP)
 }
 
 
-
 void KBlaster_k_DriverCleanup(PDRIVER_OBJECT DriverObject)
 {
 	IoDeleteDevice(DriverObject->DeviceObject);
 	IoDeleteSymbolicLink(&symlink);
 }
-
-
 
 
 NTSTATUS DriverEntry(_In_ PDRIVER_OBJECT DriverObject, _In_ PUNICODE_STRING RegistryPath)

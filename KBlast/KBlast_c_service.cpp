@@ -14,7 +14,6 @@ BOOL KBlast_c_ServiceManagement(IN SERVICE_ACTION sAction, IN OPTIONAL LPCWSTR l
 	SC_HANDLE hSC = 0, hService = 0;
 	SERVICE_STATUS sStatus = { 0 };
 
-
 	hSC = OpenSCManager(NULL, SERVICES_ACTIVE_DATABASE, SC_MANAGER_ALL_ACCESS);
 	if (hSC != 0)
 	{
@@ -33,11 +32,15 @@ BOOL KBlast_c_ServiceManagement(IN SERVICE_ACTION sAction, IN OPTIONAL LPCWSTR l
 			hService = CreateService(hSC, KBLAST_SRV_NAME, KBLAST_SRV_NAME, SERVICE_ALL_ACCESS, SERVICE_KERNEL_DRIVER, SERVICE_DEMAND_START, SERVICE_ERROR_IGNORE, lpBinaryPath, NULL, NULL, NULL, NULL, NULL);
 			if (hService != NULL)
 			{
+				wprintf(L"[+] Service registered.\n");
 				status = StartService(hService, 0, NULL);
 				if (status == FALSE)
 				{
 					DeleteService(hService);
 				}
+				else
+					wprintf(L"[+] Service started.\n");
+				
 				CloseServiceHandle(hService);
 			}
 			break;
@@ -49,7 +52,10 @@ BOOL KBlast_c_ServiceManagement(IN SERVICE_ACTION sAction, IN OPTIONAL LPCWSTR l
 				status = ControlService(hService, SERVICE_CONTROL_STOP, &sStatus);
 				if (status == TRUE)
 				{
+					wprintf(L"[+] Service stopped.\n");
 					status = DeleteService(hService);
+					if (status)
+						wprintf(L"[+] Service unregistered.\n");
 				}
 				CloseServiceHandle(hService);
 			}
@@ -120,7 +126,6 @@ DWORD KBlast_c_ServiceInitialize(IN OPTIONAL SERVICE_ACTION sAction)
 		switch (status)
 		{
 		case FALSE:
-			wprintf(L"[+] Registering service...\n");
 			status = KBlast_c_ServiceManagement(SERVICE_CREATE_AND_LOAD, (LPCWSTR)lpPath, &sInfoBuffer);
 			if (status == TRUE)
 			{
@@ -133,7 +138,7 @@ DWORD KBlast_c_ServiceInitialize(IN OPTIONAL SERVICE_ACTION sAction)
 			break;
 
 		case TRUE:
-			wprintf(L"[i] Service found.\n");
+			//wprintf(L"[i] Service found.\n");
 			if (sInfoBuffer.dwCurrentState != SERVICE_RUNNING)
 			{
 				status = KBlast_c_ServiceManagement(SERVICE_BINARY_RUN, (LPCWSTR)lpPath, &sInfoBuffer);
@@ -161,7 +166,6 @@ DWORD KBlast_c_ServiceInitialize(IN OPTIONAL SERVICE_ACTION sAction)
 	{
 		if (status == TRUE)
 		{
-			wprintf(L"[+] Cleaning...\n");
 			status = KBlast_c_ServiceManagement(SERVICE_UNLOAD_AND_DELETE, (LPCWSTR)lpPath, &sInfoBuffer);
 			if (status == TRUE)
 			{

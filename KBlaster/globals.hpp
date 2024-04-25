@@ -9,6 +9,7 @@
 
 #include <ntifs.h>
 #include <ntddk.h>
+#include <ntdef.h>
 #include <wdm.h>
 #include <aux_klib.h>
 #include "navigation.hpp"
@@ -16,7 +17,8 @@
 
 #pragma warning(disable: 4996)
 
-#define POOL_TAG 'lemS'
+#define POOL_TAG		'lemS'
+#define USER_POOL_TAG	'User'
 
 
 typedef struct _KBLAST_BUFFER {

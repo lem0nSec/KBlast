@@ -25,68 +25,109 @@ char* KBlast_c_utils_UnicodeStringToAnsiString(IN wchar_t* input)
 }
 
 
-int KBlast_c_utils_GetCommandLineArguments(IN char* inBuffer, IN BYTE separator, OUT PKBLAST_COMMANDLINE_ARGUMENTS pArgs)
+int KBlast_c_utils_GetCommandlineArguments(IN char* inBuffer, OUT PKBLAST_COMMANDLINE_ARGUMENTS pArgs)
 {
-	DWORD initialSize = 0, newSize = 0;
-	//BYTE separator = 0x7C; // "|"
+	SIZE_T szInitial = 0;
+	DWORD i = 0, j = 0, k = 0;
+	char* argStruct = 0;
+	char* realArg = 0;
 	int argc = 0;
-	char* newBuffer = 0;
 
 	if (inBuffer != 0)
 	{
-		initialSize = (DWORD)strlen(inBuffer);
-		newBuffer = inBuffer;
-		*(BYTE*)(BYTE*)((DWORD_PTR)newBuffer + initialSize - 1) = separator;
-		for (DWORD i = 0; i < initialSize; i++)
+		for (i = 0; i < MAX_PATH; i++)
 		{
-			if (*(PBYTE)((DWORD_PTR)newBuffer + i) == separator)
+			if (*(PBYTE)((PBYTE)inBuffer + i) == 0x20)
 			{
-				*(PBYTE)((DWORD_PTR)newBuffer + i) = 0x00;
+				*(PBYTE)((PBYTE)inBuffer + i) = 0x7C;
 			}
-		}
-
-		while (newSize <= initialSize)
-		{
-			if (pArgs->arg1 == NULL)
-			{
-				pArgs->arg1 = newBuffer;
-				argc++;
-			}
-			else if (pArgs->arg2 == NULL)
-			{
-				pArgs->arg2 = newBuffer;
-				argc++;
-			}
-			else if (pArgs->arg3 == NULL)
-			{
-				pArgs->arg3 = newBuffer;
-				argc++;
-			}
-			else if (pArgs->arg4 == NULL)
-			{
-				pArgs->arg4 = newBuffer;
-				argc++;
-			}
-			else if (pArgs->arg5 == NULL)
-			{
-				pArgs->arg5 = newBuffer;
-				argc++;
-			}
-			else
+			else if (*(PBYTE)((PBYTE)inBuffer + i) == 0x0A)
 			{
 				break;
 			}
+		}
 
-			newSize += (DWORD)strlen(newBuffer);
-			newBuffer = (char*)((DWORD_PTR)newBuffer + (DWORD)strlen(newBuffer) + 1);
+		szInitial = strlen(inBuffer);
+		for (i = 0; i < szInitial; i++)
+		{
+			if (*(PBYTE)((PBYTE)inBuffer + i) == 0x2F) // "/"
+			{
+				argc++;
+			}
+			else if (*(PBYTE)((PBYTE)inBuffer + i) == 0x0A)
+			{
+				break;
+			}
+		}
 
+		for (i = 0; i < szInitial; i++)
+		{
+			if (*(PBYTE)((PBYTE)inBuffer + i) == 0x2F)
+			{
+				argStruct = (char*)((PBYTE)inBuffer + i + 1);
+				for (j = 0; j < szInitial; j++)
+				{
+					if (*(PBYTE)((PBYTE)argStruct + j) == 0x3A) // ":"
+					{
+						*(PBYTE)((PBYTE)argStruct + j) = 0x00;
+						realArg = (char*)((PBYTE)argStruct + j + 1);
+						for (k = 0; k < szInitial; k++)
+						{
+							if (*(PBYTE)((PBYTE)realArg + k) == 0x0A || (*(PBYTE)((PBYTE)realArg + k) == 0x20) || (*(PBYTE)((PBYTE)realArg + k) == 0x7C))
+							{
+								*(PBYTE)((PBYTE)realArg + k) = 0x00;
+								break;
+							}
+						}
+						if (strcmp(argStruct, "action") == 0)
+						{
+							pArgs->action = (LPCSTR)realArg;
+						}
+						else if (strcmp(argStruct, "type") == 0)
+						{
+							pArgs->type = (LPCSTR)realArg;
+						}
+						else if (strcmp(argStruct, "blob") == 0)
+						{
+							pArgs->blob = (LPCSTR)realArg;
+						}
+						else if (strcmp(argStruct, "container") == 0)
+						{
+							pArgs->container = (DWORD)atoi(realArg);
+						}
+						else if (strcmp(argStruct, "size") == 0)
+						{
+							pArgs->size = (SIZE_T)atoi(realArg);
+						}
+						else if (strcmp(argStruct, "pid") == 0)
+						{
+							pArgs->pid = (ULONG)atoi(realArg);
+						}
+						else if (strcmp(argStruct, "targetpid") == 0)
+						{
+							pArgs->targetpid = (ULONG)atoi(realArg);
+						}
+						else if (strcmp(argStruct, "pointer") == 0)
+						{
+							pArgs->pointer = KBlast_c_utils_StringToKernelPointer((LPCSTR)realArg, (DWORD)strlen(realArg));
+						}
+						else if (strcmp(argStruct, "name") == 0)
+						{
+							pArgs->name = (LPCSTR)realArg;
+						}
+						argStruct = (char*)((PBYTE)realArg + strlen(realArg));
+						realArg = 0;
+						j = 0;
+						break;
+					}
+				}
+			}
 		}
 	}
 
 	return argc;
-
+		
 }
-
 
 void KBlast_c_utils_FreeAnsiString(IN char* ansiString)
 {
@@ -147,5 +188,78 @@ PVOID KBlast_c_utils_StringToKernelPointer(LPCSTR strPointer, DWORD szPtr)
 	}
 	
 	return res;
+
+}
+
+
+// procInfo is required to have the 'processID' value set to a valid pid
+BOOL KBlast_c_utils_ListProcessInformation(PKBLAST_USER_PROCESS_INFORMATION procInfo)
+{
+	BOOL status = FALSE;
+	HANDLE hSnap = 0, hProcess = 0, hToken = 0;
+	PROCESSENTRY32 pEntry32 = { 0 };
+	DWORD retL = 0, nameUserLen = MAX_PATH, domainNameLen = MAX_PATH;
+	wchar_t TokenDomain[MAX_PATH] = { 0 };
+	wchar_t TokenName[MAX_PATH] = { 0 };
+	PTOKEN_OWNER tOwner = NULL;
+	SID_NAME_USE snu;
+
+	hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	if (hSnap != INVALID_HANDLE_VALUE)
+	{
+		pEntry32.dwSize = (DWORD)sizeof(PROCESSENTRY32W);
+		if (Process32First(hSnap, &pEntry32))
+		{
+			while (Process32Next(hSnap, &pEntry32))
+			{
+				if (pEntry32.th32ProcessID == procInfo->processID)
+				{
+					status = TRUE;
+					wcsncpy_s(procInfo->ImageFileName, MAX_PATH, pEntry32.szExeFile, MAX_PATH);
+					break;
+				}
+			}
+		}
+
+		if (status)
+		{
+			hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, procInfo->processID);
+			if (hProcess != INVALID_HANDLE_VALUE)
+			{
+				OpenProcessToken(hProcess, TOKEN_QUERY, &hToken);
+				if (hToken != INVALID_HANDLE_VALUE)
+				{
+					GetTokenInformation(hToken, TokenOwner, NULL, 0, &retL);
+					if (retL > 0)
+					{
+						tOwner = (PTOKEN_OWNER)LocalAlloc(LPTR, (SIZE_T)retL);
+						if (tOwner)
+						{
+							if (GetTokenInformation(hToken, TokenOwner, (LPVOID)tOwner, retL, &retL))
+							{
+								LookupAccountSidW(NULL, tOwner->Owner, TokenName, &nameUserLen, TokenDomain, &domainNameLen, &snu);
+							}
+						}
+						SecureZeroMemory(tOwner, retL);
+						LocalFree(tOwner);
+					}
+					CloseHandle(hToken);
+				}
+				CloseHandle(hProcess);
+			}
+			CloseHandle(hSnap);
+
+			if ((wcslen(TokenName) == 0) || (wcslen(TokenDomain) == 0))
+				wcsncpy_s(procInfo->TokenOwner, MAX_PATH, L"N/A", MAX_PATH);
+			else
+			{
+				wcsncpy_s(procInfo->TokenOwner, MAX_PATH, TokenDomain, MAX_PATH);
+				wcsncpy_s((wchar_t*)(procInfo->TokenOwner + wcslen(procInfo->TokenOwner)), MAX_PATH - wcslen(procInfo->TokenOwner), L"\\", MAX_PATH - wcslen(procInfo->TokenOwner));
+				wcsncpy_s((wchar_t*)(procInfo->TokenOwner + wcslen(procInfo->TokenOwner)), MAX_PATH - wcslen(procInfo->TokenOwner), TokenName, MAX_PATH - wcslen(procInfo->TokenOwner));
+			}
+		}
+	}
+
+	return status;
 
 }
