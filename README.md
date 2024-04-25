@@ -43,7 +43,7 @@ This tool has two components. KBlaster.sys is the application's driver, the actu
 ## Commands and Features
 KBlast commands can fall into four categories which must be prepended to the actual command (generic commands can be just typed and run right away). Categories can be:
 
-- process (process kernel-side interactions)
+- process (kernel-side process interactions)
 - protection (protection PPL)
 - token (token management)
 - callback (kernel callbacks)
