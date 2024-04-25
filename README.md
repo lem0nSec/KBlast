@@ -79,9 +79,9 @@ __This tool is still at an early stage of development.__ KBlast is being activel
 To clarify, the following is the output of 'version' command on the system I am using to build the tool.
 
 ```
-KBlast > version
+[ KBlast ] --> version
 Microsoft Windows NT 10.0 OS Build 19045 ( Arch x64 )
-KBlast v1.0.0 ( Arch x64 )
+KBlast v1.1 ( Arch x64 )
 ```
 
 Since the Windows Kernel is mostly composed of 'opaque' data structures, this tool is likely to trigger bsods at this stage of development if a version other than the one mentioned is used. Development of these tools often requires months. I hope you understand and appreciate the project and the idea behind!
