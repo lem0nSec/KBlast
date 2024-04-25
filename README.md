@@ -73,7 +73,7 @@ __This tool is still at an early stage of development.__ KBlast is being activel
 
 - Module    : Callback : compatible only with Windows 10 Pro build 19045 x64
 - Command   : Token - revert : it works only if the process whose token is to be reverted is the last one whose token was modified
-- Command   : Misc - dse : still under testing on Windows 10 Pro build 19045 x64 (you should not rely on this command at this stage of develpment).
+- Command   : Misc - dse : still under testing on Windows 10 Pro build 19045 x64 (you should not rely on this command at this stage of development).
 
 
 To clarify, the following is the output of 'version' command on the system I am using to build the tool.
