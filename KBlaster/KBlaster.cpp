@@ -22,7 +22,7 @@ NTSTATUS KBlaster_k_IOCTLDispatchar(PDEVICE_OBJECT pDeviceObject, PIRP pIRP)
 	
 	ULONG length = 0;
 	ULONG outLength = stack->Parameters.DeviceIoControl.OutputBufferLength;
-
+	
 	pUserlandGenericParams = (PKBLAST_BUFFER)stack->Parameters.DeviceIoControl.Type3InputBuffer;
 	pUserlandMemoryParams = (PKBLAST_MEMORY_BUFFER)stack->Parameters.DeviceIoControl.Type3InputBuffer;
 	switch (stack->Parameters.DeviceIoControl.IoControlCode)
@@ -64,19 +64,19 @@ NTSTATUS KBlaster_k_IOCTLDispatchar(PDEVICE_OBJECT pDeviceObject, PIRP pIRP)
 		break;
 
 	case KBLASTER_IOCTL_CALLBACK_PROCESS_LIST:
-		status = KBlaster_k_EnumProcessCallbacks(outLength, ARRAY_PROCESS, pIRP->UserBuffer);
+		status = KBlaster_k_EnumCallbackRoutines(outLength, ARRAY_PROCESS, pIRP->UserBuffer);
 		break;
 
 	case KBLASTER_IOCTL_CALLBACK_THREAD_LIST:
-		status = KBlaster_k_EnumProcessCallbacks(outLength, ARRAY_THREAD, pIRP->UserBuffer);
+		status = KBlaster_k_EnumCallbackRoutines(outLength, ARRAY_THREAD, pIRP->UserBuffer);
 		break;
 
 	case KBLASTER_IOCTL_CALLBACK_IMAGE_LIST:
-		status = KBlaster_k_EnumProcessCallbacks(outLength, ARRAY_IMAGE, pIRP->UserBuffer);
+		status = KBlaster_k_EnumCallbackRoutines(outLength, ARRAY_IMAGE, pIRP->UserBuffer);
 		break;
 
 	case KBLASTER_IOCTL_CALLBACK_REGISTRY_LIST:
-		status = KBlaster_k_EnumProcessCallbacks(outLength, LISTENTRY_REGISTRY, pIRP->UserBuffer);
+		status = KBlaster_k_EnumCallbackRoutines(outLength, LISTENTRY_REGISTRY, pIRP->UserBuffer);
 		break;
 
 	case KBLASTER_IOCTL_CALLBACK_PROCESS_REMOVE:
@@ -172,7 +172,7 @@ NTSTATUS DriverEntry(_In_ PDRIVER_OBJECT DriverObject, _In_ PUNICODE_STRING Regi
 {
 	NTSTATUS status = STATUS_NOT_SUPPORTED;
 	UNREFERENCED_PARAMETER(RegistryPath);
-
+	
 	DriverObject->DriverUnload = KBlaster_k_DriverCleanup;
 	DriverObject->MajorFunction[IRP_MJ_CREATE] = KBlaster_k_CreateClose;
 	DriverObject->MajorFunction[IRP_MJ_CLOSE] = KBlaster_k_CreateClose;
@@ -199,6 +199,12 @@ NTSTATUS DriverEntry(_In_ PDRIVER_OBJECT DriverObject, _In_ PUNICODE_STRING Regi
 		}
 	}
 
+	//DbgPrint("0x%-016p\n", MmGetPhysicalAddress((PVOID)0xffff800ff4678080));
+
+	//UNICODE_STRING s = RTL_CONSTANT_STRING(L"CiInitialize");
+	//DbgPrint("0x%-016p\n", MmGetSystemRoutineAddress(&s));
+	//RtlSecureZeroMemory(&s, sizeof(UNICODE_STRING));
+	
 	return status;
 
 }

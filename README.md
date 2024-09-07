@@ -1,6 +1,6 @@
 # KBlast
 
-![Static Badge](https://img.shields.io/badge/Version-1.1-red?style=flat&color=red) ![Static Badge](https://img.shields.io/badge/License-GPL_3.0-red?style=flat&color=blue) ![Static Badge](https://img.shields.io/badge/Author-lem0nSec-red?style=flat&color=yellow)
+![Static Badge](https://img.shields.io/badge/Version-0.1-red?style=flat&color=red) ![Static Badge](https://img.shields.io/badge/License-GPL_3.0-red?style=flat&color=blue) ![Static Badge](https://img.shields.io/badge/Author-lem0nSec-red?style=flat&color=yellow)
 
 <p align="center">
   <img src="pictures/KBlast_logo.png">
@@ -14,7 +14,7 @@ __Windows Kernel Offensive Toolset__
 ```
     __ __ ____  __           __
    / //_// __ )/ /___ ______/ /_        | KBlast client - OS Build #19045 - Major version #10
-  / ,<  / __  / / __ `/ ___/ __/        | Version : 1.1 ( first release ) - Architecture : x64
+  / ,<  / __  / / __ `/ ___/ __/        | Version : 0.1 ( first release ) - Architecture : x64
  / /| |/ /_/ / / /_/ (__  ) /_          | Website : http://www.github.com/lem0nSec/KBlast
 /_/ |_/_____/_/\__,_/____/\__/          | Author  : < lem0nSec_@world:~$ >
 ------------------------------------------------------->>>
@@ -67,13 +67,17 @@ Since KBlaster.sys is just a driver I built for my own learning, it does not com
 
 - `bcdedit /set testsigning on`
 
+Under specific conditions, KBlast may be able to zero out g_cioptions using [KExecDD](https://github.com/floesen/KExecDD) and load KBlaster even though testsigning is disabled. Bear in mind that an unsuccessful attempt likely means BSOD.
+
+![](pictures/kexec.png)
+
 
 ## Important note :warning:
 __This tool is still at an early stage of development.__ KBlast is being actively tested on a Windows 10 Pro build 19045 x64 machine. Some functionalities support other Windows versions. Others don't. The following are the main issues you may encounter:
 
 - Module    : Callback : compatible only with Windows 10 Pro build 19045 x64
 - Command   : Token - revert : it works only if the process whose token is to be reverted is the last one whose token was modified
-- Command   : Misc - dse : still under testing on Windows 10 Pro build 19045 x64 (you should not rely on this command at this stage of development).
+- Command   : Misc - dse : I recently receplaced hardcoded offsets with more stable parser functions. There may still be problems under certain conditions.
 
 
 To clarify, the following is the output of 'version' command on the system I am using to build the tool.

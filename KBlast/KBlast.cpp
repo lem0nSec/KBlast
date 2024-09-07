@@ -11,7 +11,7 @@
 RTL_OSVERSIONINFOW OSinfo = { 0 };
 SYSTEM_INFO OSinfo2 = { 0 };
 
-void KBlast_c_GetInfo(DWORD dwOption)
+static void KBlast_c_GetInfo(DWORD dwOption)
 {
 	SYSTEMTIME sTime = { 0 };
 	DWORD dwBuild = 0;
@@ -96,7 +96,7 @@ void KBlast_c_GetInfo(DWORD dwOption)
 
 }
 
-BOOL KBlast_c_CheckOSVersion()
+static BOOL KBlast_c_CheckOSVersion()
 {
 	BOOL status = FALSE;
 	HMODULE ntdll = 0;
@@ -125,7 +125,7 @@ BOOL KBlast_c_CheckOSVersion()
 
 }
 
-BOOL KBlast_c_init()
+static BOOL KBlast_c_init(LPWSTR LoadMode)
 {
 	BOOL initStatus = FALSE;
 	DWORD szServiceInit = KBLAST_SD_FAILED;
@@ -134,38 +134,41 @@ BOOL KBlast_c_init()
 	adminStatus = KBlast_c_CheckTokenIntegrity();
 	if (adminStatus == TRUE)
 	{
+		if (wcscmp(LoadMode, L"/kexec") == 0)
+		{
+			if (!KBlast_c_ci_KexecDD())
+				return initStatus;
+		}
+
 		szServiceInit = KBlast_c_ServiceInitialize(SERVICE_CREATE_AND_LOAD);
 		switch (szServiceInit)
 		{
 		case KBLAST_SD_SUCCESS:
 			initStatus = TRUE;
-			//wprintf(L"[+] Driver up.\n");
 			break;
 
 		case KBLAST_SD_FAILED:
-			wprintf(L"[-] Service registration failed.\n");
+			PRINT_ERROR(L"Service start failed.\n");
 			break;
 
 		case KBLAST_D_SUCCESS:
 			initStatus = TRUE;
-			//wprintf(L"[+] Driver up.\n");
 			break;
 
 		case KBLAST_D_FAILED:
-			wprintf(L"[-] Driver down.\n");
+			PRINT_ERROR(L"Driver down.\n");
 			break;
 
 		case KBLAST_SD_EXIST:
 			initStatus = TRUE;
-			//wprintf(L"[+] Driver up.\n");
 			break;
 
 		case KBLAST_BINARY_NOT_FOUND:
-			wprintf(L"[-] %s not found.\n", KBLAST_DRV_BINARY);
+			PRINT_ERROR(L"%s not found.\n", KBLAST_DRV_BINARY);
 			break;
 
 		case KBLAST_BINARY_ERROR_GENERIC:
-			wprintf(L"[-] %s error generic.\n", KBLAST_DRV_BINARY);
+			PRINT_ERROR(L"%s error generic.\n", KBLAST_DRV_BINARY);
 			break;
 
 		default:
@@ -174,7 +177,7 @@ BOOL KBlast_c_init()
 	}
 	else
 	{
-		wprintf(L"[-] Insufficient privileges. Quitting...\n");
+		PRINT_ERROR(L"Insufficient privileges. Quitting...\n");
 	}
 
 	return initStatus;
@@ -182,7 +185,7 @@ BOOL KBlast_c_init()
 }
 
 
-BOOL KBlast_c_cleanup()
+static BOOL KBlast_c_cleanup()
 {
 	BOOL status = FALSE;
 	DWORD szServiceStatus = KBLAST_SD_EXIST;
@@ -195,7 +198,7 @@ BOOL KBlast_c_cleanup()
 		szServiceStatus = KBlast_c_ServiceInitialize(SERVICE_UNLOAD_AND_DELETE);
 		if (szServiceStatus != KBLAST_SD_SUCCESS)
 		{
-			wprintf(L"[-] Failed to unload driver\n");
+			PRINT_ERROR(L"Failed to unload driver\n");
 		}
 	}
 
@@ -204,14 +207,14 @@ BOOL KBlast_c_cleanup()
 }
 
 
-void KBlast_c_ConsoleInit()
+static void KBlast_c_ConsoleInit()
 {
 	SetConsoleTitle(KBLAST_CLT_TITLE);
 	KBlast_c_GetInfo(0);
 }
 
 
-BOOL KBlast_c_system(wchar_t* input)
+static BOOL KBlast_c_system(wchar_t* input)
 {
 	BOOL status = FALSE;
 	char* systemInput = 0;
@@ -230,14 +233,14 @@ BOOL KBlast_c_system(wchar_t* input)
 }
 
 
-BOOL KBlast_c_ConsoleStart()
+static BOOL KBlast_c_ConsoleStart()
 {
 	BOOL status = FALSE;
 	KBlast_c_ConsoleInit();
 
 	if (KBlast_c_CheckOSVersion() == FALSE)
 	{
-		wprintf(L"[!] Warning : This OS version might not be fully supported. Critical issues may rise.\n");
+		PRINT_WARNING(L"This OS version might not be fully supported. Critical issues may rise.\n");
 	}
 
 	wchar_t input[MAX_PATH];
@@ -308,7 +311,6 @@ BOOL KBlast_c_ConsoleStart()
 		}
 		else
 		{
-			wprintf(L"[!] Command not found.\n");
 			KBlast_c_module_help(GENERIC);
 		}
 	}
@@ -317,12 +319,11 @@ BOOL KBlast_c_ConsoleStart()
 
 }
 
-
 BOOL wmain(int argc, wchar_t* argv[])
 {
 	if (argc < 2)
 	{
-		if (KBlast_c_init())
+		if (KBlast_c_init((LPWSTR)L"/std"))
 		{
 			KBlast_c_ConsoleStart();
 			return KBlast_c_cleanup();
@@ -330,7 +331,7 @@ BOOL wmain(int argc, wchar_t* argv[])
 		else
 			return FALSE;
 	}
-	else if (argc < 3)
+	else if (argc < 4)
 	{
 		if (wcscmp(argv[1], L"/?") == 0)
 		{
@@ -338,7 +339,10 @@ BOOL wmain(int argc, wchar_t* argv[])
 		}
 		else if (wcscmp(argv[1], L"/load") == 0) // load driver and exit
 		{
-			return KBlast_c_init();
+			if (argv[2] != NULL)
+				return KBlast_c_init((LPWSTR)argv[2]);
+			else
+				return KBlast_c_init((LPWSTR)L"std");
 		}
 		else if (wcscmp(argv[1], L"/unload") == 0) // unload driver and exit
 		{
@@ -348,7 +352,7 @@ BOOL wmain(int argc, wchar_t* argv[])
 
 help:
 	wprintf(
-		L"Usage: %s {optional_argument}\n\n/load\t\t:\tload %s\n/unload\t\t:\tunload %s\n",
+		L"Usage: %s {optional_argument}\n\n/load\t: load %s (/std [default] | /kexec [attempt KexecDD technique])\n/unload\t: unload %s\n",
 		argv[0], KBLAST_DRV_BINARY, KBLAST_DRV_BINARY
 	);
 

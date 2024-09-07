@@ -367,13 +367,19 @@ NTSTATUS KBlaster_k_RemoveCallbackRoutine(IN PVOID pObject, IN CALLBACK_TYPE cTy
 
 
 
-NTSTATUS KBlaster_k_EnumProcessCallbacks(IN ULONG szAvailable, IN CALLBACK_TYPE cType, OUT PVOID pOutBuf)
+NTSTATUS KBlaster_k_EnumCallbackRoutines(IN ULONG szAvailable, IN CALLBACK_TYPE cType, OUT PVOID pOutBuf)
 {
 	NTSTATUS status = STATUS_UNSUCCESSFUL;
 	PVOID pStorage = 0;
 	ULONG i = 0;
 	PROCESS_KERNEL_CALLBACK_STORAGE* outBuffer = (PROCESS_KERNEL_CALLBACK_STORAGE*)pOutBuf;
 	PROCESS_KERNEL_CALLBACK_STORAGE pInfo = { 0 };
+
+	if (KBlaster_k_utils_GetWindowsVersion() != WINDOWS_22H2)
+	{
+		status = STATUS_NOT_SUPPORTED;
+		goto exit;
+	}
 
 	if (szAvailable >= sizeof(PROCESS_KERNEL_CALLBACK_STORAGE))
 	{
@@ -431,6 +437,8 @@ NTSTATUS KBlaster_k_EnumProcessCallbacks(IN ULONG szAvailable, IN CALLBACK_TYPE 
 	{
 		status = STATUS_BUFFER_TOO_SMALL;
 	}
+
+exit:
 
 	return status;
 

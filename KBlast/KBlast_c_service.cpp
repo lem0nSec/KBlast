@@ -32,14 +32,14 @@ BOOL KBlast_c_ServiceManagement(IN SERVICE_ACTION sAction, IN OPTIONAL LPCWSTR l
 			hService = CreateService(hSC, KBLAST_SRV_NAME, KBLAST_SRV_NAME, SERVICE_ALL_ACCESS, SERVICE_KERNEL_DRIVER, SERVICE_DEMAND_START, SERVICE_ERROR_IGNORE, lpBinaryPath, NULL, NULL, NULL, NULL, NULL);
 			if (hService != NULL)
 			{
-				wprintf(L"[+] Service registered.\n");
+				PRINT_SUCCESS(L"Service registered.\n");
 				status = StartService(hService, 0, NULL);
 				if (status == FALSE)
 				{
 					DeleteService(hService);
 				}
 				else
-					wprintf(L"[+] Service started.\n");
+					PRINT_SUCCESS(L"Service started.\n");
 				
 				CloseServiceHandle(hService);
 			}
@@ -52,10 +52,10 @@ BOOL KBlast_c_ServiceManagement(IN SERVICE_ACTION sAction, IN OPTIONAL LPCWSTR l
 				status = ControlService(hService, SERVICE_CONTROL_STOP, &sStatus);
 				if (status == TRUE)
 				{
-					wprintf(L"[+] Service stopped.\n");
+					PRINT_SUCCESS(L"Service stopped.\n");
 					status = DeleteService(hService);
 					if (status)
-						wprintf(L"[+] Service unregistered.\n");
+						PRINT_SUCCESS(L"Service unregistered.\n");
 				}
 				CloseServiceHandle(hService);
 			}

@@ -61,7 +61,7 @@ BOOL KBlast_c_blob_manage(IN OPTIONAL LPCSTR strBlob, IN OPTIONAL int containerN
 		}
 		else
 		{
-			wprintf(L"[!] Blob containers are all full.\n");
+			PRINT_WARNING(L"Blob containers are all full.\n");
 			break;
 		}
 		
@@ -75,12 +75,12 @@ BOOL KBlast_c_blob_manage(IN OPTIONAL LPCSTR strBlob, IN OPTIONAL int containerN
 			if (status == TRUE)
 			{
 				tBlob->szBlob = szBlob / 2; // szBlob should be divided by 2 because it is initially equal to the size of the string, where each character is actually a byte.
-				wprintf(L"[+] Blob saved in local container %d.\n", n);
+				PRINT_SUCCESS(L"Blob saved in local container %d.\n", n);
 				n = 0;
 			}
 			else
 			{
-				wprintf(L"[!] Invalid input.\n");
+				PRINT_WARNING(L"Invalid input.\n");
 			}
 			break;
 		}
@@ -104,7 +104,7 @@ BOOL KBlast_c_blob_manage(IN OPTIONAL LPCSTR strBlob, IN OPTIONAL int containerN
 				break;
 
 			default:
-				wprintf(L"[!] %d container does not exist.\n", n);
+				PRINT_WARNING(L"Container %d does not exist.\n", n);
 				break;
 			}
 
@@ -118,13 +118,13 @@ BOOL KBlast_c_blob_manage(IN OPTIONAL LPCSTR strBlob, IN OPTIONAL int containerN
 					status = TRUE;
 					if (status == TRUE)
 					{
-						wprintf(L"[+] Container %d cleared.\n", n);
+						PRINT_SUCCESS(L"Container %d cleared.\n", n);
 					}
 					break;
 				}
 				else
 				{
-					wprintf(L"[!] Container %d is empty.\n", n);
+					PRINT_WARNING(L"Container %d is empty.\n", n);
 					break;
 				}
 			}
@@ -149,7 +149,7 @@ BOOL KBlast_c_blob_manage(IN OPTIONAL LPCSTR strBlob, IN OPTIONAL int containerN
 				break;
 
 			default:
-				wprintf(L"[!] Container %d does not exist.\n", n);
+				PRINT_WARNING(L"Container %d does not exist.\n", n);
 				break;
 			}
 
@@ -158,7 +158,7 @@ BOOL KBlast_c_blob_manage(IN OPTIONAL LPCSTR strBlob, IN OPTIONAL int containerN
 				status = TRUE;
 				if (tBlob->isFull == FALSE)
 				{
-					wprintf(L"[!] Container %d is empty.\n", n);
+					PRINT_WARNING(L"Container %d is empty.\n", n);
 				}
 				else
 				{
@@ -187,7 +187,7 @@ BOOL KBlast_c_blob_manage(IN OPTIONAL LPCSTR strBlob, IN OPTIONAL int containerN
 				break;
 
 			default:
-				wprintf(L"[!] Container %d does not exist.\n", n);
+				PRINT_WARNING(L"Container %d does not exist.\n", n);
 				break;
 			}
 
@@ -207,13 +207,13 @@ BOOL KBlast_c_blob_manage(IN OPTIONAL LPCSTR strBlob, IN OPTIONAL int containerN
 					}
 					else
 					{
-						wprintf(L"[!] Blob buffer is too large.\n");
+						PRINT_WARNING(L"Blob buffer is too large.\n");
 						LocalFree(pBuf);
 					}
 				}
 				else
 				{
-					wprintf(L"[!] Blob buffer empty.\n");
+					PRINT_WARNING(L"Blob buffer empty.\n");
 				}
 			}
 		}
@@ -238,7 +238,7 @@ BOOL KBlast_c_blob_manage(IN OPTIONAL LPCSTR strBlob, IN OPTIONAL int containerN
 		}
 		else
 		{
-			wprintf(L"[!] Blob containers are all full.\n");
+			PRINT_WARNING(L"Blob containers are all full.\n");
 			break;
 		}
 
@@ -250,7 +250,7 @@ BOOL KBlast_c_blob_manage(IN OPTIONAL LPCSTR strBlob, IN OPTIONAL int containerN
 				tBlob->szBlob = (DWORD)pBuf->size;
 				RtlCopyMemory(tBlob->blob, pBuf->buffer, tBlob->szBlob);
 				tBlob->isFull = TRUE;
-				wprintf(L"[+] Blob saved in container %d\n", n);
+				PRINT_SUCCESS(L"Blob saved in container %d\n", n);
 			}
 		}
 		break;

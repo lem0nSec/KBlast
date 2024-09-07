@@ -11,23 +11,27 @@
 #include <winternl.h>
 #include <wincrypt.h>
 #include <TlHelp32.h>
+#include <Psapi.h>
 #include <shlwapi.h>
 #include <stdio.h>
 #include "KBlast_c_utils.hpp" // utils are global as they may be requested by anything
+#include "KBlast_c_privilege.hpp"
+#include "../KBlaster/navigation.hpp"
 
 #pragma comment(lib, "ntdll.lib")
 #pragma comment(lib, "crypt32.lib")
+#pragma comment(lib, "psapi.lib")
 #pragma comment(lib, "Shlwapi.lib")
 
 #pragma warning(disable: 4996)
 #define UNICODE 1
 
 #define KBLAST_CLT_TITLE	L"KBlast v1.1 ( by lem0nSec )"
-#define KBLAST_CLT_VERSION	L"1.0"
+#define KBLAST_CLT_VERSION	L"0.1"
 #define KBLAST_DRV_BINARY	L"KBlaster.sys"
 #define KBLAST_DRV_FILENAME	L"\\\\.\\KBlaster"
 #define KBLAST_SRV_NAME		L"KBlaster"
-#define KBLAST_VERSION		L"1.1"
+#define KBLAST_VERSION		L"0.1"
 #if defined(_M_X64)
 #define KBLAST_ARCH			L"x64"
 #elif defined(_M_IX86)
@@ -45,12 +49,20 @@
 #define PRINT_FUNCTION_ERROR(...) (wprintf(L"IN_FUNCTION_ERROR " TEXT(__FUNCTION__) L" : " __VA_ARGS__))
 #endif
 
+#if !defined(PRINT_ERROR)
+#define PRINT_ERROR(...) (wprintf(L"[-] ERROR : " __VA_ARGS__))
+#endif
+
+#if !defined(PRINT_SUCCESS)
+#define PRINT_SUCCESS(...) (wprintf(L"[+] SUCCESS : " __VA_ARGS__))
+#endif
+
 #if !defined(PRINT_INFO)
-#define PRINT_INFO(...) (wprintf(L"[INFO] : " __VA_ARGS__))
+#define PRINT_INFO(...) (wprintf(L"[i] INFO : " __VA_ARGS__))
 #endif
 
 #if !defined(PRINT_WARNING)
-#define PRINT_WARNING(...) (wprintf(L"[WARNING] : " __VA_ARGS__))
+#define PRINT_WARNING(...) (wprintf(L"[!] WARNING : " __VA_ARGS__))
 #endif
 
 

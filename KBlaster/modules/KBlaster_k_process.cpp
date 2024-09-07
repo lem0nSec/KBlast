@@ -18,6 +18,12 @@ NTSTATUS KBlaster_k_ProcessList(OUT PVOID pProcInfo)
 	int generic_count = 0;
 	char* ImageFileName = 0;
 
+	if (KBlaster_k_utils_GetWindowsVersion() == WINDOWS_UNSUPPORTED)
+	{
+		status = STATUS_NOT_SUPPORTED;
+		goto exit;
+	}
+
 	pEprocess = PsInitialSystemProcess;
 	while (TRUE)
 	{
@@ -61,6 +67,8 @@ NTSTATUS KBlaster_k_ProcessList(OUT PVOID pProcInfo)
 	{
 		status = STATUS_SUCCESS;
 	}
+
+exit:
 
 	return status;
 

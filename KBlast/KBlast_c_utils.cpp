@@ -192,6 +192,36 @@ PVOID KBlast_c_utils_StringToKernelPointer(LPCSTR strPointer, DWORD szPtr)
 }
 
 
+DWORD KBlast_c_utils_GetProcessIdByName(const wchar_t* procName)
+{
+	DWORD result = 0;
+	HANDLE hSnap = 0;
+	PROCESSENTRY32W entry32 = { 0 };
+
+	hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	if (hSnap)
+	{
+		entry32.dwSize = sizeof(PROCESSENTRY32W);
+		if (Process32First(hSnap, &entry32))
+		{
+			while (Process32Next(hSnap, &entry32))
+			{
+				if (_wcsicmp(entry32.szExeFile, procName) == 0)
+				{
+					result = entry32.th32ProcessID;
+					break;
+				}
+			}
+			SecureZeroMemory(&entry32, sizeof(PROCESSENTRY32W));
+		}
+		CloseHandle(hSnap);
+	}
+
+	return result;
+
+}
+
+
 // procInfo is required to have the 'processID' value set to a valid pid
 BOOL KBlast_c_utils_ListProcessInformation(PKBLAST_USER_PROCESS_INFORMATION procInfo)
 {
@@ -261,5 +291,41 @@ BOOL KBlast_c_utils_ListProcessInformation(PKBLAST_USER_PROCESS_INFORMATION proc
 	}
 
 	return status;
+
+}
+
+LPVOID KBlast_c_utils_GetDeviceDriverBaseAddress(LPSTR DeviceDriverName)
+{
+	LPVOID tmp_array = 0;
+	LPVOID result = 0;
+	DWORD needed = 0, needed2 = 0;
+	DWORD64 i = 0;
+	char name[MAX_PATH];
+	int j = 0;
+
+	EnumDeviceDrivers(NULL, 0, &needed);
+	if (needed > 0)
+	{
+		tmp_array = (LPVOID)LocalAlloc(LPTR, (SIZE_T)needed);
+		if (tmp_array)
+		{
+			if (EnumDeviceDrivers((LPVOID*)tmp_array, needed, &needed2))
+			{
+				for (i = 0; i < needed / sizeof(LPVOID); i++)
+				{
+					GetDeviceDriverBaseNameA(*(PVOID*)(PVOID*)((PBYTE)tmp_array + (8 * i)), name, MAX_PATH);
+					if (_stricmp(name, DeviceDriverName) == 0)
+					{
+						RtlCopyMemory(&result, (PBYTE)tmp_array + (8 * i), sizeof(LPVOID));
+						break;
+					}
+				}
+			}
+			
+			LocalFree(tmp_array);
+		}
+	}
+
+	return result;
 
 }

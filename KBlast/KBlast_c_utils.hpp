@@ -38,3 +38,5 @@ char* KBlast_c_utils_GetImageNameByFullPath(char* FullImagePath);
 int KBlast_c_utils_GetCommandlineArguments(IN char* inBuffer, OUT PKBLAST_COMMANDLINE_ARGUMENTS pArgs);
 PVOID KBlast_c_utils_StringToKernelPointer(LPCSTR strPointer, DWORD szPtr);
 BOOL KBlast_c_utils_ListProcessInformation(PKBLAST_USER_PROCESS_INFORMATION procInfo);
+DWORD KBlast_c_utils_GetProcessIdByName(const wchar_t* procName);
+LPVOID KBlast_c_utils_GetDeviceDriverBaseAddress(LPSTR DeviceDriverName);

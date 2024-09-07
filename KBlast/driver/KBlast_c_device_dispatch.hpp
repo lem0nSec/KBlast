@@ -10,6 +10,7 @@
 #include "../globals.hpp"
 #include "../ioctl.hpp"
 #include "../KBlast_c_blob.hpp"
+#include "../KBlast_c_ci.hpp"
 
 
 typedef struct _KBLAST_BUFFER {

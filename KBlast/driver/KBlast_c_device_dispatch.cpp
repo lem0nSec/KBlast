@@ -207,16 +207,18 @@ BOOL KBlaster_c_device_dispatch_process(wchar_t* input)
 				}
 			}
 		}
+		/*
 		else if (strcmp(pArgs.action, "unlink") == 0)
 		{
 			printf("[i] This functionality has not been implemented yet.\n");
 		}
+		*/
 		else if (strcmp(pArgs.action, "terminate") == 0)
 		{
 			pBuffer.uGeneric = pArgs.pid;
 			if (pBuffer.uGeneric > 0)
 			{
-				printf("[!] Terminating process %lu...\n", pBuffer.uGeneric);
+				PRINT_WARNING(L"Terminating process %lu...\n", pBuffer.uGeneric);
 				status = KBlast_c_device_control(KBLASTER_IOCTL_PROCESS_TERMINATE, (LPVOID)&pBuffer, sizeof(KBLAST_BUFFER), NULL, NULL);
 			}
 		}
@@ -233,7 +235,7 @@ BOOL KBlaster_c_device_dispatch_process(wchar_t* input)
 					if (StrStrIA((char*)pCurrentProcessInfo->ImageFileName, (char*)pArgs.name) != 0)
 					{
 						printf(
-							"\n[+] %s\n\t[+] EPROCESS\t: 0x%-016p\n\t[+] TOKEN\t: 0x%-016p\n\t[+] UNIQUE_PID\t: %d\n\t[+] PPL\t\t: [ %d - %d - %d - %d ]\n\n",
+							"\n%s\n\t* _eprocess\t: 0x%-016p\n\t* _Token\t: 0x%-016p\n\t* unique_pid\t: %d\n\t* PPL\t\t: [ %d - %d - %d - %d ]\n\n",
 							(char*)pCurrentProcessInfo->ImageFileName, pCurrentProcessInfo->Eprocess, pCurrentProcessInfo->Token, (int)pCurrentProcessInfo->UniqueProcessId,
 							(int)pCurrentProcessInfo->ProtectionInformation.SignatureLevel, (int)pCurrentProcessInfo->ProtectionInformation.SectionSignatureLevel, (int)pCurrentProcessInfo->ProtectionInformation.Protection.Type,
 							(int)pCurrentProcessInfo->ProtectionInformation.Protection.Signer
@@ -243,7 +245,7 @@ BOOL KBlaster_c_device_dispatch_process(wchar_t* input)
 				else
 				{
 					printf(
-						"\n[+] %s\n\t[+] EPROCESS\t: 0x%-016p\n\t[+] TOKEN\t: 0x%-016p\n\t[+] UNIQUE_PID\t: %d\n\t[+] PPL\t\t: [ %d - %d - %d - %d ]\n\n",
+						"\n %s\n\t* _eprocess\t: 0x%-016p\n\t* _token\t: 0x%-016p\n\t* unique_pid\t: %d\n\t* PPL\t\t: [ %d - %d - %d - %d ]\n\n",
 						(char*)pCurrentProcessInfo->ImageFileName, pCurrentProcessInfo->Eprocess, pCurrentProcessInfo->Token, (int)pCurrentProcessInfo->UniqueProcessId,
 						(int)pCurrentProcessInfo->ProtectionInformation.SignatureLevel, (int)pCurrentProcessInfo->ProtectionInformation.SectionSignatureLevel, (int)pCurrentProcessInfo->ProtectionInformation.Protection.Type,
 						(int)pCurrentProcessInfo->ProtectionInformation.Protection.Signer
@@ -362,13 +364,10 @@ BOOL KBlast_c_device_dispatch_misc(wchar_t* input)
 {
 	BOOL status = FALSE;
 	KBLAST_COMMANDLINE_ARGUMENTS pArgs = { 0 };
-	KBLAST_BUFFER pBuffer = { 0 };
+	KBLAST_BUFFER inBufferGeneric = { 0 };
 	PKBLAST_BUFFER pOutBufferGeneric = 0;
 	char* realInput = 0;
 	int argc = 0;
-	HMODULE hCi = 0;
-	PVOID pCiInitialize = 0;
-	ULONG offset = 0;
 
 	realInput = KBlast_c_utils_UnicodeStringToAnsiString(input);
 	argc = KBlast_c_utils_GetCommandlineArguments(realInput, &pArgs);
@@ -381,25 +380,16 @@ BOOL KBlast_c_device_dispatch_misc(wchar_t* input)
 		}
 		else if (strcmp(pArgs.action, "dse") == 0)
 		{
-			hCi = GetModuleHandle(L"CI.dll");
-			if (hCi == 0)
+			KBlast_c_ci_GetCiOptionsOffset(&inBufferGeneric.uGeneric);
+			pOutBufferGeneric = (PKBLAST_BUFFER)LocalAlloc(LPTR, sizeof(KBLAST_BUFFER));
+			if ((pOutBufferGeneric != 0) && (inBufferGeneric.uGeneric > 0))
 			{
-				hCi = LoadLibraryEx(L"CI.dll", NULL, DONT_RESOLVE_DLL_REFERENCES);
-			}
-			pCiInitialize = GetProcAddress(hCi, "CiInitialize");
-			if (pCiInitialize != 0)
-			{
-				pOutBufferGeneric = (PKBLAST_BUFFER)LocalAlloc(LPTR, sizeof(KBLAST_BUFFER));
-				if (pOutBufferGeneric != 0)
+				status = KBlast_c_device_control(KBLASTER_IOCTL_DSE, (LPVOID)&inBufferGeneric, sizeof(KBLAST_BUFFER), (LPVOID)pOutBufferGeneric, sizeof(KBLAST_BUFFER));
+				if (status == TRUE)
 				{
-					pBuffer.uGeneric = (ULONG)((DWORD_PTR)pCiInitialize - (DWORD_PTR)hCi);
-					status = KBlast_c_device_control(KBLASTER_IOCTL_DSE, (LPVOID)&pBuffer, sizeof(KBLAST_BUFFER), (LPVOID)pOutBufferGeneric, sizeof(KBLAST_BUFFER));
-					if (status == TRUE)
-					{
-						printf("[+] g_CiOptions : 0x%-016p\n[+] DSE : 0x%04lx\n", pOutBufferGeneric->pointer, pOutBufferGeneric->uGeneric);
-						RtlZeroMemory(pOutBufferGeneric, sizeof(KBLAST_BUFFER));
-						LocalFree(pOutBufferGeneric);
-					}
+					printf("* g_CiOptions\t: 0x%-016p\n* DSE\t\t: 0x%-016llu\n", pOutBufferGeneric->pointer, pOutBufferGeneric->uPointer);
+					RtlZeroMemory(pOutBufferGeneric, sizeof(KBLAST_BUFFER));
+					LocalFree(pOutBufferGeneric);
 				}
 			}
 		}
@@ -640,14 +630,14 @@ BOOL KBlast_c_device_dispatch_callbacks(wchar_t* input)
 			if (pOutBuffer->CallbackInformation[i].CallbackHandle != 0)
 			{
 				printf(
-					"\n[+] %s\n\t\t[+] Handle : 0x%-016p\n\t\t[+] Pointer : 0x%-016p ( %s + %lu )\n",
+					"\n[+] %s\n\t\t* Handle\t: 0x%-016p\n\t\t* Pointer\t: 0x%-016p ( %s + %lu )\n",
 					name, (PVOID)pOutBuffer->CallbackInformation[i].CallbackHandle, (PVOID)pOutBuffer->CallbackInformation[i].CallbackFunctionPointer, name, offset
 				); // format 2
 			}
 			else
 			{
 				printf(
-					"\n[+] %s\n\t\t[+] Pointer/Handle : 0x%-016p ( %s + %lu )\n",
+					"\n[+] %s\n\t\t* Pointer/Handle\t: 0x%-016p ( %s + %lu )\n",
 					name, (PVOID)pOutBuffer->CallbackInformation[i].CallbackFunctionPointer, name, offset
 				); // format 2
 			}

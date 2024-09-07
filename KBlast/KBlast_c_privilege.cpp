@@ -47,7 +47,7 @@ BOOL KBlast_c_CheckTokenIntegrity()
 
 }
 
-BOOL KBlast_c_SetPrivilege(HANDLE hToken, LPCWSTR privName, BOOL bEnablePrivilege)
+static BOOL KBlast_c_SetPrivilege(HANDLE hToken, LPCWSTR privName, BOOL bEnablePrivilege)
 {
 	TOKEN_PRIVILEGES tp = { 0 };
 	PRIVILEGE_SET privs = { 0 };

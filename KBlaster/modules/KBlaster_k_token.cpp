@@ -17,6 +17,12 @@ NTSTATUS KBlaster_k_TokenPrivilegeManipulate(int processID, PRIVILEGES_ACTION pr
 	PACCESS_TOKEN pAccessToken = 0;
 	PPROCESS_PRIVILEGES pPriv = 0;
 
+	if (KBlaster_k_utils_GetWindowsVersion() == WINDOWS_UNSUPPORTED)
+	{
+		status = STATUS_NOT_SUPPORTED;
+		goto exit;
+	}
+
 	status = PsLookupProcessByProcessId((HANDLE)processID, &pEprocess);
 	if (NT_SUCCESS(status))
 	{
@@ -48,6 +54,8 @@ NTSTATUS KBlaster_k_TokenPrivilegeManipulate(int processID, PRIVILEGES_ACTION pr
 		ObDereferenceObject(pEprocess);
 	}
 
+exit:
+
 	return status;
 
 }
@@ -59,6 +67,12 @@ NTSTATUS KBlaster_k_TokenContextSteal(int processID, int targetProcessID)
 	NTSTATUS status = STATUS_UNSUCCESSFUL;
 	PEPROCESS pEprocess = 0, pTargetEprocess = 0;
 	PEX_FAST_REF pToken = 0, pTargetToken = 0;
+
+	if (KBlaster_k_utils_GetWindowsVersion() == WINDOWS_UNSUPPORTED)
+	{
+		status = STATUS_NOT_SUPPORTED;
+		goto exit;
+	}
 
 	status = PsLookupProcessByProcessId((HANDLE)targetProcessID, &pTargetEprocess);
 	if (NT_SUCCESS(status))
@@ -77,6 +91,8 @@ NTSTATUS KBlaster_k_TokenContextSteal(int processID, int targetProcessID)
 		ObDereferenceObject(pTargetEprocess);
 	}
 
+exit:
+
 	return status;
 
 }
@@ -87,6 +103,12 @@ NTSTATUS KBlaster_k_TokenContextRestore(int processID)
 	NTSTATUS status = STATUS_UNSUCCESSFUL;
 	PEPROCESS pEprocess = 0;
 	PEX_FAST_REF pToken = 0;
+
+	if (KBlaster_k_utils_GetWindowsVersion() == WINDOWS_UNSUPPORTED)
+	{
+		status = STATUS_NOT_SUPPORTED;
+		goto exit;
+	}
 
 	status = PsLookupProcessByProcessId((HANDLE)processID, &pEprocess);
 	if (NT_SUCCESS(status))
@@ -101,6 +123,8 @@ NTSTATUS KBlaster_k_TokenContextRestore(int processID)
 		ObDereferenceObject(pEprocess);
 
 	}
+
+exit:
 
 	return status;
 

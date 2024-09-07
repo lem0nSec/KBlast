@@ -14,6 +14,12 @@ NTSTATUS KBlaster_k_ProcessProtection(int processID, PROTECTION_OPTION prOption)
 	PEPROCESS pEprocess = 0;
 	PPROCESS_PROTECTION_INFO ppInfo = 0;
 
+	if (KBlaster_k_utils_GetWindowsVersion() == WINDOWS_UNSUPPORTED)
+	{
+		status = STATUS_NOT_SUPPORTED;
+		goto exit;
+	}
+
 	status = PsLookupProcessByProcessId((HANDLE)processID, &pEprocess);
 	if (NT_SUCCESS(status))
 	{
@@ -55,6 +61,8 @@ NTSTATUS KBlaster_k_ProcessProtection(int processID, PROTECTION_OPTION prOption)
 
 		ObDereferenceObject(pEprocess);
 	}
+
+exit:
 
 	return status;
 

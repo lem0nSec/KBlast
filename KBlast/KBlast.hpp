@@ -8,6 +8,7 @@
 #pragma once
 
 #include "globals.hpp"
+#include "KBlast_c_ci.hpp"
 #include "KBlast_c_service.hpp"
 #include "KBlast_c_privilege.hpp"
 #include "driver/KBlast_c_device_dispatch.hpp"
