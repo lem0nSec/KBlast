@@ -9,46 +9,38 @@
 __Windows Kernel Offensive Toolset__
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------
-`KBlast` is a small application I built while experimenting with Windows kernel offensive security techniques. It puts together almost all the techniques discussed in the [Offensive Driver Development](https://training.zeropointsecurity.co.uk/courses/offensive-driver-development) course from Zero Point Security, plus some extra techniques. I thought that building up this tool rather than writing down a cheatsheet was a better way to both put into practice the concepts learned and provide the community with a comprehensive learning resource.
+`KBlast` is a small application I built while experimenting with Windows kernel offensive security techniques. I started this project years ago and I add features from time to time. I consider this tool like a 'box' which containes Windows kernel-related security techniques that I decide to translate into code.
 
 ```
     __ __ ____  __           __
-   / //_// __ )/ /___ ______/ /_        | KBlast client - OS Build #19045 - Major version #10
-  / ,<  / __  / / __ `/ ___/ __/        | Version : 0.1 ( first release ) - Architecture : x64
- / /| |/ /_/ / / /_/ (__  ) /_          | Website : http://www.github.com/lem0nSec/KBlast
+   / //_// __ )/ /___ ______/ /_        | KBlast client - OS Build #22631 - Major version #10
+  / ,<  / __  / / __ `/ ___/ __/        | Architecture : x64
+ / /| |/ /_/ / / /_/ (__  ) /_          | Website : https://www.github.com/lem0nSec/KBlast
 /_/ |_/_____/_/\__,_/____/\__/          | Author  : < lem0nSec_@world:~$ >
 ------------------------------------------------------->>>
 
-[ KBlast ] --> help
+[KBlast] --> help
+                          help  -       Show this help
+                          quit  -       Quit KBlast
+                         clear  -       Clear the screen
+                           pid  -       Show current pid
+                          time  -       Display system time
+                       version  -       Display system version information
+                             !  -       Execute system command
 
-Commands - ' generic ' ( generic commands. Do not initiate kernel interactions )
-              help:     Show this help
-              quit:     Quit KBlast
-               cls:     Clear the screen
-            banner:     Print KBlast banner
-               pid:     Show current pid
-              time:     Display system time
-           version:     Display system version information
-            !{cmd}:     Execute system command
-
-Examples:
-No example is available for ' generic ' commands
-
-
-[ KBlast ] -->
+[KBlast] --> !whoami
 ```
 ## How it works
-This tool has two components. KBlaster.sys is the application's driver, the actual core where all central features reside. In contrast, KBlast.exe is the client application. KBlast.exe takes user commands, generate a specific input to be sent to KBlaster, and once the driver has finished its operation the client may or may not return the result of the operation depending on what was done.
+This tool has two components. `KBlaster.sys` is the application's driver where all central features reside. `KBlast.exe` is the client application, which takes commands and reaches out to Kblaster.
 
 ## Commands and Features
-KBlast commands can fall into four categories which must be prepended to the actual command (generic commands can be just typed and run right away). Categories can be:
+KBlast commands can fall into five 'modules' which must be prepended to the actual command (standard commands can be just typed and run right away). Modules can be:
 
-- process (kernel-side process interactions)
-- protection (protection PPL)
+- process
+- protection (PPL)
 - token (token management)
-- callback (kernel callbacks)
-- blob (memory read/write)
-- misc (misc functionalities)
+- callback (kernel callbacks - Process, Thread, Image, Registry for now)
+- misc (misc functionalities such as R/W)
 
 
 ## Examples
