@@ -11,14 +11,6 @@
 #include "../globals.hpp"
 
 
-typedef enum _PRIVILEGES_ACTION {
-
-    PRIVILEGES_ENABLEALL,
-    PRIVILEGES_DISABLEALL,
-
-} PRIVILEGES_ACTION;
-
-
 typedef struct _PROCESS_PRIVILEGES
 {
     UCHAR Present[8];
@@ -28,10 +20,19 @@ typedef struct _PROCESS_PRIVILEGES
 } PROCESS_PRIVILEGES, * PPROCESS_PRIVILEGES;
 
 typedef struct _EX_FAST_REF {
-
     PVOID Value;
-
 } EX_FAST_REF, * PEX_FAST_REF;
+
+typedef struct _KLBR_TOKEN_PRIV {
+    ULONG processId;
+    BOOL IsEnable;
+} KLBR_TOKEN_PRIV, * PKLBR_TOKEN_PRIV;
+
+typedef struct _KLBR_TOKEN {
+    ULONG processId;
+    ULONG targetProcessId;
+    BOOL IsSteal;
+} KLBR_TOKEN, * PKLBR_TOKEN;
 
 
 /* These structs should be implemented to fix the 'restore' functionality

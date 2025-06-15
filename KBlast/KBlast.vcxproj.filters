@@ -18,22 +18,16 @@
     <ClCompile Include="KBlast.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="KBlast_c_blob.cpp">
+    <ClCompile Include="Kblast_service.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="KBlast_c_privilege.cpp">
+    <ClCompile Include="Kblast_string.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="KBlast_c_service.cpp">
+    <ClCompile Include="Kblast_process.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="KBlast_c_utils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="driver\KBlast_c_device_dispatch.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="KBlast_c_ci.cpp">
+    <ClCompile Include="Kblast_device.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -44,28 +38,19 @@
     <ClInclude Include="globals.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ioctl.hpp">
+    <ClInclude Include="Kblast_service.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="KBlast_c_blob.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="KBlast_c_privilege.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="KBlast_c_service.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="KBlast_c_utils.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="driver\KBlast_c_device_dispatch.hpp">
+    <ClInclude Include="Kblast_string.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="rsrc\resource.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="KBlast_c_ci.hpp">
+    <ClInclude Include="Kblast_process.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Kblast_device.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

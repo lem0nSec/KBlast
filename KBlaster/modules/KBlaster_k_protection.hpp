@@ -12,12 +12,10 @@
 
 
 typedef enum _PROTECTION_OPTION {
-
-    PROTECTION_WINTCB,
-    PROTECTION_LSA,
-    PROTECTION_ANTIMALWARE,
-    PROTECTION_NONE
-
+    ProtectionWintcb,
+    ProtectionLsa,
+    ProtectionAntimalware,
+    ProtectionNone
 } PROTECTION_OPTION;
 
 typedef struct _PS_PROTECTION
@@ -28,10 +26,14 @@ typedef struct _PS_PROTECTION
 
 } PS_PROTECTION, * PPS_PROTECTION;
 
-typedef struct _PROCESS_PROTECTION_INFO
-{
+typedef struct _PROCESS_PROTECTION_INFO {
     UCHAR SignatureLevel;
     UCHAR SectionSignatureLevel;
     PS_PROTECTION Protection;
 
 } PROCESS_PROTECTION_INFO, * PPROCESS_PROTECTION_INFO;
+
+typedef struct _KBLR_PROTECTION {
+    ULONG processId;
+    PROTECTION_OPTION Protection;
+} KBLR_PROTECTION, * PKBLR_PROTECTION;

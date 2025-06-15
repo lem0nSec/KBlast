@@ -8,116 +8,56 @@
 #include "KBlaster_k_memory.hpp"
 
 
-NTSTATUS KBlaser_k_memory_manage(IN PKBLAST_MEMORY_BUFFER InBuf, OUT OPTIONAL PVOID OutBuf, KBLAST_MEMORY_ACTION action)
+__declspec(code_seg("PAGE"))
+NTSTATUS Kblaster_memory_CopyMemory(
+	_Inout_ PVOID pMemoryRequest, 
+	_In_ ULONG RequestLength)
 {
-	NTSTATUS status = STATUS_UNSUCCESSFUL;
-	KBLAST_MEMORY_BUFFER* buf = (KBLAST_MEMORY_BUFFER*)OutBuf;
+	PAGED_CODE();
+
+	NTSTATUS status = 1;
 	MM_COPY_ADDRESS mmCAddress = { 0 };
-	SIZE_T old = 0;
+	SIZE_T NumOfBytesTransferred = 0;
 	PMDL pMdl = 0;
+	PKBLR_MEMORY_BUFFER pRequest = static_cast<PKBLR_MEMORY_BUFFER>(pMemoryRequest);
 
-	if (MmIsAddressValid(InBuf->ptr) == TRUE)
-	{
-		switch (action)
-		{
-		case MEMORY_WRITE:
-			mmCAddress.VirtualAddress = (PVOID)InBuf->buffer;
-			pMdl = IoAllocateMdl(InBuf->ptr, InBuf->size, FALSE, FALSE, NULL);
-			if (pMdl)
-			{
-				__try
-				{
-					MmProbeAndLockPages(pMdl, KernelMode, IoReadAccess);
-					status = MmCopyMemory(InBuf->ptr, mmCAddress, (SIZE_T)InBuf->size, MM_COPY_MEMORY_VIRTUAL, &old);
-					MmUnlockPages(pMdl);
-				}
-				__except(EXCEPTION_EXECUTE_HANDLER)
-				{
-					status = GetExceptionCode();
-				}
-				IoFreeMdl(pMdl);
-			}
-			
-			break;
+	if (RequestLength < sizeof(KBLR_MEMORY_BUFFER)) {
+		status = STATUS_INVALID_PARAMETER;
+		goto Exit;
+	}
 
-		case MEMORY_READ:
-			mmCAddress.VirtualAddress = InBuf->ptr;
-			pMdl = IoAllocateMdl(InBuf->ptr, InBuf->size, FALSE, FALSE, NULL);
-			if (pMdl)
-			{
-				__try
-				{
-					MmProbeAndLockPages(pMdl, KernelMode, IoWriteAccess);
-					status = MmCopyMemory((PVOID)buf->buffer, mmCAddress, (SIZE_T)InBuf->size, MM_COPY_MEMORY_VIRTUAL, &old);
-					MmUnlockPages(pMdl);
-				}
-				__except (EXCEPTION_EXECUTE_HANDLER)
-				{
-					status = GetExceptionCode();
-				}
-				IoFreeMdl(pMdl);
-			}
+	pMdl = IoAllocateMdl(pRequest->ptr, pRequest->size, FALSE, FALSE, NULL);
+	if (!pMdl) {
+		status = STATUS_UNSUCCESSFUL;
+		goto Exit;
+	}
 
-			break;
-
-		default:
-			break;
+	__try {
+		
+		ACQUIRE_WRITE_LOCK(g_Locked);
+		MmProbeAndLockPages(pMdl, KernelMode, pRequest->Operation);
+		
+		if (pRequest->Operation == IoWriteAccess) {
+			mmCAddress.VirtualAddress = pRequest->buffer;
+			status = MmCopyMemory(pRequest->ptr, mmCAddress, pRequest->size, MM_COPY_MEMORY_VIRTUAL, &NumOfBytesTransferred);
 		}
+		else {
+			mmCAddress.VirtualAddress = pRequest->ptr;
+			status = MmCopyMemory(pRequest->buffer, mmCAddress, pRequest->size, MM_COPY_MEMORY_VIRTUAL, &NumOfBytesTransferred);
+		}
+
+		MmUnlockPages(pMdl);
+		RELEASE_WRITE_LOCK(g_Locked);
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER) {
+		
+		status = GetExceptionCode();
+	}
+
+Exit:
+	if (pMdl) {
+		IoFreeMdl(pMdl);
 	}
 
 	return status;
-
-}
-
-
-
-NTSTATUS KBlaster_k_memory_dse(IN ULONG offset, OUT PVOID pOutBuf)
-{
-	NTSTATUS status = STATUS_UNSUCCESSFUL;
-	PAUX_MODULE_EXTENDED_INFO pAuxModuleExtendedInfo = 0;
-	PVOID p_g_cioptions = 0;
-	ULONG64 CiBaseAddress = 0, i = 0;
-	ULONG szBuffer = 0, nModules = 0;
-	KBLAST_BUFFER* outBuffer = (KBLAST_BUFFER*)pOutBuf;
-
-	status = AuxKlibQueryModuleInformation(&szBuffer, sizeof(AUX_MODULE_EXTENDED_INFO), NULL);
-	if ((status == STATUS_SUCCESS) && (szBuffer != 0))
-	{
-		pAuxModuleExtendedInfo = (PAUX_MODULE_EXTENDED_INFO)ExAllocatePoolWithTag(PagedPool, szBuffer, POOL_TAG);
-		if (pAuxModuleExtendedInfo != 0)
-		{
-			RtlZeroMemory(pAuxModuleExtendedInfo, szBuffer);
-			status = AuxKlibQueryModuleInformation(&szBuffer, sizeof(AUX_MODULE_EXTENDED_INFO), pAuxModuleExtendedInfo);
-			
-			if (NT_SUCCESS(status))
-			{
-				nModules = szBuffer / sizeof(AUX_MODULE_EXTENDED_INFO);
-				for (i = 0; i < nModules; i++)
-				{
-					if (strcmp((char*)pAuxModuleExtendedInfo[i].FullPathName, "\\SystemRoot\\system32\\CI.dll") == 0)
-					{
-						CiBaseAddress = (ULONG64)pAuxModuleExtendedInfo[i].BasicInfo.ImageBase;
-						p_g_cioptions = (PVOID)(CiBaseAddress + offset);
-						if (p_g_cioptions > (PVOID)CiBaseAddress)
-						{
-							outBuffer->pointer = p_g_cioptions;
-							outBuffer->uPointer = *(PULONG64)p_g_cioptions;
-							status = STATUS_SUCCESS;
-						}
-						else
-						{
-							outBuffer->pointer = (PVOID)0;
-							outBuffer->uPointer = 0;
-							status = STATUS_UNSUCCESSFUL;
-						}
-					}
-				}
-
-				ExFreePoolWithTag(pAuxModuleExtendedInfo, POOL_TAG);
-			}
-		}
-	}
-
-	return status;
-
 }

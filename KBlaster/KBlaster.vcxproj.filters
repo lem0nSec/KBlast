@@ -27,9 +27,6 @@
     <ClCompile Include="KBlaster.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="KBlaster_k_utils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="modules\KBlaster_k_callbacks.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -45,12 +42,15 @@
     <ClCompile Include="modules\KBlaster_k_process.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="modules\KBlaster_k_assist.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="globals.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="navigation.hpp">
+    <ClInclude Include="offsets.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ioctl.hpp">
@@ -68,13 +68,13 @@
     <ClInclude Include="KBlaster.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="KBlaster_k_utils.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="modules\KBlaster_k_memory.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="modules\KBlaster_k_process.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="modules\KBlaster_k_assist.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

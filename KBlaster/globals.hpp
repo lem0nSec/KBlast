@@ -7,28 +7,9 @@
 
 #pragma once
 
-#include <ntifs.h>
-#include <ntddk.h>
-#include <ntdef.h>
-#include <wdm.h>
-#include <aux_klib.h>
-#include "navigation.hpp"
-#include "KBlaster_k_utils.hpp"
+#include "modules/KBlaster_k_assist.hpp"
 
-#pragma warning(disable: 4996)
-
-#define POOL_TAG		'lemS'
-#define USER_POOL_TAG	'User'
-
-
-typedef struct _KBLAST_BUFFER {
-
-	int integer1;
-	int integer2;
-	PVOID pointer;
-	ULONG64 uPointer;
-	ULONG uGeneric;
-	char* string1;
-	char* string2;
-
-} KBLAST_BUFFER, * PKBLAST_BUFFER;
+typedef int BOOL;
+extern NTSTATUS Kblaster_assist_Initialize();
+extern NTSTATUS Kblaster_assist_GetLoadedModulesFillBuffer(_Inout_ PKBLR_ASSIST_MODULE_EXTENDED_INFORMATION pAllModules);
+extern void Kblaster_assist_GetLoadedModulesFreeBuffer(_In_ PKBLR_ASSIST_MODULE_EXTENDED_INFORMATION pAllModules);

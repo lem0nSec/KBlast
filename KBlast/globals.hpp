@@ -14,29 +14,32 @@
 #include <Psapi.h>
 #include <shlwapi.h>
 #include <stdio.h>
-#include "KBlast_c_utils.hpp" // utils are global as they may be requested by anything
-#include "KBlast_c_privilege.hpp"
-#include "../KBlaster/navigation.hpp"
+
+#include "Kblast_device.hpp"
+#include "Kblast_string.hpp"
+#include "Kblast_service.hpp"
+#include "Kblast_process.hpp"
+#include "../KBlaster/offsets.hpp"
 
 #pragma comment(lib, "ntdll.lib")
 #pragma comment(lib, "crypt32.lib")
 #pragma comment(lib, "psapi.lib")
 #pragma comment(lib, "Shlwapi.lib")
 
-#pragma warning(disable: 4996)
 #define UNICODE 1
 
-#define KBLAST_CLT_TITLE	L"KBlast v1.1 ( by lem0nSec )"
-#define KBLAST_CLT_VERSION	L"0.1"
-#define KBLAST_DRV_BINARY	L"KBlaster.sys"
-#define KBLAST_DRV_FILENAME	L"\\\\.\\KBlaster"
-#define KBLAST_SRV_NAME		L"KBlaster"
-#define KBLAST_VERSION		L"0.1"
-#if defined(_M_X64)
-#define KBLAST_ARCH			L"x64"
-#elif defined(_M_IX86)
-#define KBLAST_ARCH			L"x86"
-#endif
+#define PRINT_ERR_FULL(fmt, ...) do {															\
+				DWORD LastError = GetLastError();												\
+				wprintf(L"[-] " TEXT(__FUNCTION__) L" ( 0x%08X ) : " fmt L"\n", LastError);		\
+			} while (0)
+
+#define PRINT_ERR(...) (wprintf(L"[-] Error : " __VA_ARGS__ L"\n"))
+#define PRINT_SUCC(...) (wprintf(L"[+] Success : " __VA_ARGS__ L"\n"))
+#define PRINT_INFO(...) (wprintf(L"[i] Info : " __VA_ARGS__ L"\n"))
+#define PRINT_WARN(...) (wprintf(L"[!] Warning : " __VA_ARGS__ L"\n"))
+
+#define	Add2Ptr(P, I)   ((PVOID)((PBYTE)(P) + (PBYTE)(I)))
+#define Sub2Ptr(P, I)	((PVOID)((PBYTE)(P) - (PBYTE)(I)))
 
 #define OSARCH_X64			L"x64"
 #define OSARCH_X86			L"x86"
@@ -45,31 +48,11 @@
 #define OSARCH_IA64			L"Intel Itanium-based"
 #define OSARCH_UNKNOWN		L"Unknown"
 
-#if !defined(PRINT_FUNCTION_ERROR)
-#define PRINT_FUNCTION_ERROR(...) (wprintf(L"IN_FUNCTION_ERROR " TEXT(__FUNCTION__) L" : " __VA_ARGS__))
-#endif
 
-#if !defined(PRINT_ERROR)
-#define PRINT_ERROR(...) (wprintf(L"[-] ERROR : " __VA_ARGS__))
-#endif
-
-#if !defined(PRINT_SUCCESS)
-#define PRINT_SUCCESS(...) (wprintf(L"[+] SUCCESS : " __VA_ARGS__))
-#endif
-
-#if !defined(PRINT_INFO)
-#define PRINT_INFO(...) (wprintf(L"[i] INFO : " __VA_ARGS__))
-#endif
-
-#if !defined(PRINT_WARNING)
-#define PRINT_WARNING(...) (wprintf(L"[!] WARNING : " __VA_ARGS__))
-#endif
-
-
-typedef struct _KBLAST_MEMORY_BUFFER {
-
-	PVOID ptr;
-	ULONG size;
-	UCHAR buffer[250];
-
-} KBLAST_MEMORY_BUFFER, * PKBLAST_MEMORY_BUFFER; // this should be written on another header file
+// global variables
+extern SC_HANDLE			g_KblasterService;
+extern RTL_OSVERSIONINFOW	g_OsVersionInfo;
+extern SYSTEM_INFO			g_SystemInfo;
+extern const wchar_t*		g_Architecture;
+extern const wchar_t*		g_KblastArchitecture;
+extern HANDLE				g_KblasterDevice;

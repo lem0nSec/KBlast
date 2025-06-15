@@ -10,57 +10,69 @@
 
 #include "../globals.hpp"
 
+#define INVERT_ROUTINE_HANDLE(H)	*(PVOID*)(H & 0xfffffffffffffff8)
 
-typedef enum _CALLBACK_TYPE {
+typedef enum {
+	ProcessNotify,
+	ThreadNotify,
+	ImageLoad,
+	RegistryCallback,
+	ObjectCallback,
+	FilterCallback,
+	NetworkCallback
+} CallbackType;
 
-	ARRAY_PROCESS,
-	ARRAY_THREAD,
-	ARRAY_IMAGE,
-	LISTENTRY_REGISTRY,
-	// LISTENTRY_OBJECT // todo
+typedef struct _KBLR_CALLBACK {
+	CallbackType CallbackType;
+} KBLR_CALLBACK, * PKBLR_CALLBACK;
 
-} CALLBACK_TYPE;
+#pragma pack(push, 1)
+typedef struct _KBLR_CALLBACK_REMOVE {
+	CallbackType CallbackType;
+	ULONG_PTR RoutineIdentifier;
+} KBLR_CALLBACK_REMOVE, * PKBLR_CALLBACK_REMOVE;
+#pragma pack(pop)
 
-
-typedef struct _CALLBACK_MODULE_INFORMATION {
-
+typedef struct _ROUTINE_MODULE_INFORMATION {
 	PVOID ModuleBase;
 	ULONG ModuleImageSize;
 	USHORT ModuleFileNameOffset;
 	CHAR ModuleFullPathName[AUX_KLIB_MODULE_PATH_LEN];
+} ROUTINE_MODULE_INFORMATION, * PROUTINE_MODULE_INFORMATION;
 
-} CALLBACK_MODULE_INFORMATION, * PCALLBACK_MODULE_INFORMATION;
-
-
-typedef struct _CALLBACK_INFORMATION {
-
-	ULONG64 CallbackHandle;
+typedef struct _ROUTINE_INFORMATION {
+	ULONG_PTR Handle;
 	PVOID PointerToHandle;
-	PVOID CallbackFunctionPointer;
-	CALLBACK_MODULE_INFORMATION ModuleInformation;
+	PVOID Routine;
+	ROUTINE_MODULE_INFORMATION ModuleInformation;
+} ROUTINE_INFORMATION, * PROUTINE_INFORMATION;
 
-} CALLBACK_INFORMATION, * PCALLBACK_INFORMATION;
-
-
-typedef struct _PROCESS_KERNEL_CALLBACK_STORAGE {
-
-	PVOID Storage;
-	ULONG CallbackQuota;
-	CALLBACK_INFORMATION CallbackInformation[50];
-
-} PROCESS_KERNEL_CALLBACK_STORAGE, * PPROCESS_KERNEL_CALLBACK_STORAGE;
-
+typedef struct _KBLR_NOTIFY_ROUTINE_ARRAY_INFORMATION {
+	PVOID pArray;
+	ULONG NumberOfRoutines;
+	ROUTINE_INFORMATION RoutineInformation[ANYSIZE_ARRAY];
+} KBLR_NOTIFY_ROUTINE_ARRAY_INFORMATION, * PKBLR_NOTIFY_ROUTINE_ARRAY_INFORMATION;
 
 typedef struct _CMREG_CALLBACK {
-	
 	LIST_ENTRY List;
 	ULONG Unknown1;
 	ULONG Unknown2;
 	LARGE_INTEGER Cookie;
 	PVOID Unknown3;
 	PEX_CALLBACK_FUNCTION Function;
-
 } CMREG_CALLBACK, * PCMREG_CALLBACK;
+
+
+
+
+
+
+
+
+
+
+
+
 
 /*
 typedef struct _OBJECT_TYPE {

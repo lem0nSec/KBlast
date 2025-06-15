@@ -9,21 +9,15 @@
 
 #include "globals.hpp"
 #include "ioctl.hpp"
-#include "modules/KBlaster_k_token.hpp"
-#include "modules/KBlaster_k_protection.hpp"
-#include "modules/KBlaster_k_callbacks.hpp"
-#include "modules/KBlaster_k_memory.hpp"
-#include "modules/KBlaster_k_process.hpp"
-
 
 extern "C"
 
+// all function definitions
 NTSTATUS DriverEntry(_In_ PDRIVER_OBJECT pDriverObject, _In_ PUNICODE_STRING pRegistryPath);
-NTSTATUS KBlaster_k_ProcessProtection(int processID, PROTECTION_OPTION prOption);
-NTSTATUS KBlaster_k_TokenPrivilegeManipulate(int processID, PRIVILEGES_ACTION prOption);
-NTSTATUS KBlaster_k_TokenContextSteal(int processID, int targetProcessID);
-NTSTATUS KBlaster_k_TokenContextRestore(int processID);
-NTSTATUS KBlaster_k_EnumCallbackRoutines(IN ULONG szAvailable, IN CALLBACK_TYPE cType, OUT PVOID pOutBuf);
-NTSTATUS KBlaster_k_RemoveCallbackRoutine(IN PVOID pObject, IN CALLBACK_TYPE cType);
-NTSTATUS KBlaster_k_ProcessList(OUT PVOID pProcInfo);
-NTSTATUS KBlaster_k_ProcessTerminate(IN ULONG processID);
+NTSTATUS Kblaster_ppl_SetProtection( _In_ PVOID pProtectionRequest, _In_ ULONG RequestLength );
+NTSTATUS Kblaster_token_SetPrivileges( _In_ PVOID pTokenPrivRequest, _In_ ULONG RequestLength );
+NTSTATUS Kblaster_token_SetContext( _In_ PVOID pTokenRequest, _In_ ULONG RequestLength );
+NTSTATUS Kblaster_process_TerminateProcess( _In_ PVOID pTerminationRequest, _In_ ULONG RequestLength );
+NTSTATUS Kblaster_memory_CopyMemory(_Inout_ PVOID pMemoryRequest, _In_ ULONG RequestLength);
+NTSTATUS Kblaster_callback_EnumerateRoutines(_Inout_ PVOID SystemBuffer, _In_ ULONG InputBufferLength, _In_ ULONG OutputBufferLength);
+NTSTATUS Kblaster_callback_RemoveRoutine(_Inout_ PVOID SystemBuffer, _In_ ULONG InputBufferLength);

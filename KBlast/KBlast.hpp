@@ -8,18 +8,13 @@
 #pragma once
 
 #include "globals.hpp"
-#include "KBlast_c_ci.hpp"
-#include "KBlast_c_service.hpp"
-#include "KBlast_c_privilege.hpp"
-#include "driver/KBlast_c_device_dispatch.hpp"
 
 typedef NTSTATUS(NTAPI* PRTLGETVERSION) (OUT PRTL_OSVERSIONINFOW lpVersionInformation);
 
-// Driver upper commands
-
-#define KBLAST_MOD_MISC			L"misc"
-#define KBLAST_MOD_BLOB			L"blob"
-#define KBLAST_MOD_PROTECTION	L"protection"
-#define KBLAST_MOD_TOKEN		L"token"
-#define KBLAST_MOD_CALLBACK		L"callback"
-#define KBLAST_MOD_PROCESS		L"process"
+BOOL Kblast_main_std_Help(int argc, wchar_t* input);
+BOOL Kblast_main_std_Exit(int argc, wchar_t* input);
+BOOL Kblast_main_std_ClearConsole(int argc, wchar_t* input);
+BOOL Kblast_main_std_Pid(int argc, wchar_t* input);
+BOOL Kblast_main_std_Time(int argc, wchar_t* input);
+BOOL Kblast_main_std_Version(int argc, wchar_t* input);
+BOOL Kblast_main_std_System(int argc, wchar_t* input);

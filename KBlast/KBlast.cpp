@@ -8,354 +8,335 @@
 #include "KBlast.hpp"
 
 
-RTL_OSVERSIONINFOW OSinfo = { 0 };
-SYSTEM_INFO OSinfo2 = { 0 };
+HANDLE g_KblasterDevice					= 0;
+RTL_OSVERSIONINFOW g_OsVersionInfo		= { 0 };
+SYSTEM_INFO g_SystemInfo				= { 0 };
+const wchar_t* g_Architecture			= OSARCH_UNKNOWN;
+BOOL l_SignalSelfTermination			= FALSE;
 
-static void KBlast_c_GetInfo(DWORD dwOption)
+#if defined(__x86_64__) || defined(_M_X64)
+const wchar_t* g_KblastArchitecture = OSARCH_X64;
+#elif defined(i386) || defined(__i386__) || defined(__i386) || defined(_M_IX86)
+const wchar_t* g_KblastArchitecture = OSARCH_X86;
+#else
+const wchar_t* g_KblastArchitecture = OSARCH_UNKNOWN;
+#endif
+
+
+KBL_COMMAND KblStandardCmd[]{
+	{L"help",			L"Show this help",						Kblast_main_std_Help},
+	{L"quit",			L"Quit KBlast",							Kblast_main_std_Exit},
+	{L"clear",			L"Clear the screen",					Kblast_main_std_ClearConsole},
+	{L"pid",			L"Show current pid",					Kblast_main_std_Pid},
+	{L"time",			L"Display system time",					Kblast_main_std_Time},
+	{L"version",		L"Display system version information",	Kblast_main_std_Version},
+	{L"!",				L"Execute system command",				Kblast_main_std_System}
+	//{L"whoami",			L"Display current token information",	Kblast_main_std_Whoami}
+};
+
+KBL_COMMAND KblModuleCmd[]{
+	{L"protection",		L"Commands - ' protection ' ( process protection interactions )",		Kblast_device_IoctlProtection},
+	{L"token",			L"Commands - ' token ' ( token manipulation interactions )",			Kblast_device_IoctlToken},
+	{L"callback",		L"Commands - ' callback ' ( kernel callbacks interactions )",			Kblast_device_IoctlCallback},
+	{L"misc",			L"Commands - ' misc ' ( misc functionalities. )",						Kblast_device_IoctlMisc},
+	{L"process",		L"Commands - ' process ' ( process manipulation interactions )",		Kblast_device_IoctlProcess}
+	//{L"blob",			L"Commands - ' blob ' ( blob & containers interactions )",				Kblast_device_IoctlBlob}
+};
+
+
+static
+inline
+BOOL Kblast_main_std_Help(int argc, wchar_t* input)
 {
-	SYSTEMTIME sTime = { 0 };
-	DWORD dwBuild = 0;
-	HMODULE ntdll = 0;
-	PRTLGETVERSION RtlGetVersion = 0;
-	const wchar_t* kArch = 0;
+	SIZE_T i = 0;
 
-	if (OSinfo.dwOSVersionInfoSize == 0)
-	{
-		OSinfo.dwOSVersionInfoSize = sizeof(RTL_OSVERSIONINFOW);
-		ntdll = GetModuleHandleW(L"ntdll.dll");
-		if (ntdll != 0)
-		{
-			RtlGetVersion = (PRTLGETVERSION)GetProcAddress(ntdll, "RtlGetVersion");
-			if (RtlGetVersion != 0)
-			{
-				RtlGetVersion(&OSinfo);
-			}
+	for (i = 0; i < KBL_COMM_ELEMS(KblStandardCmd); i++) {
+		wprintf(L"%30s\t-\t%s\n",
+			KblStandardCmd[i].lpCommand,
+			KblStandardCmd[i].lpDescription);
+	}
+
+	return TRUE;
+}
+
+static
+inline
+BOOL Kblast_main_std_Exit(int argc, wchar_t* input)
+{
+	l_SignalSelfTermination = TRUE;
+
+	wprintf(L"Bye!\n");
+
+	return l_SignalSelfTermination;
+}
+
+static
+inline
+BOOL Kblast_main_std_ClearConsole(int argc, wchar_t* input)
+{
+	system("cls");
+
+	return TRUE;
+}
+
+static
+inline
+BOOL Kblast_main_std_Pid(int argc, wchar_t* input)
+{
+	wprintf(L"Current Process Id: %d\n", GetCurrentProcessId());
+
+	return TRUE;
+}
+
+static
+inline
+BOOL Kblast_main_std_Time(int argc, wchar_t* input)
+{
+	SYSTEMTIME SystemTime = { 0 };
+	
+	GetSystemTime(&SystemTime);
+	wprintf(L"System time is : %d:%d:%d - %d/%d/%d\n", 
+		SystemTime.wHour, 
+		SystemTime.wMinute, 
+		SystemTime.wSecond, 
+		SystemTime.wMonth, 
+		SystemTime.wDay, 
+		SystemTime.wYear);
+
+	return TRUE;
+}
+
+static
+inline
+BOOL Kblast_main_std_Version(int argc, wchar_t* input)
+{
+	wprintf(L"Microsoft Windows NT %d.%d OS Build %d ( OS Arch %s ) ( Kblast arch %s )\n", 
+		g_OsVersionInfo.dwMajorVersion, 
+		g_OsVersionInfo.dwMinorVersion, g_OsVersionInfo.dwBuildNumber, 
+		g_Architecture, // fix here
+		g_KblastArchitecture);
+	
+	return TRUE;
+}
+
+static
+inline
+BOOL Kblast_main_std_System(int argc, wchar_t* input)
+{
+	BOOL status = FALSE;
+	ANSI_STRING AnsiString = { 0 };
+	UNICODE_STRING UnicodeString = { 0 };
+
+	RtlInitUnicodeString(&UnicodeString, input);
+
+	if (!Kblast_string_CreateAnsiStringFromUnicodeString(&UnicodeString, &AnsiString)) {
+		goto Exit;
+	}
+
+	system((const char*)(DWORD_PTR)AnsiString.Buffer + 1);
+
+	status = TRUE;
+
+Exit:
+	if (AnsiString.Buffer) {
+		Kblast_string_FreeAnsiString(&AnsiString);
+	}
+
+	return status;
+}
+
+
+static
+inline
+BOOL Kblast_main_Shutdown()
+{
+	CloseHandle(g_KblasterDevice);
+	return Kblast_service_DeleteService(g_KblasterService);
+}
+
+static
+BOOL Kblast_main_DispatchCommand(_In_ wchar_t* input)
+{
+	BOOL status = FALSE;
+	BOOL standard = FALSE;
+	BOOL modules = FALSE;
+	DWORD index = 0;
+	int argc = 0;
+
+	if (!input) {
+		SetLastError(ERROR_INVALID_PARAMETER);
+		goto Exit;
+	}
+
+	standard = Kblast_string_CommandSearch(input, KblStandardCmd, KBL_COMM_ELEMS(KblStandardCmd), &index);
+	modules = Kblast_string_CommandSearch(input, KblModuleCmd, KBL_COMM_ELEMS(KblModuleCmd), &index);
+	if (!standard && !modules) {
+		SetLastError(ERROR_INVALID_COMMAND_LINE);
+		goto Exit;
+	}
+
+	if (!CommandLineToArgvW(input, &argc)) {
+		goto Exit;
+	}
+
+	if (standard) {
+		status = KblStandardCmd[index].Function(argc, input);
+	}
+	
+	if (modules) {
+		status = KblModuleCmd[index].Function(argc, input);
+	}
+	
+	
+Exit:
+	
+	return status;
+}
+
+
+static
+void Kblast_main_StartConsole()
+{
+	wchar_t input[MAX_PATH] = { 0 };
+
+	SetConsoleTitle(L"Kblast");
+
+	wprintf(
+		L"    __ __ ____  __           __\n"
+		L"   / //_// __ )/ /___ ______/ /_\t| KBlast client - OS Build #%d - Major version #%d\n"
+		L"  / ,<  / __  / / __ `/ ___/ __/\t| Architecture : %s\n"
+		L" / /| |/ /_/ / / /_/ (__  ) /_\t\t| Website : https://www.github.com/lem0nSec/KBlast\n"
+		L"/_/ |_/_____/_/\\__,_/____/\\__/\t\t| Author  : < lem0nSec_@world:~$ >\n"
+		L"------------------------------------------------------->>>\n",
+		g_OsVersionInfo.dwBuildNumber, g_OsVersionInfo.dwMajorVersion, g_KblastArchitecture
+	);
+
+	while (1) {
+		wprintf(L"\n" L"[KBlast] --> ");
+		fgetws(input, ARRAYSIZE(input), stdin); fflush(stdin);
+		Kblast_string_AdjustInputCommandString(input);
+		Kblast_main_DispatchCommand(input);
+		if (l_SignalSelfTermination) {
+			break;
 		}
 	}
 
-	GetSystemInfo(&OSinfo2);
+	return;
+}
 
-	switch (OSinfo2.wProcessorArchitecture)
+static
+BOOL Kblast_main_Initialize()
+{
+	BOOL status = FALSE;
+	PRTLGETVERSION RtlGetVersion = 0;
+	HMODULE hNtdll = 0;
+	DWORD dwRequiredLength = 0;
+	wchar_t lpPath[MAX_PATH] = { 0 };
+
+
+	dwRequiredLength = GetFullPathName(L"Kblaster.sys", MAX_PATH, lpPath, NULL);
+	if (!dwRequiredLength) {
+		goto Exit;
+	}
+
+	if (!Kblast_process_CheckTokenIntegrityLevel(GetCurrentProcess(), SECURITY_MANDATORY_HIGH_RID)) {
+		PRINT_ERR_FULL("Insufficient privileges");
+		goto Exit;
+	}
+
+	if (!Kblast_service_RunService(L"Kblaster", lpPath, &g_KblasterService)) {
+		PRINT_ERR_FULL("Service install failure");
+		goto Exit;
+	}
+
+	g_KblasterDevice = CreateFile(
+		L"\\\\.\\KBlaster",
+		FILE_ANY_ACCESS,
+		0,
+		NULL,
+		OPEN_EXISTING,
+		FILE_ATTRIBUTE_SYSTEM,
+		0
+	);
+	if (g_KblasterDevice == INVALID_HANDLE_VALUE ||
+		!g_KblasterDevice) {
+		PRINT_ERR_FULL(L"Device opening failure");
+		g_KblasterDevice = 0;
+		goto Exit;
+	}
+
+	hNtdll = GetModuleHandle(L"ntdll.dll");
+	if (!hNtdll) {
+		goto Exit;
+	}
+
+	RtlGetVersion = reinterpret_cast<PRTLGETVERSION>(GetProcAddress(hNtdll, "RtlGetVersion"));
+	if (!RtlGetVersion) {
+		goto Exit;
+	}
+
+	if (!NT_SUCCESS(RtlGetVersion(&g_OsVersionInfo))) {
+		goto Exit;
+	}
+
+	GetSystemInfo(&g_SystemInfo);
+
+	switch (g_SystemInfo.wProcessorArchitecture)
 	{
 	case PROCESSOR_ARCHITECTURE_AMD64:
-		kArch = OSARCH_X64;
+		g_Architecture = OSARCH_X64;
 		break;
 
 	case PROCESSOR_ARCHITECTURE_INTEL:
-		kArch = OSARCH_X86;
+		g_Architecture = OSARCH_X86;
 		break;
 
 	case PROCESSOR_ARCHITECTURE_ARM:
-		kArch = OSARCH_ARM;
+		g_Architecture = OSARCH_ARM;
 		break;
 
 	case PROCESSOR_ARCHITECTURE_ARM64:
-		kArch = OSARCH_ARM64;
+		g_Architecture = OSARCH_ARM64;
 		break;
 
 	case PROCESSOR_ARCHITECTURE_IA64:
-		kArch = OSARCH_IA64;
+		g_Architecture = OSARCH_IA64;
 		break;
 
 	case PROCESSOR_ARCHITECTURE_UNKNOWN:
-		kArch = OSARCH_UNKNOWN;
+		g_Architecture = OSARCH_UNKNOWN;
 		break;
 
 	default:
-		break;
+		//SetLastError()
+		goto Exit;
 	}
 
-	SecureZeroMemory(&OSinfo2, sizeof(SYSTEM_INFO));
+	status = TRUE;
 
-	switch (dwOption)
-	{
-	case 0:
-		GetSystemTime(&sTime);
-		wprintf(
-			L"    __ __ ____  __           __\n"
-			L"   / //_// __ )/ /___ ______/ /_\t| KBlast client - OS Build #%d - Major version #%d\n"
-			L"  / ,<  / __  / / __ `/ ___/ __/\t| Version : %s ( first release ) - Architecture : %s\n"
-			L" / /| |/ /_/ / / /_/ (__  ) /_\t\t| Website : http://www.github.com/lem0nSec/KBlast\n"
-			L"/_/ |_/_____/_/\\__,_/____/\\__/\t\t| Author  : < lem0nSec_@world:~$ >\n"
-			L"------------------------------------------------------->>>\n", OSinfo.dwBuildNumber, OSinfo.dwMajorVersion, KBLAST_VERSION, KBLAST_ARCH
-		);
-		break;
-
-	case 1:
-		GetSystemTime(&sTime);
-		wprintf(L"System time is : %d:%d:%d - %d/%d/%d\n", sTime.wHour, sTime.wMinute, sTime.wSecond, sTime.wMonth, sTime.wDay, sTime.wYear);
-		break;
-
-	case 2:
-		wprintf(L"Microsoft Windows NT %d.%d OS Build %d ( Arch %s )\nKBlast v%s ( Arch %s )\n", OSinfo.dwMajorVersion, OSinfo.dwMinorVersion, OSinfo.dwBuildNumber, kArch, KBLAST_VERSION, KBLAST_ARCH);
-		break;
-
-	default:
-		break;
-	}
-
-}
-
-static BOOL KBlast_c_CheckOSVersion()
-{
-	BOOL status = FALSE;
-	HMODULE ntdll = 0;
-	PRTLGETVERSION RtlGetVersion = 0;
-
-	if (OSinfo.dwOSVersionInfoSize == 0)
-	{
-		OSinfo.dwOSVersionInfoSize = sizeof(RTL_OSVERSIONINFOW);
-		ntdll = GetModuleHandleW(L"ntdll.dll");
-		if (ntdll != 0)
-		{
-			RtlGetVersion = (PRTLGETVERSION)GetProcAddress(ntdll, "RtlGetVersion");
-			if (RtlGetVersion != 0)
-			{
-				RtlGetVersion(&OSinfo);
-			}
-		}
-	}
-
-	if ((OSinfo.dwBuildNumber == 19045) && (OSinfo.dwMajorVersion == 10))
-	{
-		status = TRUE;
+Exit:
+	if (!status &&
+		(g_KblasterService ||
+			g_KblasterDevice)) {
+		Kblast_main_Shutdown();
 	}
 
 	return status;
-
-}
-
-static BOOL KBlast_c_init(LPWSTR LoadMode)
-{
-	BOOL initStatus = FALSE;
-	DWORD szServiceInit = KBLAST_SD_FAILED;
-	BOOL adminStatus = FALSE;
-
-	adminStatus = KBlast_c_CheckTokenIntegrity();
-	if (adminStatus == TRUE)
-	{
-		if (wcscmp(LoadMode, L"/kexec") == 0)
-		{
-			if (!KBlast_c_ci_KexecDD())
-				return initStatus;
-		}
-
-		szServiceInit = KBlast_c_ServiceInitialize(SERVICE_CREATE_AND_LOAD);
-		switch (szServiceInit)
-		{
-		case KBLAST_SD_SUCCESS:
-			initStatus = TRUE;
-			break;
-
-		case KBLAST_SD_FAILED:
-			PRINT_ERROR(L"Service start failed.\n");
-			break;
-
-		case KBLAST_D_SUCCESS:
-			initStatus = TRUE;
-			break;
-
-		case KBLAST_D_FAILED:
-			PRINT_ERROR(L"Driver down.\n");
-			break;
-
-		case KBLAST_SD_EXIST:
-			initStatus = TRUE;
-			break;
-
-		case KBLAST_BINARY_NOT_FOUND:
-			PRINT_ERROR(L"%s not found.\n", KBLAST_DRV_BINARY);
-			break;
-
-		case KBLAST_BINARY_ERROR_GENERIC:
-			PRINT_ERROR(L"%s error generic.\n", KBLAST_DRV_BINARY);
-			break;
-
-		default:
-			break;
-		}
-	}
-	else
-	{
-		PRINT_ERROR(L"Insufficient privileges. Quitting...\n");
-	}
-
-	return initStatus;
-
 }
 
 
-static BOOL KBlast_c_cleanup()
+int wmain(int argc, wchar_t* argv[])
 {
-	BOOL status = FALSE;
-	DWORD szServiceStatus = KBLAST_SD_EXIST;
-	BOOL adminStatus = FALSE;
 
-
-	adminStatus = KBlast_c_CheckTokenIntegrity();
-	if (adminStatus == TRUE)
-	{
-		szServiceStatus = KBlast_c_ServiceInitialize(SERVICE_UNLOAD_AND_DELETE);
-		if (szServiceStatus != KBLAST_SD_SUCCESS)
-		{
-			PRINT_ERROR(L"Failed to unload driver\n");
-		}
+	if (!Kblast_main_Initialize()) {
+		goto Exit;
 	}
 
-	return status;
+	Kblast_main_StartConsole();
 
-}
+	Kblast_main_Shutdown();
 
+Exit:
 
-static void KBlast_c_ConsoleInit()
-{
-	SetConsoleTitle(KBLAST_CLT_TITLE);
-	KBlast_c_GetInfo(0);
-}
-
-
-static BOOL KBlast_c_system(wchar_t* input)
-{
-	BOOL status = FALSE;
-	char* systemInput = 0;
-
-	systemInput = KBlast_c_utils_UnicodeStringToAnsiString(input);
-	if (systemInput != 0)
-	{
-		system((char*)((DWORD_PTR)systemInput + 1));
-		status = TRUE;
-	}
-
-	KBlast_c_utils_FreeAnsiString(systemInput);
-
-	return status;
-
-}
-
-
-static BOOL KBlast_c_ConsoleStart()
-{
-	BOOL status = FALSE;
-	KBlast_c_ConsoleInit();
-
-	if (KBlast_c_CheckOSVersion() == FALSE)
-	{
-		PRINT_WARNING(L"This OS version might not be fully supported. Critical issues may rise.\n");
-	}
-
-	wchar_t input[MAX_PATH];
-	while (TRUE)
-	{
-		wprintf(L"\n[ KBlast ] --> ");
-		fgetws(input, ARRAYSIZE(input), stdin); fflush(stdin);
-		if (wcscmp(input, L"help\n") == 0)
-		{
-			KBlast_c_module_help(GENERIC);
-		}
-		else if (wcscmp(input, L"quit\n") == 0)
-		{
-			wprintf(L"bye!\n");
-			break;
-		}
-		else if (wcscmp(input, L"banner\n") == 0)
-		{
-			KBlast_c_GetInfo(0);
-		}
-		else if (wcscmp(input, L"cls\n") == 0)
-		{
-			system("cls");
-		}
-		else if (wcscmp(input, L"pid\n") == 0)
-		{
-			wprintf(L"PID : %d\n", GetCurrentProcessId());
-		}
-		else if (wcsncmp(input, L"!", 1) == 0)
-		{
-			status = KBlast_c_system(input);
-		}
-		else if (wcscmp(input, L"time\n") == 0)
-		{
-			KBlast_c_GetInfo(1);
-		}
-		else if (wcscmp(input, L"version\n") == 0)
-		{
-			KBlast_c_GetInfo(2);
-		}
-		else if (wcsncmp(input, KBLAST_MOD_MISC, wcslen(KBLAST_MOD_MISC)) == 0)
-		{
-			KBlast_c_device_dispatch_misc(input);
-		}
-		else if (wcsncmp(input, KBLAST_MOD_BLOB, wcslen(KBLAST_MOD_BLOB)) == 0)
-		{
-			KBlast_c_device_dispatch_blob(input);
-		}
-		else if (wcsncmp(input, KBLAST_MOD_PROTECTION, wcslen(KBLAST_MOD_PROTECTION)) == 0)
-		{
-			KBlast_c_device_dispatch_protection(input);
-		}
-		else if (wcsncmp(input, KBLAST_MOD_TOKEN, wcslen(KBLAST_MOD_TOKEN)) == 0)
-		{
-			KBlast_c_device_dispatch_token(input);
-		}
-		else if (wcsncmp(input, KBLAST_MOD_CALLBACK, wcslen(KBLAST_MOD_CALLBACK)) == 0)
-		{
-			KBlast_c_device_dispatch_callbacks(input);
-		}
-		else if (wcsncmp(input, KBLAST_MOD_PROCESS, wcslen(KBLAST_MOD_PROCESS)) == 0)
-		{
-			KBlaster_c_device_dispatch_process(input);
-		}
-		else if (wcscmp(input, L"\n") == 0)
-		{
-			continue;
-		}
-		else
-		{
-			KBlast_c_module_help(GENERIC);
-		}
-	}
-
-	return status;
-
-}
-
-BOOL wmain(int argc, wchar_t* argv[])
-{
-	if (argc < 2)
-	{
-		if (KBlast_c_init((LPWSTR)L"/std"))
-		{
-			KBlast_c_ConsoleStart();
-			return KBlast_c_cleanup();
-		}
-		else
-			return FALSE;
-	}
-	else if (argc < 4)
-	{
-		if (wcscmp(argv[1], L"/?") == 0)
-		{
-			goto help;
-		}
-		else if (wcscmp(argv[1], L"/load") == 0) // load driver and exit
-		{
-			if (argv[2] != NULL)
-				return KBlast_c_init((LPWSTR)argv[2]);
-			else
-				return KBlast_c_init((LPWSTR)L"std");
-		}
-		else if (wcscmp(argv[1], L"/unload") == 0) // unload driver and exit
-		{
-			return KBlast_c_cleanup();
-		}
-	}
-
-help:
-	wprintf(
-		L"Usage: %s {optional_argument}\n\n/load\t: load %s (/std [default] | /kexec [attempt KexecDD technique])\n/unload\t: unload %s\n",
-		argv[0], KBLAST_DRV_BINARY, KBLAST_DRV_BINARY
-	);
-
-	return TRUE;
-
+	return 1;
 }
