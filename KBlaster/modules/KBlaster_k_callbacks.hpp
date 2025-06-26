@@ -15,23 +15,31 @@
 typedef enum {
 	ProcessNotify,
 	ThreadNotify,
-	ImageLoad,
+	ImageNotify,
 	RegistryCallback,
-	ObjectCallback,
+	ObjectCallbacks,
 	FilterCallback,
 	NetworkCallback
 } CallbackType;
 
-typedef struct _KBLR_CALLBACK {
-	CallbackType CallbackType;
-} KBLR_CALLBACK, * PKBLR_CALLBACK;
+typedef enum {
+	ProcessType,
+	ThreadType,
+	DesktopType
+} ObjectCallbackType;
 
-#pragma pack(push, 1)
-typedef struct _KBLR_CALLBACK_REMOVE {
+typedef struct _KBLR_CALLBACK_OPERATION {
 	CallbackType CallbackType;
-	ULONG_PTR RoutineIdentifier;
-} KBLR_CALLBACK_REMOVE, * PKBLR_CALLBACK_REMOVE;
-#pragma pack(pop)
+	union {
+		ULONG_PTR RoutineIdentifier;
+	} NotifyRoutine;
+	union {
+		LARGE_INTEGER Cookie;
+	} RegistryCallback;
+	union {
+		PVOID CallbackEntry;
+	} ObjectCallback;
+} KBLR_CALLBACK_OPERATION, * PKBLR_CALLBACK_OPERATION;
 
 typedef struct _ROUTINE_MODULE_INFORMATION {
 	PVOID ModuleBase;
@@ -40,11 +48,34 @@ typedef struct _ROUTINE_MODULE_INFORMATION {
 	CHAR ModuleFullPathName[AUX_KLIB_MODULE_PATH_LEN];
 } ROUTINE_MODULE_INFORMATION, * PROUTINE_MODULE_INFORMATION;
 
-typedef struct _ROUTINE_INFORMATION {
+typedef struct _NOTIFY_ROUTINE {
 	ULONG_PTR Handle;
 	PVOID PointerToHandle;
 	PVOID Routine;
-	ROUTINE_MODULE_INFORMATION ModuleInformation;
+} NOTIFY_ROUTINE, * PNOTIFY_ROUTINE;
+
+typedef struct _REGISTRY_CALLBACK {
+	LARGE_INTEGER Cookie;
+	PVOID Routine;
+} REGISTRY_CALLBACK, * PREGISTRY_CALLBACK;
+
+typedef struct _OBJECT_CALLBACK {
+	PVOID CallbackEntry;
+	ObjectCallbackType Type;
+	OB_OPERATION Operation;
+	BOOL Enabled;
+	PVOID PreOperation;
+	PVOID PostOperation;
+} OBJECT_CALLBACK, * POBJECT_CALLBACK;
+
+typedef struct _ROUTINE_INFORMATION {
+	ROUTINE_MODULE_INFORMATION FirstModuleInformation;
+	ROUTINE_MODULE_INFORMATION SecondModuleInformation;
+	union {
+		NOTIFY_ROUTINE NotifyRoutine;
+		REGISTRY_CALLBACK RegistryCallback;
+		OBJECT_CALLBACK ObjectCallback;
+	} SpecificRoutineInformation;
 } ROUTINE_INFORMATION, * PROUTINE_INFORMATION;
 
 typedef struct _KBLR_NOTIFY_ROUTINE_ARRAY_INFORMATION {
@@ -62,6 +93,35 @@ typedef struct _CMREG_CALLBACK {
 	PEX_CALLBACK_FUNCTION Function;
 } CMREG_CALLBACK, * PCMREG_CALLBACK;
 
+// 0xd8 bytes (sizeof) - Win10 22h2 (build 19045) to Win11 23h2
+// This struct can be used in Win11 24h2 as long as the members past
+// CallbackList are not used. 24h2 has two more members past CallbasList,
+// namely ...
+typedef struct _OBJECT_TYPE_23H2 {
+	LIST_ENTRY TypeList;
+	UNICODE_STRING Name;
+	VOID* DefaultObject;
+	UCHAR Index;
+	ULONG TotalNumberOfObjects;
+	ULONG TotalNumberOfHandles;
+	ULONG HighWaterNumberOfObjects;
+	ULONG HighWaterNumberOfHandles;
+	UCHAR TypeInfo_gap[0x78]; /* struct _OBJECT_TYPE_INITIALIZER */
+	EX_PUSH_LOCK TypeLock;
+	ULONG Key;
+	LIST_ENTRY CallbackList;
+} OBJECT_TYPE_23H2, * POBJECT_TYPE_23H2;
+
+typedef struct _OB_CALLBACK_ENTRY {
+	LIST_ENTRY CallbackList;
+	OB_OPERATION Operations;
+	BOOL Enabled;
+	struct OB_CALLBACK* Entry;
+	POBJECT_TYPE ObjectType;
+	POB_PRE_OPERATION_CALLBACK PreOperation;
+	POB_POST_OPERATION_CALLBACK PostOperation;
+	KSPIN_LOCK Lock;
+} OB_CALLBACK_ENTRY, * POB_CALLBACK_ENTRY;
 
 
 
@@ -110,5 +170,3 @@ typedef struct _CALLBACK_ENTRY_ITEM {
 	__int64 unk;
 } CALLBACK_ENTRY_ITEM, * PCALLBACK_ENTRY_ITEM;
 */
-
-//PVOID KBlaster_k_GetCallbackStoragePointer(IN CALLBACK_TYPE cType);

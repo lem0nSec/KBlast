@@ -9,33 +9,34 @@
 
 
 KBL_COMMAND KblModuleProtection[] = {
-	{L"wintcb (/type) ",			L"Enable PPL full(wintcb)",			0},
-	{L"lsa (/type) ",			L"Enable PPL light(lsa)",			0},
-	{L"antimalware (/type) ",	L"Enable PPL light(antimalware)",	0},
-	{L"none (/type) ",			L"Disable PPL",						0}
+	{L"wintcb (/type) ",			L"Enable PPL full(wintcb)"},
+	{L"lsa (/type) ",			L"Enable PPL light(lsa)"},
+	{L"antimalware (/type) ",	L"Enable PPL light(antimalware)"},
+	{L"none (/type) ",			L"Disable PPL"}
 };
 
 KBL_COMMAND KblModuleToken[] = {
-	{L"enablepriv (/action)",		L"Enable all privileges for a given process",		0},
-	{L"disablepriv (/action)",		L"Disable all privileges for a given process",		0},
-	{L"steal (/action)",			L"Steal token and give it to a given process",		0},
-	{L"restore (/action)",			L"Restore the original token of a given process",	0}
+	{L"enablepriv (/action)",		L"Enable all privileges for a given process"},
+	{L"disablepriv (/action)",		L"Disable all privileges for a given process"},
+	{L"steal (/action)",			L"Steal token and give it to a given process"},
+	{L"restore (/action)",			L"Restore the original token of a given process"}
 };
 
 KBL_COMMAND KblModuleCallback[] = {
-	{L"process (/type)",	L"Process creation kernel callbacks",	0},
-	{L"thread (/type)",		L"Thread creation kernel callbacks",	0},
-	{L"image (/type)",		L"Image loading kernel callbacks",		0},
-	{L"registry (/type)",	L"Registry kernel callbacks",			0}
+	{L"process (/type)",	L"Process creation kernel callbacks"},
+	{L"thread (/type)",		L"Thread creation kernel callbacks"},
+	{L"image (/type)",		L"Image loading kernel callbacks"},
+	{L"registry (/type)",	L"Registry kernel callbacks"},
+	{L"object (/type)",	L"Object kernel callbacks"}
 };
 
 KBL_COMMAND KblModuleProcess[] = {
-	{L"terminate (/action)",	L"Terminate process",	0}
+	{L"terminate (/action)",	L"Terminate process"}
 };
 
 KBL_COMMAND KblModuleMisc[] = {
-	{L"bsod (/action)",		L"Guess what this command does",	0},
-	{L"memory (/action)",	L"Memory Read/Write (unsafe)",		0}
+	{L"bsod (/action)",		L"Guess what this command does"},
+	{L"memory (/action)",	L"Memory Read/Write (unsafe)"}
 };
 
 static 
@@ -442,12 +443,31 @@ BOOL Kblast_device_IoctlCallback(int argc, wchar_t* input)
 
 	KBL_MODULE_COMMANDLINE Arguments = { 0 };
 	
-	KBLR_CALLBACK CallbackRequest = { ProcessNotify, 0 };
+	KBLR_CALLBACK_OPERATION CallbackRequest = { ProcessNotify, 0 };
 	PKBLR_NOTIFY_ROUTINE_ARRAY_INFORMATION pRoutineInformation = 0;
 
 	DWORD IoControlCode = 0;
 	SIZE_T szOutputBuffer = 0;
 	DWORD i = 0;
+
+	char PsProcessType[] = "Process";
+	char PsThreadType[] = "Thread";
+	char ExDesktopObjectType[] = "Desktop";
+	char OpCreate[] = "Create";
+	char OpDuplicate[] = "Duplicate";
+	char OpBoth[] = "Create | Duplicate";
+	char Undefined[] = "Undefined";
+	PCSTR ObjectType = 0;
+	PCSTR Operation = 0;
+	PCSTR FirstModuleName = 0;
+	PCSTR SecondModuleName = 0;
+	ULONG64 FirstModuleOffset = 0;
+	ULONG64 SecondModuleOffset = 0;
+	PVOID pCallbackEntry = 0;
+	PVOID PreOperation = 0;
+	PVOID PostOperation = 0;
+	BOOL Enabled = FALSE;
+
 
 	status = Kblast_string_ParseCommandline(input, &Arguments);
 	if (!status) {
@@ -469,7 +489,7 @@ BOOL Kblast_device_IoctlCallback(int argc, wchar_t* input)
 	if (!strcmp(Arguments.Commandline.Action, "list")) {
 		IoControlCode = KBLASTER_IOCTL_CALLBACK_ENUM;
 		Arguments.Commandline.Value = 0;
-		szOutputBuffer = 0x1000;
+		szOutputBuffer = 0x5000;
 
 		pRoutineInformation = static_cast<PKBLR_NOTIFY_ROUTINE_ARRAY_INFORMATION>(VirtualAlloc(NULL, szOutputBuffer, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE));
 		if (!pRoutineInformation) {
@@ -492,61 +512,158 @@ BOOL Kblast_device_IoctlCallback(int argc, wchar_t* input)
 		CallbackRequest.CallbackType = ThreadNotify;
 	}
 	else if (!strcmp(Arguments.Commandline.Type, "image")) {
-		CallbackRequest.CallbackType = ImageLoad;
+		CallbackRequest.CallbackType = ImageNotify;
 	}
 	else if (!strcmp(Arguments.Commandline.Type, "registry")) {
 		CallbackRequest.CallbackType = RegistryCallback;
 	}
 	else if (!strcmp(Arguments.Commandline.Type, "object")) {
-		CallbackRequest.CallbackType = ObjectCallback;
+		CallbackRequest.CallbackType = ObjectCallbacks;
 	}
 	else if (!strcmp(Arguments.Commandline.Type, "filter")) {
 		CallbackRequest.CallbackType = FilterCallback;
 	}
 	else if (!strcmp(Arguments.Commandline.Type, "network")) {
-		CallbackRequest.CallbackType = NetworkCallout;
+		CallbackRequest.CallbackType = NetworkCallback;
 	}
 	else {
 		goto Exit;
 	}
 
-	CallbackRequest.hRoutine = (ULONG_PTR)Arguments.Commandline.Value;
-
+	if (IoControlCode == KBLASTER_IOCTL_CALLBACK_REMOVE) {
+		if (
+			(CallbackRequest.CallbackType == ProcessNotify) ||
+			(CallbackRequest.CallbackType == ThreadNotify) ||
+			(CallbackRequest.CallbackType == ImageNotify)
+			) {
+			CallbackRequest.NotifyRoutine.RoutineIdentifier = (ULONG_PTR)Arguments.Commandline.Value;
+		}
+		else if (CallbackRequest.CallbackType == RegistryCallback) {
+			CallbackRequest.RegistryCallback.Cookie.QuadPart = (LONGLONG)Arguments.Commandline.Value;
+		}
+		else if (CallbackRequest.CallbackType == ObjectCallbacks) {
+			CallbackRequest.ObjectCallback.CallbackEntry = Arguments.Commandline.Value;
+		}
+	}
+	
 	status = Kblast_p_device_SubmitIoctlRequest(
 		IoControlCode,
 		&CallbackRequest,
-		sizeof(KBLR_CALLBACK),
+		sizeof(KBLR_CALLBACK_OPERATION),
 		pRoutineInformation,
 		(DWORD)szOutputBuffer
 	);
 
-	if (IoControlCode == KBLASTER_IOCTL_CALLBACK_ENUM) {
-		if (!pRoutineInformation->NumberOfRoutines) {
-			PRINT_ERR_FULL(L"Routines unavailable");
-			status = FALSE;
-			goto Exit;
-		}
+	if (!status) {
+		PRINT_ERR_FULL(L"Callback operation failed.");
+		goto Exit;
+	}
 
+	if (IoControlCode == KBLASTER_IOCTL_CALLBACK_ENUM) {
 		if (!strcmp(Arguments.Commandline.Type, "process") ||
 			!strcmp(Arguments.Commandline.Type, "thread") ||
 			(!strcmp(Arguments.Commandline.Type, "image"))) {
 			for (i = 0; i < pRoutineInformation->NumberOfRoutines; i++) {
 				printf("[+] 0x%I64x\t--> 0x%-016p\t- %s\t+ 0x%I64x\n",
-					pRoutineInformation->RoutineInformation[i].Handle,
-					pRoutineInformation->RoutineInformation[i].Routine,
-					Kblast_string_GetImageNameByFullPath(pRoutineInformation->RoutineInformation[i].ModuleInformation.ModuleFullPathName),
-					(ULONG64)(ULONG_PTR)Sub2Ptr(pRoutineInformation->RoutineInformation[i].Routine, pRoutineInformation->RoutineInformation[i].ModuleInformation.ModuleBase)
+					pRoutineInformation->RoutineInformation[i].SpecificRoutineInformation.NotifyRoutine.Handle,
+					pRoutineInformation->RoutineInformation[i].SpecificRoutineInformation.NotifyRoutine.Routine,
+					Kblast_string_GetImageNameByFullPath(pRoutineInformation->RoutineInformation[i].FirstModuleInformation.ModuleFullPathName),
+					(ULONG64)(ULONG_PTR)Sub2Ptr(pRoutineInformation->RoutineInformation[i].SpecificRoutineInformation.NotifyRoutine.Routine, pRoutineInformation->RoutineInformation[i].FirstModuleInformation.ModuleBase)
 				);
 			}
 		}
 		else if (!strcmp(Arguments.Commandline.Type, "registry")) {
 			for (i = 0; i < pRoutineInformation->NumberOfRoutines; i++) {
 				printf("[+] 0x%I64x\t--> 0x%-016p\t- %s\t+ 0x%I64x\n",
-					pRoutineInformation->RoutineInformation[i].Handle,
-					pRoutineInformation->RoutineInformation[i].Routine,
-					Kblast_string_GetImageNameByFullPath(pRoutineInformation->RoutineInformation[i].ModuleInformation.ModuleFullPathName),
-					(ULONG64)(ULONG_PTR)Sub2Ptr(pRoutineInformation->RoutineInformation[i].Routine, pRoutineInformation->RoutineInformation[i].ModuleInformation.ModuleBase)
+					pRoutineInformation->RoutineInformation[i].SpecificRoutineInformation.RegistryCallback.Cookie.QuadPart,
+					pRoutineInformation->RoutineInformation[i].SpecificRoutineInformation.RegistryCallback.Routine,
+					Kblast_string_GetImageNameByFullPath(pRoutineInformation->RoutineInformation[i].FirstModuleInformation.ModuleFullPathName),
+					(ULONG64)(ULONG_PTR)Sub2Ptr(pRoutineInformation->RoutineInformation[i].SpecificRoutineInformation.RegistryCallback.Routine, pRoutineInformation->RoutineInformation[i].FirstModuleInformation.ModuleBase)
 				);
+			}
+		}
+		else if (!strcmp(Arguments.Commandline.Type, "object")) {
+			for (i = 0; i < pRoutineInformation->NumberOfRoutines; i++) {
+				switch (pRoutineInformation->RoutineInformation[i].SpecificRoutineInformation.ObjectCallback.Type)
+				{
+				case ProcessType:
+					ObjectType = PsProcessType;
+					break;
+				case ThreadType:
+					ObjectType = PsThreadType;
+					break;
+				case DesktopType:
+					ObjectType = ExDesktopObjectType;
+					break;
+				default:
+					ObjectType = Undefined;
+					break;
+				}
+
+				switch (pRoutineInformation->RoutineInformation[i].SpecificRoutineInformation.ObjectCallback.Operation)
+				{
+				case 1:
+					Operation = OpCreate;
+					break;
+				case 2:
+					Operation = OpDuplicate;
+					break;
+				case 3:
+					Operation = OpBoth;
+					break;
+				default:
+					Operation = Undefined;
+					break;
+				}
+
+				pCallbackEntry = pRoutineInformation->RoutineInformation[i].SpecificRoutineInformation.ObjectCallback.CallbackEntry;
+				Enabled = pRoutineInformation->RoutineInformation[i].SpecificRoutineInformation.ObjectCallback.Enabled;
+				PreOperation = pRoutineInformation->RoutineInformation[i].SpecificRoutineInformation.ObjectCallback.PreOperation;
+				PostOperation = pRoutineInformation->RoutineInformation[i].SpecificRoutineInformation.ObjectCallback.PostOperation;
+				if (pRoutineInformation->RoutineInformation[i].FirstModuleInformation.ModuleBase) {
+					FirstModuleName = Kblast_string_GetImageNameByFullPath(pRoutineInformation->RoutineInformation[i].FirstModuleInformation.ModuleFullPathName);
+					FirstModuleOffset = (ULONG64)(ULONG_PTR)Sub2Ptr(PreOperation, pRoutineInformation->RoutineInformation[i].FirstModuleInformation.ModuleBase);
+				}
+				else {
+					FirstModuleName = "";
+				}
+				if (pRoutineInformation->RoutineInformation[i].SecondModuleInformation.ModuleBase) {
+					SecondModuleName = Kblast_string_GetImageNameByFullPath(pRoutineInformation->RoutineInformation[i].SecondModuleInformation.ModuleFullPathName);
+					SecondModuleOffset = (ULONG64)(ULONG_PTR)Sub2Ptr(PostOperation, pRoutineInformation->RoutineInformation[i].SecondModuleInformation.ModuleBase);
+				}
+				else {
+					SecondModuleName = "";
+				}
+				
+				printf(
+					"[+] Entry: 0x%-016p\n\t\t"
+					"* Type\t\t: %s\n\t\t"
+					"* Enabled\t: %d\n\t\t"
+					"* Operation\t: %s\n\t\t"
+					"* PreOperation\t: 0x%-016p\t - %s\t+ 0x%I64x\n\t\t"
+					"* PostOperation\t: 0x%-016p\t - %s\t+ 0x%I64x\n",
+					pCallbackEntry,
+					ObjectType,
+					Enabled,
+					Operation,
+					PreOperation,
+					FirstModuleName,
+					FirstModuleOffset,
+					PostOperation,
+					SecondModuleName,
+					SecondModuleOffset
+				);
+
+				pCallbackEntry = 0;
+				Enabled = 0;
+				Operation = 0;
+				PreOperation = 0;
+				PostOperation = 0;
+				FirstModuleName = 0;
+				FirstModuleOffset = 0;
+				SecondModuleName = 0;
+				SecondModuleOffset = 0;
+
 			}
 		}
 	}

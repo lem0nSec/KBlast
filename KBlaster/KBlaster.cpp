@@ -132,7 +132,6 @@ void KBlaster_main_Unload(
 
 	IoDeleteDevice(DriverObject->DeviceObject);
 	IoDeleteSymbolicLink(&symlink);
-
 	return;
 }
 

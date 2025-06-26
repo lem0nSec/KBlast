@@ -228,6 +228,19 @@ PVOID Kblast_string_StringToPointer(_In_ LPCSTR StringPointer)
 	return (void*)(uintptr_t)val;
 }
 
+const char* Kblast_string_GetImageNameByFullPath(_In_ const char* FullImagePath) {
+	const char* filename = strrchr(FullImagePath, '\\');
+	
+	if (filename == NULL) {
+		filename = FullImagePath; // No backslash found, assume full_path is the filename
+	}
+	else {
+		filename++; // Move past the '\'
+	}
+	return filename;
+}
+
+/*
 char* Kblast_string_GetImageNameByFullPath(_In_ char* FullImagePath)
 {
 	BYTE separator = 0x5C;
@@ -243,6 +256,7 @@ char* Kblast_string_GetImageNameByFullPath(_In_ char* FullImagePath)
 
 	return (char*)((DWORD_PTR)FullImagePath + i + 1);
 }
+*/
 
 BOOL Kblast_string_ConvertStringToHexBlob(
 	_In_ LPCSTR StringBlob,

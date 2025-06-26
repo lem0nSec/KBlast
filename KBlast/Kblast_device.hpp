@@ -11,6 +11,8 @@
 #include "../KBlaster/ioctl.hpp"
 
 
+typedef ULONG OB_OPERATION;
+
 typedef enum _PROTECTION_OPTION {
 	ProtectionWintcb,
 	ProtectionLsa,
@@ -41,19 +43,31 @@ typedef struct _KLBR_TOKEN {
 typedef enum {
 	ProcessNotify,
 	ThreadNotify,
-	ImageLoad,
+	ImageNotify,
 	RegistryCallback,
-	ObjectCallback,
+	ObjectCallbacks,
 	FilterCallback,
-	NetworkCallout
+	NetworkCallback
 } CallbackType;
 
-#pragma pack(push, 1)
-typedef struct _KBLR_CALLBACK {
+typedef enum {
+	ProcessType,
+	ThreadType,
+	DesktopType
+} ObjectCallbackType;
+
+typedef struct _KBLR_CALLBACK_OPERATION {
 	CallbackType CallbackType;
-	ULONG_PTR hRoutine;
-} KBLR_CALLBACK, * PKBLR_CALLBACK;
-#pragma pack(pop)
+	union {
+		ULONG_PTR RoutineIdentifier;
+	} NotifyRoutine;
+	union {
+		LARGE_INTEGER Cookie;
+	} RegistryCallback;
+	union {
+		PVOID CallbackEntry;
+	} ObjectCallback;
+} KBLR_CALLBACK_OPERATION, * PKBLR_CALLBACK_OPERATION;
 
 typedef struct _ROUTINE_MODULE_INFORMATION {
 	PVOID ModuleBase;
@@ -62,11 +76,34 @@ typedef struct _ROUTINE_MODULE_INFORMATION {
 	CHAR ModuleFullPathName[256]; // AUX_KLIB_MODULE_PATH_LEN
 } ROUTINE_MODULE_INFORMATION, * PROUTINE_MODULE_INFORMATION;
 
-typedef struct _ROUTINE_INFORMATION {
+typedef struct _NOTIFY_ROUTINE {
 	ULONG_PTR Handle;
 	PVOID PointerToHandle;
 	PVOID Routine;
-	ROUTINE_MODULE_INFORMATION ModuleInformation;
+} NOTIFY_ROUTINE, * PNOTIFY_ROUTINE;
+
+typedef struct _REGISTRY_CALLBACK {
+	LARGE_INTEGER Cookie;
+	PVOID Routine;
+} REGISTRY_CALLBACK, * PREGISTRY_CALLBACK;
+
+typedef struct _OBJECT_CALLBACK {
+	PVOID CallbackEntry;
+	ObjectCallbackType Type;
+	OB_OPERATION Operation;
+	BOOL Enabled;
+	PVOID PreOperation;
+	PVOID PostOperation;
+} OBJECT_CALLBACK, * POBJECT_CALLBACK;
+
+typedef struct _ROUTINE_INFORMATION {
+	ROUTINE_MODULE_INFORMATION FirstModuleInformation;
+	ROUTINE_MODULE_INFORMATION SecondModuleInformation;
+	union {
+		NOTIFY_ROUTINE NotifyRoutine;
+		REGISTRY_CALLBACK RegistryCallback;
+		OBJECT_CALLBACK ObjectCallback;
+	} SpecificRoutineInformation;
 } ROUTINE_INFORMATION, * PROUTINE_INFORMATION;
 
 typedef struct _KBLR_NOTIFY_ROUTINE_ARRAY_INFORMATION {
