@@ -39,7 +39,7 @@ KBlast commands can fall into five 'modules' which must be prepended to the actu
 - process
 - protection (PPL)
 - token (token management)
-- callback (kernel callbacks - Process, Thread, Image, Registry for now)
+- callback (kernel callbacks - Process, Thread, Image, Registry, Object for now)
 - misc (misc functionalities such as R/W)
 
 
