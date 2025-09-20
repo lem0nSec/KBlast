@@ -9,7 +9,7 @@
 __Windows Kernel Offensive Toolset__
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------
-`KBlast` is a small application I built while experimenting with Windows kernel offensive security techniques. I started this project years ago and I add features from time to time. I consider this tool like a 'box' which containes Windows kernel-related security techniques that I decide to translate into code.
+`KBlast` is a small application I built while experimenting with Windows kernel offensive security techniques. I started this project years ago and I add features from time to time. I consider this tool like a 'box' containing Windows kernel-related offensive security techniques.
 
 ```
     __ __ ____  __           __
@@ -31,7 +31,7 @@ __Windows Kernel Offensive Toolset__
 [KBlast] --> !whoami
 ```
 ## How it works
-This tool has two components. `KBlaster.sys` is the application's driver where all central features reside. `KBlast.exe` is the client application, which takes commands and reaches out to Kblaster.
+This tool has two components. `KBlaster.sys` is the application's driver where all central features reside. `KBlast.exe` is the client application taking commands and sending them to the driver.
 
 ## Commands and Features
 KBlast commands can fall into five 'modules' which must be prepended to the actual command (standard commands can be just typed and run right away). Modules can be:
